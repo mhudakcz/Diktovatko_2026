@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+
+# Osobní data a nastavení – nikdy necommitovat
+config.json
+history.db
+diktovatko.log
+exporty/

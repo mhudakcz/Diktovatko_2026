@@ -1,0 +1,11 @@
+faster-whisper>=1.2
+sounddevice>=0.5
+numpy>=2.0
+keyboard>=0.13
+pyperclip>=1.9
+pystray>=0.19
+pillow>=11.0
+pywebview>=6.0
+pycaw>=20240316
+comtypes>=1.4
+httpx>=0.27
