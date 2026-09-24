@@ -49,6 +49,8 @@ DEFAULT_CONFIG = {
     # Během nahrávání ztlumit ostatní aplikace (Spotify, videa…) na tento podíl hlasitosti (0 = úplně)
     "duck_audio": True,
     "duck_level": 0.1,
+    # Jednou za pár hodin se podívat na GitHub, jestli nevyšla nová verze
+    "check_updates": True,
 }
 
 
@@ -132,7 +134,7 @@ def validate(cfg):
         out["model"] = d["model"]
     if out["ui_language"] not in UI_LANGUAGES:
         out["ui_language"] = d["ui_language"]
-    for k in ("sounds", "trailing_space", "history", "store_titles", "overlay", "duck_audio"):
+    for k in ("sounds", "trailing_space", "history", "store_titles", "overlay", "duck_audio", "check_updates"):
         out[k] = bool(out[k])
     try:
         out["duck_level"] = max(0.0, min(1.0, float(out["duck_level"])))

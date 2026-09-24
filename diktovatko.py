@@ -27,6 +27,7 @@ import config
 import history
 import i18n
 import plat
+import updater
 from i18n import t
 from version import VERSION
 
@@ -38,6 +39,8 @@ SAMPLE_RATE = 16000
 MAX_RECORDING_SECONDS = 15 * 60  # zapomenuté nahrávání v režimu Přepínat se samo ukončí
 PRUNE_EVERY_SECONDS = 6 * 3600
 SUPPORT_URL = "https://ko-fi.com/michalhudak"
+UPDATE_EVERY_SECONDS = 6 * 3600
+UPDATE_FIRST_DELAY = 30  # první kontrola chvíli po startu, ať nezdržuje načítání
 
 # Log se rotuje (max. 3 × 1 MB) a nikdy neobsahuje nadiktovaný text, jen délky a časy.
 _handler = logging.handlers.RotatingFileHandler(LOG_PATH, maxBytes=1_000_000, backupCount=2, encoding="utf-8")
@@ -228,6 +231,8 @@ class App:
         self.overlay = None  # vytváří se jen jednou, vypnutí se řeší přes nastavení
         self.ducker = None
         self.reload_engine = False
+        self.update = None  # {"version", "notes", "url"}, když je na GitHubu novější verze
+        self._notified = None
         self._stopping = False
         self.stream = None
         self.window_proc = None
@@ -254,6 +259,11 @@ class App:
                     lambda _: t("menu.hotkey", keys=", ".join(hotkey_label(h) for h in self.cfg["hotkeys"])),
                     None,
                     enabled=False,
+                ),
+                pystray.MenuItem(
+                    lambda _: t("menu.update", v=self.update["version"]) if self.update else "",
+                    lambda: threading.Thread(target=self.install_update, daemon=True).start(),
+                    visible=lambda _: bool(self.update),
                 ),
                 pystray.Menu.SEPARATOR,
                 pystray.MenuItem(tr("menu.history"), lambda: self.open_window("history"), default=True),
@@ -453,6 +463,7 @@ class App:
             if time.time() - last_prune > PRUNE_EVERY_SECONDS:
                 last_prune = time.time()
                 self._prune()
+            self._handle_update_request()
             try:
                 mtime = config.CONFIG_PATH.stat().st_mtime
                 if mtime == self.config_mtime:
@@ -506,11 +517,78 @@ class App:
         self.set_state("idle")
         return True
 
+    # --- aktualizace ------------------------------------------------------------
+    def _update_loop(self):
+        time.sleep(UPDATE_FIRST_DELAY)
+        while True:
+            if self.cfg["check_updates"]:
+                self.check_update()
+            time.sleep(UPDATE_EVERY_SECONDS)
+
+    def check_update(self):
+        try:
+            self.update = updater.check()
+            updater.write_state(latest=self.update, checked=datetime.now().isoformat(timespec="minutes"))
+        except Exception:
+            log.warning("Kontrola aktualizací se nepovedla", exc_info=True)
+            updater.write_state(latest=self.update, error=True)
+            return
+        plat.run_on_main(self.icon.update_menu)
+        if self.update and self._notified != self.update["version"]:
+            self._notified = self.update["version"]
+            log.info("Je k dispozici verze %s", self.update["version"])
+            self._notify(t("notify.update.body", v=self.update["version"]), t("notify.update.title"))
+
+    def _notify(self, text, title="Diktovátko"):
+        try:
+            self.icon.notify(text, title)
+        except Exception:
+            log.info("Systémové oznámení nejde zobrazit: %s", text)
+
+    def _handle_update_request(self):
+        if not updater.REQUEST_FILE.exists():
+            return
+        try:
+            action = updater.REQUEST_FILE.read_text(encoding="utf-8").strip()
+        finally:
+            updater.REQUEST_FILE.unlink(missing_ok=True)
+        if action == "check":
+            self.check_update()
+        elif action == "install":
+            threading.Thread(target=self.install_update, daemon=True).start()
+
+    def install_update(self):
+        if updater.is_dev_checkout():
+            self._notify(t("notify.dev"))
+            return
+        if not self.update:
+            self.check_update()
+            if not self.update:
+                return
+        version = self.update["version"]
+        with self.lock:
+            if self.state in ("recording", "transcribing"):
+                return  # aktualizace nepřeruší rozpracované diktování, uživatel to zkusí znovu
+            self.set_state("loading")
+        self._notify(t("notify.updating", v=version))
+        try:
+            updater.install(version)
+        except Exception:
+            log.exception("Aktualizace na %s selhala", version)
+            self.set_state("idle")
+            self._notify(t("notify.update.fail"))
+            return
+        updater.write_state(latest=None, installed=version)
+        updater.restart()
+        self.quit()
+
     # --- běh ---------------------------------------------------------------
     def _init(self, icon):
         icon.visible = True
         self._prune()
         threading.Thread(target=self._watch_config, daemon=True).start()
+        threading.Thread(target=self._update_loop, daemon=True).start()
+        updater.write_state(latest=None)
         if not self._load_engine():
             return
         self.hotkeys.set_hotkeys(self.cfg["hotkeys"])
@@ -549,6 +627,8 @@ class App:
 
 
 if __name__ == "__main__":
+    if "--after-update" in sys.argv:
+        time.sleep(3)  # předchozí instance se po aktualizaci ještě ukončuje
     plat.init_process()
     try:
         App().run()

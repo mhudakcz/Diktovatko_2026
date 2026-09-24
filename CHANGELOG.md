@@ -2,6 +2,12 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.10.0 – 2026-09-24
+
+- Automatické aktualizace: aplikace jednou za 6 hodin zkontroluje GitHub Releases, při nové verzi zobrazí upozornění a v menu ikony i v Nastavení → Aktualizace nabídne „Aktualizovat“. Aktualizace stáhne novou verzi, ponechá nastavení, klíč i historii, doinstaluje nové knihovny a aplikaci restartuje.
+- Nastavení → Aktualizace: nainstalovaná verze, popis novinek, tlačítka Zkontrolovat a Aktualizovat teď, volba automatické kontroly.
+- Vývojová kopie z gitu se aktualizací nepřepisuje.
+
 ## 0.9.2 – 2026-09-24
 
 - Žluté tlačítko „☕ Podpořit“ v horní liště všech stránek (web i návod, CZ, EN, DE) vede rovnou na Ko-fi. Je vidět i na telefonu.

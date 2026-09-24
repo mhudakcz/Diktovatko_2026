@@ -14,6 +14,7 @@ import config
 import history
 import i18n
 import plat
+import updater
 from i18n import t
 from version import VERSION
 
@@ -21,7 +22,7 @@ APP_DIR = config.APP_DIR
 UI_REQUEST = APP_DIR / ".ui_request"
 WINDOW_TITLE = "Diktovátko"
 VIEWS = ("history", "stats", "settings")
-URLS = {"groq_keys": "https://console.groq.com/keys"}  # jediné adresy, které okno smí otevřít
+URLS = {"groq_keys": "https://console.groq.com/keys", "releases": updater.RELEASES_URL}  # jediné adresy, které okno smí otevřít
 UI_LANGUAGES = [("cs", "Čeština"), ("en", "English"), ("de", "Deutsch")]  # každý ve svém jazyce
 
 _handler = logging.handlers.RotatingFileHandler(APP_DIR / "okno.log", maxBytes=500_000, backupCount=1, encoding="utf-8")
@@ -113,6 +114,15 @@ class Api:
             log.exception("Automatické spuštění")
             return {"ok": False, "error": t("err.autostart", lang, e=e)}
         return {"ok": True}
+
+    # --- aktualizace (instaluje je tray aplikace, okno jí jen pošle požadavek) ---
+    def update_info(self):
+        return updater.read_state()
+
+    def request_update(self, action):
+        if action in ("check", "install"):
+            updater.REQUEST_FILE.write_text(action, encoding="utf-8")
+        return True
 
     def open_url(self, name):
         import webbrowser

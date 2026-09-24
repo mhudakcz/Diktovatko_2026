@@ -78,6 +78,7 @@ header h1 { margin: 0; font: 700 24px/1.1 var(--display); letter-spacing: -0.02e
 .btn:hover { border-color: var(--muted); }
 .btn svg { width: 14px; height: 14px; }
 .btn.primary { background: var(--ultra); border-color: var(--ultra); color: #fff; }
+.notes { white-space: pre-wrap; margin: 8px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--fog); font: 13px/1.5 var(--body); color: var(--ink-2); max-height: 220px; overflow: auto; }
 .btn.danger { color: #B42318; border-color: color-mix(in srgb, #B42318 40%, var(--line)); }
 .btn.danger:hover { background: #B42318; color: #fff; }
 .split { display: inline-flex; }
@@ -334,6 +335,16 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
           <div><div class="t" data-i18n="set.ui.t">Jazyk okna, menu a indikátoru</div><div class="d" data-i18n="set.ui.d"></div></div>
           <select class="field" id="ui-language"></select>
         </div>
+      </section>
+
+      <section class="card" id="upd-card">
+        <h2 data-i18n="set.upd.h">Aktualizace</h2>
+        <div class="row">
+          <div><div class="t" id="upd-status"></div><div class="d" id="upd-detail"></div></div>
+          <div class="inline"><button type="button" class="btn" id="upd-check" data-i18n="set.upd.check">Zkontrolovat</button><button type="button" class="btn primary" id="upd-install" data-i18n="set.upd.install" hidden>Aktualizovat teď</button></div>
+        </div>
+        <div class="row" id="upd-notes-row" hidden style="display:block"><div class="t" data-i18n="set.upd.notes">Co je nového</div><pre class="notes" id="upd-notes"></pre></div>
+        <div class="row"><div><div class="t" data-i18n="set.upd.auto">Automaticky kontrolovat aktualizace</div><div class="d" data-i18n="set.upd.autoD"></div></div><label class="switch"><input type="checkbox" id="check-updates"><span></span></label></div>
       </section>
 
       <div class="savebar"><button type="button" class="btn primary" id="save">Uložit nastavení</button><span class="msg" id="save-msg"></span></div>
@@ -597,6 +608,21 @@ function keyText(hk) {
 }
 function keyName(p) { return I18N[LANG].keys?.[p] || KEY_NAMES[p] || p.toUpperCase(); }
 function caps(hk) { return hk.split("+").map((p) => `<kbd>${esc(keyName(p))}</kbd>`).join(""); }
+function renderUpdate(u) {
+  const latest = u.latest;
+  $("upd-status").textContent = latest ? t("set.upd.available", { v: latest.version }) : t("set.upd.current", { v: u.current });
+  $("upd-detail").textContent = u.dev ? t("set.upd.dev") : latest ? t("set.upd.availableD") : u.error ? t("set.upd.error") : u.checked ? t("set.upd.uptodate") : "";
+  $("upd-install").hidden = !latest || u.dev;
+  $("upd-notes-row").hidden = !latest || !latest.notes;
+  $("upd-notes").textContent = latest ? latest.notes : "";
+}
+async function waitUpdateInfo(prev) {
+  for (let i = 0; i < 20; i++) {
+    await new Promise((r) => setTimeout(r, 500));
+    const u = await api().update_info();
+    if (JSON.stringify(u) !== prev) return renderUpdate(u);
+  }
+}
 async function loadSettings() {
   state.settings = await api().get_settings();
   const { config: c, presets, languages, models, autostart, platform, ui_languages } = state.settings;
@@ -619,6 +645,8 @@ async function loadSettings() {
   $("groq-remove").hidden = !state.settings.has_key;
   $("hist-days").innerHTML = state.settings.history_days.map((d) => `<option value="${d}" ${c.history_days === d ? "selected" : ""}>${d ? t("set.days", { n: d }) : t("set.forever")}</option>`).join("");
   $("titles").checked = c.store_titles;
+  $("check-updates").checked = c.check_updates;
+  renderUpdate(await api().update_info());
   $("prompt").value = c.initial_prompt || "";
   $("duck").checked = c.duck_audio; $("duck-level").value = Math.round(c.duck_level * 100); duckLabel();
   $("overlay").checked = c.overlay; $("sounds").checked = c.sounds; $("trailing").checked = c.trailing_space; $("hist").checked = c.history;
@@ -650,6 +678,13 @@ $("groq-show").onclick = () => { const i = $("groq"); const show = i.type === "p
 $("groq-link").onclick = () => api().open_url("groq_keys");
 $("groq").addEventListener("input", () => { state.keyAction = $("groq").value.trim() ? "set" : "keep"; });
 $("groq-remove").onclick = () => { state.keyAction = "remove"; $("groq").value = ""; $("groq").placeholder = t("set.groq.willRemove"); setDirty(true); };
+$("upd-check").onclick = async () => {
+  const prev = JSON.stringify(await api().update_info());
+  $("upd-detail").textContent = t("set.upd.checking");
+  await api().request_update("check");
+  waitUpdateInfo(prev);
+};
+$("upd-install").onclick = async () => { await api().request_update("install"); $("upd-detail").textContent = t("set.upd.installing"); $("upd-install").hidden = true; };
 $("clear-history").onclick = async () => {
   if (!confirm(t("confirm.clear"))) return;
   const n = await api().clear_history();
@@ -661,7 +696,7 @@ $("save").onclick = async () => {
   const hotkeys = chosenHotkey() ? [chosenHotkey()] : [];
   const cfg = {
     hotkeys, mode: $("mode").dataset.v, language: $("language").value || null, model: $("model").value,
-    initial_prompt: $("prompt").value.trim(), history_days: +$("hist-days").value, store_titles: $("titles").checked,
+    initial_prompt: $("prompt").value.trim(), history_days: +$("hist-days").value, store_titles: $("titles").checked, check_updates: $("check-updates").checked,
     duck_audio: $("duck").checked, duck_level: +$("duck-level").value / 100,
     overlay: $("overlay").checked, sounds: $("sounds").checked, trailing_space: $("trailing").checked, history: $("hist").checked,
     ui_language: $("ui-language").value,

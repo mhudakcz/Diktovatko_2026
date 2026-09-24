@@ -14,3 +14,5 @@ okno.log*
 exporty/
 .ui_request
 .ducked.json
+.update.json
+.update_request
