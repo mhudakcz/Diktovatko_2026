@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Diktovátko</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Okno nic nenačítá z internetu (písma jsou systémová) a skripty smí jen místní. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <style>
 :root {
   --fog: #EEF1F5; --paper: #FFFFFF; --ink: #1B2230; --ink-2: #4A5366; --muted: #7B8496;
@@ -79,6 +78,8 @@ header h1 { margin: 0; font: 700 24px/1.1 var(--display); letter-spacing: -0.02e
 .btn:hover { border-color: var(--muted); }
 .btn svg { width: 14px; height: 14px; }
 .btn.primary { background: var(--ultra); border-color: var(--ultra); color: #fff; }
+.btn.danger { color: #B42318; border-color: color-mix(in srgb, #B42318 40%, var(--line)); }
+.btn.danger:hover { background: #B42318; color: #fff; }
 .split { display: inline-flex; }
 .split .btn:first-child { border-radius: 8px 0 0 8px; }
 .split select { border: 1px solid var(--line); border-left: 0; border-radius: 0 8px 8px 0; background: var(--paper); padding: 0 6px; font-size: 13px; cursor: pointer; }
@@ -298,7 +299,7 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
         </div>
         <div class="row">
           <div><div class="t" data-i18n="set.groq.t">Groq API klíč</div><div class="d"><span data-i18n="set.groq.d"></span> <button type="button" class="link" id="groq-link" data-i18n="set.groq.link">Získat klíč zdarma</button></div></div>
-          <div class="inline"><input class="field" id="groq" type="password" autocomplete="off" placeholder="gsk_…"><button type="button" class="btn" id="groq-show" data-i18n="set.groq.show">Zobrazit</button></div>
+          <div class="inline"><input class="field" id="groq" type="password" autocomplete="off" spellcheck="false" placeholder="gsk_…"><button type="button" class="btn" id="groq-show" data-i18n="set.groq.show">Zobrazit</button><button type="button" class="btn" id="groq-remove" data-i18n="set.groq.remove" hidden>Smazat klíč</button></div>
         </div>
         <div class="row">
           <div><div class="t" data-i18n="set.model.t">Lokální model</div><div class="d" data-i18n="set.model.d">Používá se, když není vyplněný Groq klíč. Při první změně se model stáhne.</div></div>
@@ -321,6 +322,9 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
         <div class="row"><div><div class="t" data-i18n="set.sounds.t">Pípnutí při startu a konci nahrávání</div></div><label class="switch"><input type="checkbox" id="sounds"><span></span></label></div>
         <div class="row"><div><div class="t" data-i18n="set.trailing.t">Mezera za vloženým textem</div><div class="d" data-i18n="set.trailing.d">Hodí se, když diktujete po kouscích.</div></div><label class="switch"><input type="checkbox" id="trailing"><span></span></label></div>
         <div class="row"><div><div class="t" data-i18n="set.hist.t">Ukládat historii</div><div class="d" data-i18n="set.hist.d">Text, čas a okno se ukládají jen do vašeho počítače.</div></div><label class="switch"><input type="checkbox" id="hist"><span></span></label></div>
+        <div class="row"><div><div class="t" data-i18n="set.titles.t">Ukládat názvy oken</div><div class="d" data-i18n="set.titles.d"></div></div><label class="switch"><input type="checkbox" id="titles"><span></span></label></div>
+        <div class="row"><div><div class="t" data-i18n="set.days.t">Jak dlouho historii uchovávat</div><div class="d" data-i18n="set.days.d"></div></div><select class="field" id="hist-days"></select></div>
+        <div class="row"><div><div class="t" data-i18n="set.clear.t">Smazat celou historii</div><div class="d" data-i18n="set.clear.d"></div></div><button type="button" class="btn danger" id="clear-history" data-i18n="set.clear.btn">Smazat historii</button></div>
         <div class="row"><div><div class="t" id="autostart-t">Spouštět po přihlášení</div></div><label class="switch"><input type="checkbox" id="autostart"><span></span></label></div>
       </section>
 
@@ -341,6 +345,7 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
   <span class="count" id="selcount"></span>
   <button class="go" id="copy-text" data-i18n="bar.copyText">Kopírovat text</button>
   <button id="copy-meta" data-i18n="bar.copyMeta">Kopírovat s časem a oknem</button>
+  <button id="delete-sel" data-i18n="bar.delete">Smazat</button>
   <button id="clear" data-i18n="bar.clear">Zrušit výběr</button>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -368,12 +373,12 @@ const api = () => window.pywebview.api;
 function appLabel(exe) { return APP_NAMES[(exe || "").toLowerCase()] || (exe || t("app.unknown")).replace(/\.exe$/i, ""); }
 function appColor(exe) { let h = 0; for (const ch of (exe || "").toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return PALETTE[h % PALETTE.length]; }
 function cleanTitle(t) { t = t || ""; for (const re of TITLE_SUFFIXES) t = t.replace(re, ""); return t; }
-function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 function highlight(s) {
-  const safe = esc(s);
-  if (!state.q) return safe;
-  const re = new RegExp(esc(state.q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
-  return safe.replace(re, (m) => `<mark>${m}</mark>`);
+  s = String(s ?? "");
+  if (!state.q) return esc(s);
+  const re = new RegExp("(" + state.q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi");
+  return s.split(re).map((part, i) => (i % 2 ? `<mark>${esc(part)}</mark>` : esc(part))).join("");
 }
 function dayLabel(iso) {
   const d = new Date(iso + "T00:00:00"), today = new Date(); today.setHours(0, 0, 0, 0);
@@ -506,7 +511,18 @@ $("list").addEventListener("click", (e) => {
 $("copy-text").onclick = () => copyRows(selectedRows(), false);
 $("copy-meta").onclick = () => copyRows(selectedRows(), true);
 $("clear").onclick = () => { state.selected.clear(); renderList(); renderBar(); };
-$("export").onclick = async () => { const n = await api().export(periodKey(), state.q, $("fmt").value); toast(t("toast.exported", { records: tp("record", n) })); };
+$("delete-sel").onclick = async () => {
+  const ids = [...state.selected];
+  if (!ids.length || !confirm(t("confirm.delete", { records: tp("record", ids.length) }))) return;
+  const n = await api().delete_entries(ids);
+  state.selected.clear();
+  toast(t("toast.deleted", { records: tp("record", n) }));
+  loadHistory();
+};
+$("export").onclick = async () => {
+  const r = await api().export(periodKey(), state.q, $("fmt").value);
+  toast(r.ok ? t("toast.exported", { records: tp("record", r.count) }) : t("toast.exportFail"));
+};
 
 /* ---------------- statistiky ---------------- */
 async function loadStats() {
@@ -519,6 +535,7 @@ async function loadStats() {
   $("stats-sub").textContent = s.first_use
     ? t("stats.since", { date: new Date(s.first_use + "T00:00:00").toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" }) })
     : t("stats.empty");
+  state.daily = s.daily;
   renderChart(s.daily);
   const max = Math.max(1, ...s.apps.map((a) => a.words));
   $("appbars").innerHTML = s.apps.length
@@ -570,7 +587,8 @@ function renderChart(daily) {
 }
 function niceCeil(v) { const p = 10 ** Math.floor(Math.log10(v)); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p; return 10 * p; }
 function roundTop(x, base, w, h, r) { return `M${x},${base} V${base - h + r} Q${x},${base - h} ${x + r},${base - h} H${x + w - r} Q${x + w},${base - h} ${x + w},${base - h + r} V${base} Z`; }
-window.addEventListener("resize", () => { if (state.view === "stats") loadStats(); });
+let resizeTimer;
+window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (state.view === "stats" && state.daily) renderChart(state.daily); }, 120); });
 
 /* ---------------- nastavení ---------------- */
 function keyText(hk) {
@@ -595,7 +613,12 @@ async function loadSettings() {
   setSeg(c.mode);
   $("language").innerHTML = languages.map(([v, l]) => `<option value="${v ?? ""}" ${(c.language ?? "") === (v ?? "") ? "selected" : ""}>${l}</option>`).join("");
   $("model").innerHTML = models.map(([v, l]) => `<option value="${v}" ${c.model === v ? "selected" : ""}>${l}</option>`).join("");
-  $("groq").value = c.groq_api_key || "";
+  state.keyAction = "keep";
+  $("groq").value = "";
+  $("groq").placeholder = state.settings.has_key ? t("set.groq.saved") : "gsk_…";
+  $("groq-remove").hidden = !state.settings.has_key;
+  $("hist-days").innerHTML = state.settings.history_days.map((d) => `<option value="${d}" ${c.history_days === d ? "selected" : ""}>${d ? t("set.days", { n: d }) : t("set.forever")}</option>`).join("");
+  $("titles").checked = c.store_titles;
   $("prompt").value = c.initial_prompt || "";
   $("duck").checked = c.duck_audio; $("duck-level").value = Math.round(c.duck_level * 100); duckLabel();
   $("overlay").checked = c.overlay; $("sounds").checked = c.sounds; $("trailing").checked = c.trailing_space; $("hist").checked = c.history;
@@ -624,26 +647,34 @@ function duckLabel() { const v = +$("duck-level").value; $("duck-val").textConte
 $("mode").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && b.dataset.v !== $("mode").dataset.v) { setSeg(b.dataset.v); setDirty(true); } });
 $("duck-level").addEventListener("input", duckLabel);
 $("groq-show").onclick = () => { const i = $("groq"); const show = i.type === "password"; i.type = show ? "text" : "password"; $("groq-show").textContent = show ? t("set.groq.hide") : t("set.groq.show"); };
-$("groq-link").onclick = () => api().open_url("https://console.groq.com/keys");
+$("groq-link").onclick = () => api().open_url("groq_keys");
+$("groq").addEventListener("input", () => { state.keyAction = $("groq").value.trim() ? "set" : "keep"; });
+$("groq-remove").onclick = () => { state.keyAction = "remove"; $("groq").value = ""; $("groq").placeholder = t("set.groq.willRemove"); setDirty(true); };
+$("clear-history").onclick = async () => {
+  if (!confirm(t("confirm.clear"))) return;
+  const n = await api().clear_history();
+  toast(t("toast.deleted", { records: tp("record", n) }));
+};
 $("save").onclick = async () => {
   if ($("save").classList.contains("saved")) return;
   $("save").disabled = true; $("save").textContent = t("set.saving");
   const hotkeys = chosenHotkey() ? [chosenHotkey()] : [];
   const cfg = {
     hotkeys, mode: $("mode").dataset.v, language: $("language").value || null, model: $("model").value,
-    groq_api_key: $("groq").value.trim(), initial_prompt: $("prompt").value.trim(),
+    initial_prompt: $("prompt").value.trim(), history_days: +$("hist-days").value, store_titles: $("titles").checked,
     duck_audio: $("duck").checked, duck_level: +$("duck-level").value / 100,
     overlay: $("overlay").checked, sounds: $("sounds").checked, trailing_space: $("trailing").checked, history: $("hist").checked,
     ui_language: $("ui-language").value,
   };
   const langChanged = cfg.ui_language !== state.settings.config.ui_language;
   let res;
-  try { res = await api().save_settings(cfg, $("autostart").checked); }
+  try { res = await api().save_settings(cfg, $("autostart").checked, state.keyAction, $("groq").value.trim()); }
   catch (e) { res = { ok: false, error: t("set.saveFail", { e }) }; }
   $("save").disabled = false;
   if (res.ok) {
     state.settings.config = { ...state.settings.config, ...cfg };
-    if (langChanged) { await initLang(); loadSettings(); }
+    if (langChanged) await initLang();
+    await loadSettings();
     setDirty(false, new Date().toLocaleTimeString(locale(), { hour: "2-digit", minute: "2-digit" }));
     toast(t("toast.saved"));
   } else {
@@ -665,7 +696,7 @@ document.addEventListener("keydown", (e) => {
 });
 async function checkPending() {
   const v = await api().pending_view();
-  if (v && v !== state.view) showView(v);
+  if (v && v !== state.view && ["history", "stats", "settings"].includes(v)) showView(v);
   else if (state.view === "history") loadHistory();
   else if (state.view === "stats") loadStats();
 }

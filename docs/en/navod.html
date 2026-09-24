@@ -191,7 +191,7 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
   <article>
     <h1>Step-by-step guide</h1>
     <p class="lede">From installation to your first dictated sentence. You don't need any technical skills, just follow the steps one by one.</p>
-    <p class="meta">This guide is for <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">version 0.8.2</a>. Use the switch at the top to choose <b>Windows</b> or <b>Mac</b>, and the guide adjusts to match.</p>
+    <p class="meta">This guide is for <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">version 0.9.0</a>. Use the switch at the top to choose <b>Windows</b> or <b>Mac</b>, and the guide adjusts to match.</p>
 
     <div class="tldr">
       <h2 class="tldr-h">In short</h2>
@@ -350,7 +350,7 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
         <li><b>Offline on your computer</b> works right away with no sign-up. But the first time you use it, about 1.6 GB is downloaded, and transcription takes roughly as long as the recording itself.</li>
         <li><b>Through the Groq service</b> it's done in a second. For that you need <b>your own free key</b>.</li>
       </ul>
-      <div class="note"><p><b>Every user needs their own key.</b> The key is like a password to your Groq account. Diktovátko stores it only on your computer (in the <code>config.json</code> file) and never shares it. Don't send the key to anyone and don't paste it anywhere public.</p></div>
+      <div class="note"><p><b>Every user needs their own key.</b> The key is like a password to your Groq account. Diktovátko stores it only on your computer, in the system password vault (Credential Manager on Windows, Keychain on Mac), and never shares it. Don't send the key to anyone and don't paste it anywhere public.</p></div>
       <h3>How to get a key</h3>
       <ol class="steps">
         <li><div>Open <a href="https://console.groq.com/keys">console.groq.com/keys</a>.</div></li>
@@ -456,7 +456,7 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
       <h3>Updating to a new version</h3>
       <ol class="steps">
         <li><div>Quit Diktovátko: icon → <b>Quit</b>.</div></li>
-        <li><div>Download the new <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">ZIP</a> and copy its contents over the old folder. The files <code>config.json</code> (settings and key) and <code>history.db</code> (history) aren't overwritten because they aren't in the ZIP.</div></li>
+        <li><div>Download the new <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">ZIP</a> and copy its contents over the old folder. The files <code>config.json</code> (settings) and <code>history.db</code> (history) aren't overwritten because they aren't in the ZIP. The key stays in the system vault.</div></li>
         <li><div>Run <code class="win">install.bat</code><code class="mac">install.command</code> again and then <code class="win">start.bat</code><code class="mac">start.command</code>.</div></li>
       </ol>
       <h3>Uninstalling</h3>

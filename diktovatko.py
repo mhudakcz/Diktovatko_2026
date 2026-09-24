@@ -6,6 +6,7 @@ se vloží tam, kde máte kurzor.
 
 import io
 import logging
+import logging.handlers
 import os
 import re
 import subprocess
@@ -17,7 +18,6 @@ from collections import deque
 from datetime import datetime
 
 import numpy as np
-import pyperclip
 import pystray
 import sounddevice as sd
 from PIL import Image, ImageDraw
@@ -34,13 +34,15 @@ LOG_PATH = APP_DIR / "diktovatko.log"
 UI_REQUEST = APP_DIR / ".ui_request"
 WINDOW_TITLE = "Diktovátko"
 SAMPLE_RATE = 16000
+MAX_RECORDING_SECONDS = 15 * 60  # zapomenuté nahrávání v režimu Přepínat se samo ukončí
+PRUNE_EVERY_SECONDS = 6 * 3600
 
-logging.basicConfig(
-    filename=LOG_PATH,
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s",
-    encoding="utf-8",
-)
+# Log se rotuje (max. 3 × 1 MB) a nikdy neobsahuje nadiktovaný text, jen délky a časy.
+_handler = logging.handlers.RotatingFileHandler(LOG_PATH, maxBytes=1_000_000, backupCount=2, encoding="utf-8")
+_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+logging.basicConfig(level=logging.INFO, handlers=[_handler])
+if sys.platform != "win32":
+    os.chmod(LOG_PATH, 0o600)
 log = logging.getLogger("diktovatko")
 
 
@@ -69,31 +71,61 @@ def status_text(state):
     return t("status." + state)
 
 
+def hotkey_label(hk):
+    return i18n.hotkey_label(hk, HOTKEY_LABELS.get(hk, hk))
+
+
+class GroqError(Exception):
+    """Chyba služby Groq s krátkým klíčem hlášky pro uživatele (overlay.*)."""
+
+    def __init__(self, message_key, detail=""):
+        super().__init__(detail or message_key)
+        self.message_key = message_key
+
+
 class Transcriber:
     def __init__(self, cfg):
         self.cfg = cfg
         self.model = None
         self.model_name = None
+        self.active_engine = None  # "groq" nebo název lokálního modelu, který je právě připravený
+        self._http = None
+        self._lock = threading.Lock()
+
+    def uses_groq(self):
+        return bool(config.groq_key(self.cfg))
+
+    def wanted_engine(self):
+        return "groq" if self.uses_groq() else self.cfg["model"]
+
+    def needs_reload(self):
+        return self.wanted_engine() != self.active_engine
 
     def load(self):
-        if config.groq_key(self.cfg):
+        if self.uses_groq():
             log.info("Používám Groq API (%s)", self.cfg["groq_model"])
+            self.active_engine = "groq"
             return
-        if self.model is not None and self.model_name == self.cfg["model"]:
-            return
-        from faster_whisper import WhisperModel
+        with self._lock:
+            if self.model is not None and self.model_name == self.cfg["model"]:
+                self.active_engine = self.model_name
+                return
+            from faster_whisper import WhisperModel
 
-        log.info("Načítám lokální model %s…", self.cfg["model"])
-        self.model = WhisperModel(
-            self.cfg["model"], device="cpu", compute_type="int8", cpu_threads=os.cpu_count() or 4
-        )
-        self.model_name = self.cfg["model"]
-        log.info("Model načten")
+            log.info("Načítám lokální model %s…", self.cfg["model"])
+            self.model = WhisperModel(
+                self.cfg["model"], device="cpu", compute_type="int8", cpu_threads=os.cpu_count() or 4
+            )
+            self.model_name = self.cfg["model"]
+            self.active_engine = self.model_name
+            log.info("Model načten")
 
     def transcribe(self, audio):
-        if config.groq_key(self.cfg):
+        if self.uses_groq():
             # Groq přijme soubor do 25 MB (~13 min WAV), delší nahrávku dělíme v tichém místě.
-            return " ".join(t for t in (self._groq(part) for part in split_audio(audio)) if t)
+            return " ".join(x for x in (self._groq(part) for part in split_audio(audio)) if x)
+        if self.model is None or self.model_name != self.cfg["model"]:
+            self.load()  # např. klíč byl smazán během přepisu – model nahrajeme teď
         segments, _ = self.model.transcribe(
             audio,
             language=self.cfg["language"],
@@ -103,6 +135,13 @@ class Transcriber:
             condition_on_previous_text=False,
         )
         return "".join(s.text for s in segments).strip()
+
+    def _client(self):
+        import httpx
+
+        if self._http is None:  # jedno spojení pro všechna diktování (bez nového TLS handshaku)
+            self._http = httpx.Client(timeout=httpx.Timeout(60, connect=10))
+        return self._http
 
     def _groq(self, audio):
         import httpx
@@ -118,13 +157,19 @@ class Transcriber:
             data["language"] = self.cfg["language"]
         if self.cfg["initial_prompt"]:
             data["prompt"] = self.cfg["initial_prompt"]
-        r = httpx.post(
-            "https://api.groq.com/openai/v1/audio/transcriptions",
-            headers={"Authorization": f"Bearer {config.groq_key(self.cfg)}"},
-            files={"file": ("audio.wav", buf.getvalue(), "audio/wav")},
-            data=data,
-            timeout=60,
-        )
+        try:
+            r = self._client().post(
+                "https://api.groq.com/openai/v1/audio/transcriptions",
+                headers={"Authorization": f"Bearer {config.groq_key(self.cfg)}"},
+                files={"file": ("audio.wav", buf.getvalue(), "audio/wav")},
+                data=data,
+            )
+        except httpx.HTTPError as e:
+            raise GroqError("overlay.offline", type(e).__name__) from e
+        if r.status_code in (401, 403):
+            raise GroqError("overlay.bad_key", f"HTTP {r.status_code}")
+        if r.status_code == 429:
+            raise GroqError("overlay.rate_limit", "HTTP 429")
         r.raise_for_status()
         return r.json()["text"].strip()
 
@@ -155,34 +200,18 @@ def has_speech(audio, threshold=0.012, min_voiced=0.25):
     return (rms > threshold).sum() * 0.05 >= min_voiced
 
 
-# Věty, které si Whisper vymýšlí z ticha (naučil se je z titulků a videí).
+# Věty, které si Whisper vymýšlí z ticha (naučil se je z titulků a videí). Zahazujeme je,
+# jen když tvoří celý přepis – skutečné diktování se slovy "děkuji za pozornost" projde.
 HALLUCINATIONS = re.compile(
-    r"titulky (vytvořil|připravil|pro vás)|www\.|děkuji za (pozornost|sledování)|"
-    r"subtitles by|thanks for watching|amara\.org|^\W*$",
+    r"^\W*(titulky (vytvořil|připravil|pro vás)\b.*|děkuji za (pozornost|sledování)|"
+    r"subtitles by\b.*|thanks for watching!?|untertitel (im auftrag des zdf|von)\b.*|"
+    r"amara\.org.*)?\W*$",
     re.IGNORECASE,
 )
 
 
 def is_hallucination(text):
-    return bool(HALLUCINATIONS.search(text)) and len(text) < 80
-
-
-def paste_text(text):
-    """Vloží text do aktivního okna přes schránku a pak schránku obnoví."""
-    try:
-        previous = pyperclip.paste()
-    except Exception:
-        previous = None
-    pyperclip.copy(text)
-    time.sleep(0.05)
-    plat.paste()
-    time.sleep(0.3)
-    if previous is not None:
-        pyperclip.copy(previous)
-
-
-def hotkey_label(hk):
-    return i18n.hotkey_label(hk, HOTKEY_LABELS.get(hk, hk))
+    return bool(HALLUCINATIONS.match(text))
 
 
 class App:
@@ -194,12 +223,14 @@ class App:
         self.state = "loading"
         self.chunks = []
         self.levels = deque(maxlen=40)
-        self.overlay = None
+        self.overlay = None  # vytváří se jen jednou, vypnutí se řeší přes nastavení
         self.ducker = None
-        self._apply_extras()
+        self.reload_engine = False
+        self._stopping = False
         self.stream = None
         self.window_proc = None
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
+        self._ensure_extras()
         self.hotkeys = plat.hotkey_manager(self.on_hotkey_press, self.on_hotkey_release, self.on_hotkey_interrupt)
 
         # Texty položek jsou funkce, aby se po změně jazyka v nastavení přeložily bez restartu.
@@ -233,29 +264,40 @@ class App:
             ),
         )
 
-    def _apply_extras(self):
+    def _ensure_extras(self):
         if self.cfg["overlay"] and self.overlay is None:
             self.overlay = plat.overlay(lambda: list(self.levels))
-        elif not self.cfg["overlay"] and self.overlay is not None:
+        if self.ducker is None:
+            self.ducker = plat.audio_ducker(self.cfg["duck_level"])
+            self.ducker.restore_leftover()  # hlasitost ztlumená před pádem aplikace se vrátí
+        self.ducker.level = self.cfg["duck_level"]
+        if not self.cfg["duck_audio"]:
+            self.ducker.restore()
+
+    def _show(self, state, message=""):
+        if self.overlay and self.cfg["overlay"]:
+            self.overlay.show(state, message)
+        elif self.overlay:
             self.overlay.hide()
-            self.overlay = None
-        if self.cfg["duck_audio"]:
-            if self.ducker is None:
-                self.ducker = plat.audio_ducker(self.cfg["duck_level"])
-            self.ducker.level = self.cfg["duck_level"]
-        else:
-            self.ducker = None
 
     def set_state(self, state):
         self.state = state
-        self.icon.icon = ICONS[state]
-        self.icon.title = f"Diktovátko – {status_text(state)}"
-        self.icon.update_menu()
-        if self.overlay:
-            if state in ("recording", "transcribing"):
-                self.overlay.show(state)
-            else:
-                self.overlay.hide()
+
+        def ui():
+            self.icon.icon = ICONS[state]
+            self.icon.title = f"Diktovátko – {status_text(state)}"
+            self.icon.update_menu()
+
+        plat.run_on_main(ui)  # na macOS smí UI měnit jen hlavní vlákno
+        if state in ("recording", "transcribing"):
+            self._show(state)
+        elif self.overlay:
+            self.overlay.hide()
+
+    def _error(self, message_key):
+        if self.cfg["sounds"]:
+            plat.beep("error")
+        self._show("error", t(message_key))
 
     # --- nahrávání ---------------------------------------------------------
     def _audio_callback(self, indata, frames, time_info, status):
@@ -263,6 +305,10 @@ class App:
         self.chunks.append(mono)
         rms = float(np.sqrt(np.mean(mono**2)))
         self.levels.append(min(1.0, (rms * 14) ** 0.8))
+        if len(self.chunks) * 800 >= MAX_RECORDING_SECONDS * SAMPLE_RATE and not self._stopping:
+            self._stopping = True
+            log.info("Nahrávání ukončeno po %d minutách", MAX_RECORDING_SECONDS // 60)
+            threading.Thread(target=self.stop_recording, daemon=True).start()
 
     def start_recording(self):
         with self.lock:
@@ -270,29 +316,39 @@ class App:
                 return
             self.chunks = []
             self.levels.clear()
+            self._stopping = False
             self.started_at = datetime.now()
             try:
                 self.target = plat.foreground_window()
+                self.target_id = plat.foreground_id()
             except Exception:
                 log.exception("Nepodařilo se zjistit aktivní okno")
-                self.target = ("", "")
-            self.stream = sd.InputStream(
-                samplerate=SAMPLE_RATE, channels=1, dtype="float32", blocksize=800,
-                callback=self._audio_callback,
-            )
-            self.stream.start()
-            if self.ducker:
+                self.target, self.target_id = ("", ""), None
+            try:
+                self.stream = sd.InputStream(
+                    samplerate=SAMPLE_RATE, channels=1, dtype="float32", blocksize=800,
+                    callback=self._audio_callback,
+                )
+                self.stream.start()
+            except Exception:
+                log.exception("Mikrofon není dostupný")
+                self.stream = None
+                self._error("overlay.no_mic")
+                return
+            if self.cfg["duck_audio"]:
                 self.ducker.duck()
             self.set_state("recording")
         if self.cfg["sounds"]:
             plat.beep("start")
 
     def _close_stream(self):
-        self.stream.stop()
-        self.stream.close()
+        try:
+            self.stream.stop()
+            self.stream.close()
+        except Exception:
+            log.exception("Nepodařilo se zavřít mikrofon")
         self.stream = None
-        if self.ducker:
-            self.ducker.restore()
+        self.ducker.restore()
 
     def stop_recording(self):
         with self.lock:
@@ -300,12 +356,11 @@ class App:
                 return
             self._close_stream()
             self.set_state("transcribing")
+            audio = np.concatenate(self.chunks) if self.chunks else np.zeros(0, dtype=np.float32)
+            job = (audio, self.started_at, self.target, self.target_id)
         if self.cfg["sounds"]:
             plat.beep("stop")
-        audio = np.concatenate(self.chunks) if self.chunks else np.zeros(0, dtype=np.float32)
-        threading.Thread(
-            target=self._process, args=(audio, self.started_at, self.target), daemon=True
-        ).start()
+        threading.Thread(target=self._process, args=job, daemon=True).start()
 
     def abort_recording(self):
         """Zkratka byla jen součástí jiné kombinace (např. Ctrl+C) – nahrávku zahodíme."""
@@ -316,8 +371,8 @@ class App:
             self.set_state("idle")
         log.info("Nahrávání zrušeno – během držení zkratky byla stisknuta jiná klávesa")
 
-    def _process(self, audio, started_at, target):
-        failed = False
+    def _process(self, audio, started_at, target, target_id):
+        message = None
         try:
             duration = len(audio) / SAMPLE_RATE
             if duration < 0.3:
@@ -328,26 +383,49 @@ class App:
                 return
             t0 = time.time()
             text = self.transcriber.transcribe(audio)
-            log.info("Přepis %.1fs audia za %.1fs: %r", duration, time.time() - t0, text)
-            if is_hallucination(text):
-                log.info("Zahazuji typickou halucinaci Whisperu: %r", text)
+            log.info("Přepis %.1fs audia za %.1fs, %d znaků", duration, time.time() - t0, len(text))
+            if not text or is_hallucination(text):
+                log.info("Prázdný přepis nebo typická halucinace Whisperu, nic nevkládám")
                 return
-            if text:
-                paste_text(text + (" " if self.cfg["trailing_space"] else ""))
-                if self.cfg["history"]:
-                    engine = "groq" if config.groq_key(self.cfg) else self.cfg["model"]
-                    history.save(started_at, text, target[0], target[1], duration, engine)
+            pasted = self.paste(text + (" " if self.cfg["trailing_space"] else ""), target_id)
+            if not pasted:
+                message = "overlay.copied"
+            if self.cfg["history"]:
+                engine = "groq" if self.transcriber.uses_groq() else self.cfg["model"]
+                title = target[1] if self.cfg["store_titles"] else ""
+                history.save(started_at, text, target[0], title, duration, engine)
+        except GroqError as e:
+            log.warning("Groq: %s", e)
+            message = e.message_key
         except Exception:
             log.exception("Přepis selhal")
-            failed = True
-            if self.cfg["sounds"]:
-                plat.beep("error")
+            message = "overlay.failed"
         finally:
             self.set_state("idle")
-            if failed and self.overlay:
-                self.overlay.show("error", t("overlay.failed"))
+            if message == "overlay.copied":
+                self._show("error", t(message, paste=plat.PASTE_HINT))
+            elif message:
+                self._error(message)
+            self._maybe_reload_engine()
 
-    # --- zkratky -------------------------------------------------------------
+    def paste(self, text, target_id):
+        """Vloží text přes schránku. Když se mezitím změnilo aktivní okno, jen ho nechá ve schránce."""
+        if target_id is not None and plat.foreground_id() != target_id:
+            log.info("Aktivní okno se během přepisu změnilo, text zůstává ve schránce")
+            plat.set_clipboard(text)
+            return False
+        previous = plat.get_clipboard()  # None = ve schránce nebyl text (obrázek, soubor) – neobnovujeme
+        plat.set_clipboard(text)
+        seq = plat.clipboard_seq()
+        plat.wait_modifiers_released()  # držený Win/Ctrl by z Ctrl+V udělal jinou zkratku
+        plat.paste()
+        # Pomalejší aplikace (Electron, vzdálená plocha) čtou schránku se zpožděním.
+        time.sleep(0.8)
+        if previous is not None and plat.clipboard_seq() == seq:
+            plat.set_clipboard(previous, private=False)
+        return True
+
+    # --- zkratky (volá je jedno vlákno správce zkratek, v pořadí stisků) ----------------------
     def on_hotkey_press(self, hk):
         if self.state == "idle":
             self.start_recording()
@@ -364,32 +442,56 @@ class App:
     # --- nastavení -------------------------------------------------------------
     def _watch_config(self):
         """Změny z okna nastavení (nebo ručně v config.json) se projeví bez restartu."""
+        last_prune = 0.0
         while True:
             time.sleep(1)
+            if time.time() - last_prune > PRUNE_EVERY_SECONDS:
+                last_prune = time.time()
+                self._prune()
             try:
                 mtime = config.CONFIG_PATH.stat().st_mtime
                 if mtime == self.config_mtime:
                     continue
                 self.config_mtime = mtime
+                config.invalidate_key_cache()  # klíč mohl změnit proces okna aplikace
                 new = config.load_config()
             except Exception:
                 log.exception("Nepodařilo se načíst config.json")
                 continue
-            engine_changed = (
-                bool(config.groq_key(new)) != bool(config.groq_key(self.cfg)) or new["model"] != self.cfg["model"]
-            )
-            self.cfg.clear()
-            self.cfg.update(new)
-            i18n.set_lang(self.cfg["ui_language"])
-            self._apply_extras()
-            self.hotkeys.set_hotkeys(self.cfg["hotkeys"])
-            self.icon.update_menu()
-            log.info("Nastavení aktualizováno, zkratky: %s (%s)", self.cfg["hotkeys"], self.cfg["mode"])
-            if engine_changed and self.state == "idle":
-                self._load_engine()
+            with self.lock:
+                old = self.cfg
+                # Celý slovník vyměníme naráz, ať ostatní vlákna nikdy nevidí rozpracovaný stav.
+                self.cfg = new
+                self.transcriber.cfg = new
+                if self.transcriber.needs_reload():
+                    self.reload_engine = True
+            i18n.set_lang(new["ui_language"])
+            self._ensure_extras()
+            self.hotkeys.set_hotkeys(new["hotkeys"])
+            plat.run_on_main(self.icon.update_menu)
+            log.info("Nastavení aktualizováno, zkratky: %s (%s)", new["hotkeys"], new["mode"])
+            if new["history_days"] != old["history_days"]:
+                self._prune()
+            self._maybe_reload_engine()
+
+    def _prune(self):
+        try:
+            n = history.prune(self.cfg["history_days"])
+            if n:
+                log.info("Smazáno %d starých záznamů historie", n)
+        except Exception:
+            log.exception("Promazání historie selhalo")
+
+    def _maybe_reload_engine(self):
+        """Změnu přepisu (Groq ↔ lokální model) provedeme, až aplikace nic nenahrává ani nepřepisuje."""
+        with self.lock:
+            if not self.reload_engine or self.state != "idle":
+                return
+            self.reload_engine = False
+            self.set_state("loading")
+        self._load_engine()
 
     def _load_engine(self):
-        self.set_state("loading")
         try:
             self.transcriber.load()
         except Exception:
@@ -402,6 +504,7 @@ class App:
     # --- běh ---------------------------------------------------------------
     def _init(self, icon):
         icon.visible = True
+        self._prune()
         threading.Thread(target=self._watch_config, daemon=True).start()
         if not self._load_engine():
             return
@@ -422,7 +525,7 @@ class App:
         try:
             start, end = history.period_range(period)
             out, n = history.export(start, end, lang=i18n.lang())
-            log.info("Export %s–%s: %d záznamů -> %s", start, end, n, out)
+            log.info("Export %s–%s: %d záznamů", start, end, n)
             plat.open_path(out)
         except Exception:
             log.exception("Export selhal")
@@ -432,8 +535,7 @@ class App:
         plat.open_path(history.EXPORT_DIR)
 
     def quit(self):
-        if self.ducker:
-            self.ducker.restore_now()
+        self.ducker.restore_now()
         self.hotkeys.stop()
         self.icon.stop()
 

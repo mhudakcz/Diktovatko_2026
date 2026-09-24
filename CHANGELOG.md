@@ -2,6 +2,32 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.9.0 – 2026-09-24
+
+Bezpečnostní audit a revize kódu.
+
+**Bezpečnost a soukromí**
+- Groq klíč je v systémovém trezoru hesel (Windows Správce přihlašovacích údajů, macOS Klíčenka), ne v `config.json`. Stávající klíč se přesune automaticky. Do okna aplikace se klíč neposílá.
+- Log neobsahuje nadiktovaný text a rotuje se (max. 3 × 1 MB).
+- Schránka se obnoví až po vložení a jen tehdy, když v ní je pořád náš text. Obrázek nebo soubor ve schránce se nepřepíše prázdným textem.
+- Když uživatel během přepisu přepne okno, text se nevloží do jiného okna, ale zůstane ve schránce s upozorněním.
+- Nadiktovaný text se ve Windows neukládá do historie schránky (Win+V) ani do cloudové schránky. Na Macu je označený jako dočasný.
+- Okno aplikace: bezpečnostní pravidla CSP, žádné písmo z Googlu, otevřít jde jen stránka Groq s klíči, export přijme jen MD a CSV.
+- CSV export je chráněný proti spuštění vzorců z názvů oken v Excelu.
+- Historie: mazání vybraných záznamů i celé historie, automatické mazání starších záznamů, volba neukládat názvy oken.
+- Kontrola všech hodnot nastavení, zamčené verze závislostí, instalátory kontrolují verzi Pythonu.
+- Na Macu mají `config.json`, `history.db` a log práva jen pro vlastníka.
+
+**Spolehlivost a výkon**
+- Stisky zkratek se zpracovávají v jednom vlákně v pořadí, takže se po rychlém ťuknutí nezasekne mikrofon. Ve Windows se ověřuje skutečný stav kláves (po zamčení počítače už nespustí nahrávání samotný Ctrl).
+- Změny nastavení a přepnutí mezi Groq a lokálním modelem jsou ošetřené proti souběhu.
+- Ztlumené aplikace se po pádu při dalším startu vrátí na původní hlasitost.
+- Srozumitelné hlášky při chybě mikrofonu, neplatném klíči, limitu Groq nebo výpadku internetu. Nahrávání se po 15 minutách ukončí samo.
+- Statistiky počítá databáze (sloupec `words`), databáze v režimu WAL, hledání bez ohledu na velikost písmen i s diakritikou.
+- Indikátor vykresluje úsporněji (2× převzorkování, 24 snímků/s). Spojení ke Groq se používá opakovaně.
+- Filtr vymyšlených vět zahodí jen přepis, který je celý vymyšlený. Běžné věty s „děkuji za pozornost“ projdou.
+- Odstraněn zastaralý `autostart.ps1` (automatické spouštění je v nastavení).
+
 ## 0.8.2 – 2026-09-24
 
 - Web: výrazný štítek „0 Kč měsíčně. Bez předplatného, napořád.“ hned nad nadpisem na první obrazovce (CZ, EN, DE).

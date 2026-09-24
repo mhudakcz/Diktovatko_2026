@@ -1,4 +1,4 @@
-"""Lokální historie diktování (SQLite) a export.
+"""Lokální historie diktování (SQLite), statistiky a export.
 
 Použití z příkazové řádky:
     python history.py                          # posledních 30 dní -> Markdown
@@ -9,13 +9,19 @@ Použití z příkazové řádky:
 
 import argparse
 import csv
+import os
 import sqlite3
+import sys
+import threading
+from contextlib import closing, contextmanager
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
 APP_DIR = Path(__file__).resolve().parent
 DB_PATH = APP_DIR / "history.db"
 EXPORT_DIR = APP_DIR / "exporty"
+EXPORT_FORMATS = ("md", "csv")
+MAX_ENTRIES = 2000  # nejvýš tolik záznamů naráz do okna historie
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS dictations (
@@ -25,37 +31,84 @@ CREATE TABLE IF NOT EXISTS dictations (
     app TEXT,                    -- např. chrome.exe, slack.exe (na Macu název aplikace)
     window_title TEXT,           -- titulek okna (záložka, konverzace, dokument)
     audio_seconds REAL,
-    engine TEXT
+    engine TEXT,
+    words INTEGER                -- počet slov, ať statistiky nemusí text znovu počítat
 );
 CREATE INDEX IF NOT EXISTS idx_dictations_ts ON dictations(ts);
 """
 
+_ready = set()
+_ready_lock = threading.Lock()
 
-def connect():
-    con = sqlite3.connect(DB_PATH)
+
+def _init(con):
+    # Musí být jako první, mimo transakci. WAL: tray aplikace i okno historie čtou a zapisují souběžně.
+    con.execute("PRAGMA journal_mode=WAL")
     con.executescript(SCHEMA)
-    return con
+    cols = {r[1] for r in con.execute("PRAGMA table_info(dictations)")}
+    if "words" not in cols:  # starší databáze bez sloupce words
+        con.execute("ALTER TABLE dictations ADD COLUMN words INTEGER")
+    todo = con.execute("SELECT id, text FROM dictations WHERE words IS NULL").fetchall()
+    con.executemany("UPDATE dictations SET words = ? WHERE id = ?", [(_words(t), i) for i, t in todo])
+    con.commit()
+    if sys.platform != "win32":
+        os.chmod(DB_PATH, 0o600)
+
+
+@contextmanager
+def connect():
+    """Otevře databázi (schéma se zakládá jen jednou za běh) a po použití ji zavře."""
+    with closing(sqlite3.connect(DB_PATH, timeout=5)) as con:
+        con.create_function("fold", 1, lambda s: s.casefold() if s else "", deterministic=True)
+        key = str(DB_PATH)
+        if key not in _ready:
+            with _ready_lock:
+                if key not in _ready:
+                    _init(con)
+                    _ready.add(key)
+        with con:
+            yield con
+
+
+def _words(text):
+    return len(text.split())
 
 
 def save(ts, text, app, window_title, audio_seconds, engine):
     with connect() as con:
         con.execute(
-            "INSERT INTO dictations (ts, text, app, window_title, audio_seconds, engine) VALUES (?,?,?,?,?,?)",
-            (ts.isoformat(timespec="seconds"), text, app, window_title, round(audio_seconds, 1), engine),
+            "INSERT INTO dictations (ts, text, app, window_title, audio_seconds, engine, words) VALUES (?,?,?,?,?,?,?)",
+            (ts.isoformat(timespec="seconds"), text, app, window_title, round(audio_seconds, 1), engine, _words(text)),
         )
 
 
-# --- export -------------------------------------------------------------------
-def fetch(date_from, date_to, search=None):
-    sql = "SELECT ts, app, window_title, text FROM dictations WHERE ts >= ? AND ts < ?"
-    params = [date_from.isoformat(), (date_to + timedelta(days=1)).isoformat()]
-    if search:
-        sql += " AND (text LIKE ? OR window_title LIKE ?)"
-        params += [f"%{search}%"] * 2
+def delete(ids):
+    ids = [int(i) for i in ids]
+    if not ids:
+        return 0
     with connect() as con:
-        return con.execute(sql + " ORDER BY ts", params).fetchall()
+        cur = con.execute(f"DELETE FROM dictations WHERE id IN ({','.join('?' * len(ids))})", ids)
+        return cur.rowcount
 
 
+def clear_all():
+    with connect() as con:
+        n = con.execute("DELETE FROM dictations").rowcount
+    with closing(sqlite3.connect(DB_PATH)) as con:
+        con.execute("VACUUM")  # smazaný text nezůstane ve volných stránkách souboru
+    return n
+
+
+def prune(keep_days):
+    """Smaže záznamy starší než keep_days dní (0 = nechat vše)."""
+    if not keep_days:
+        return 0
+    cutoff = (date.today() - timedelta(days=int(keep_days))).isoformat()
+    with connect() as con:
+        return con.execute("DELETE FROM dictations WHERE ts < ?", (cutoff,)).rowcount
+
+
+# --- období ------------------------------------------------------------------------
 PERIODS = [
     ("today", "Dnes"),
     ("7d", "Posledních 7 dní"),
@@ -89,89 +142,111 @@ def period_range(key, today=None):
     return date(2000, 1, 1), today
 
 
+def _query(cols, date_from, date_to, search=None, order="ASC", limit=None):
+    sql = f"SELECT {cols} FROM dictations WHERE ts >= ? AND ts < ?"
+    params = [date_from.isoformat(), (date_to + timedelta(days=1)).isoformat()]
+    if search:
+        # instr + fold: hledání bez ohledu na velikost písmen i u diakritiky, bez zástupných znaků LIKE
+        sql += " AND (instr(fold(text), ?) > 0 OR instr(fold(window_title), ?) > 0)"
+        params += [search.casefold()] * 2
+    sql += f" ORDER BY ts {order}"
+    if limit:
+        sql += f" LIMIT {int(limit)}"
+    return sql, params
+
+
+def fetch(date_from, date_to, search=None):
+    sql, params = _query("ts, app, window_title, text", date_from, date_to, search)
+    with connect() as con:
+        return con.execute(sql, params).fetchall()
+
+
+def fetch_dicts(date_from, date_to, search=None):
+    sql, params = _query("id, ts, app, window_title, text, audio_seconds", date_from, date_to, search, "DESC", MAX_ENTRIES)
+    with connect() as con:
+        con.row_factory = sqlite3.Row
+        return [dict(r) for r in con.execute(sql, params)]
+
+
+# --- statistiky (počítá je databáze, ne Python nad celou historií) --------------------------
 TYPING_WPM = 40  # průměrná rychlost psaní na klávesnici, pro odhad ušetřeného času
-
-
-def _words(text):
-    return len(text.split())
 
 
 def stats(today=None):
     today = today or date.today()
     with connect() as con:
-        rows = con.execute("SELECT ts, app, text, audio_seconds FROM dictations ORDER BY ts").fetchall()
+        def summary(since):
+            where, params = ("WHERE ts >= ?", [since.isoformat()]) if since else ("", [])
+            count, words, chars, secs = con.execute(
+                f"SELECT COUNT(*), COALESCE(SUM(words),0), COALESCE(SUM(LENGTH(text)),0), COALESCE(SUM(audio_seconds),0) "
+                f"FROM dictations {where}", params,
+            ).fetchone()
+            return {
+                "count": count,
+                "words": words,
+                "chars": chars,
+                "audio_seconds": round(secs, 1),
+                "saved_minutes": round(max(0.0, words / TYPING_WPM - secs / 60), 1),
+            }
 
-    def summary(since):
-        sel = [r for r in rows if since is None or r[0][:10] >= since.isoformat()]
-        words = sum(_words(r[2]) for r in sel)
-        secs = sum(r[3] or 0 for r in sel)
-        return {
-            "count": len(sel),
-            "words": words,
-            "chars": sum(len(r[2]) for r in sel),
-            "audio_seconds": round(secs, 1),
-            "saved_minutes": round(max(0.0, words / TYPING_WPM - secs / 60), 1),
-        }
-
-    days = [today - timedelta(days=i) for i in range(29, -1, -1)]
-    per_day = {d.isoformat(): 0 for d in days}
-    for ts, _, text, _ in rows:
-        if ts[:10] in per_day:
-            per_day[ts[:10]] += _words(text)
-
-    apps = {}
-    for _, app, text, _ in rows:
-        a = apps.setdefault(app or "", {"app": app or "", "count": 0, "words": 0})
-        a["count"] += 1
-        a["words"] += _words(text)
-
-    total_words = sum(_words(r[2]) for r in rows)
-    total_secs = sum(r[3] or 0 for r in rows)
-    active_days = sorted({r[0][:10] for r in rows})
-    streak, d = 0, today
-    while d.isoformat() in active_days:
-        streak += 1
-        d -= timedelta(days=1)
-
-    return {
-        "periods": {
+        periods = {
             "today": summary(today),
             "7d": summary(today - timedelta(days=6)),
             "30d": summary(today - timedelta(days=29)),
             "all": summary(None),
-        },
-        "daily": [{"date": k, "words": v} for k, v in per_day.items()],
-        "apps": sorted(apps.values(), key=lambda a: -a["words"])[:8],
-        "first_use": rows[0][0][:10] if rows else None,
+        }
+        start = today - timedelta(days=29)
+        per_day = dict(con.execute(
+            "SELECT substr(ts,1,10), SUM(words) FROM dictations WHERE ts >= ? GROUP BY 1", (start.isoformat(),)
+        ).fetchall())
+        apps = [
+            {"app": a or "", "count": c, "words": w}
+            for a, c, w in con.execute(
+                "SELECT app, COUNT(*), SUM(words) FROM dictations GROUP BY app ORDER BY 3 DESC LIMIT 8"
+            )
+        ]
+        active_days = {r[0] for r in con.execute("SELECT DISTINCT substr(ts,1,10) FROM dictations")}
+        first = con.execute("SELECT MIN(ts) FROM dictations").fetchone()[0]
+
+    streak, d = 0, today
+    while d.isoformat() in active_days:
+        streak += 1
+        d -= timedelta(days=1)
+    total = periods["all"]
+    days = [(start + timedelta(days=i)).isoformat() for i in range(30)]
+    return {
+        "periods": periods,
+        "daily": [{"date": k, "words": per_day.get(k, 0)} for k in days],
+        "apps": apps,
+        "first_use": first[:10] if first else None,
         "active_days": len(active_days),
         "streak": streak,
-        "wpm": round(total_words / (total_secs / 60)) if total_secs > 5 else None,
+        "wpm": round(total["words"] / (total["audio_seconds"] / 60)) if total["audio_seconds"] > 5 else None,
         "typing_wpm": TYPING_WPM,
     }
 
 
-def fetch_dicts(date_from, date_to, search=None):
-    sql = "SELECT id, ts, app, window_title, text, audio_seconds FROM dictations WHERE ts >= ? AND ts < ?"
-    params = [date_from.isoformat(), (date_to + timedelta(days=1)).isoformat()]
-    if search:
-        sql += " AND (text LIKE ? OR window_title LIKE ?)"
-        params += [f"%{search}%"] * 2
-    with connect() as con:
-        con.row_factory = sqlite3.Row
-        return [dict(r) for r in con.execute(sql + " ORDER BY ts DESC", params)]
+# --- export ------------------------------------------------------------------------
+def _csv_safe(value):
+    """Titulek okna nastavuje libovolná webová stránka – buňka začínající =, +, -, @ by se v Excelu spustila jako vzorec."""
+    s = "" if value is None else str(value)
+    return "'" + s if s[:1] in ("=", "+", "-", "@", "\t", "\r") else s
 
 
 def export(date_from, date_to, fmt="md", search=None, lang=None):
     from i18n import t
 
+    if fmt not in EXPORT_FORMATS:
+        raise ValueError(f"Nepodporovaný formát exportu: {fmt!r}")
     rows = fetch(date_from, date_to, search)
     EXPORT_DIR.mkdir(exist_ok=True)
-    out = EXPORT_DIR / f"diktovani_{date_from}_{date_to}.{fmt}"
+    stamp = datetime.now().strftime("%H%M%S")  # další export stejného období nepřepíše ten předchozí
+    out = EXPORT_DIR / f"diktovani_{date_from}_{date_to}_{stamp}.{fmt}"
     if fmt == "csv":
         with out.open("w", newline="", encoding="utf-8-sig") as f:  # BOM kvůli Excelu
             w = csv.writer(f, delimiter=";")
             w.writerow(t("export.csv", lang))
-            w.writerows(rows)
+            w.writerows([[_csv_safe(c) for c in row] for row in rows])
     else:
         lines = [
             "# " + t("export.title", lang, start=date_from, end=date_to),
@@ -196,7 +271,7 @@ def main():
     p.add_argument("--from", dest="date_from", type=date.fromisoformat)
     p.add_argument("--to", dest="date_to", type=date.fromisoformat)
     p.add_argument("--month", help="např. 2026-09")
-    p.add_argument("--format", choices=["md", "csv"], default="md")
+    p.add_argument("--format", choices=EXPORT_FORMATS, default="md")
     p.add_argument("--search", help="hledat v textu nebo titulku okna")
     a = p.parse_args()
 

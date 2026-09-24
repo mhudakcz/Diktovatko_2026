@@ -191,7 +191,7 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
   <article>
     <h1>Anleitung Schritt für Schritt</h1>
     <p class="lede">Von der Installation bis zum ersten diktierten Satz. Sie brauchen keine technischen Kenntnisse, folgen Sie einfach den Schritten der Reihe nach.</p>
-    <p class="meta">Diese Anleitung gilt für <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">Version 0.8.2</a>. Wählen Sie oben, ob Sie <b>Windows</b> oder einen <b>Mac</b> haben. Die Anleitung passt sich daran an.</p>
+    <p class="meta">Diese Anleitung gilt für <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">Version 0.9.0</a>. Wählen Sie oben, ob Sie <b>Windows</b> oder einen <b>Mac</b> haben. Die Anleitung passt sich daran an.</p>
 
     <div class="tldr">
       <h2 class="tldr-h">Kurz gesagt</h2>
@@ -350,7 +350,7 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
         <li><b>Offline auf Ihrem Computer</b> funktioniert sofort und ohne Registrierung. Bei der ersten Nutzung werden aber etwa 1,6 GB heruntergeladen, und die Transkription dauert ungefähr so lange wie die Aufnahme selbst.</li>
         <li><b>Über den Dienst Groq</b> ist sie in einer Sekunde fertig. Dafür brauchen Sie einen <b>eigenen kostenlosen Schlüssel</b>.</li>
       </ul>
-      <div class="note"><p><b>Jeder Nutzer braucht seinen eigenen Schlüssel.</b> Der Schlüssel ist wie ein Passwort für Ihr Groq-Konto. Diktovátko speichert ihn nur auf Ihrem Computer (in der Datei <code>config.json</code>) und gibt ihn nie weiter. Schicken Sie den Schlüssel niemandem und fügen Sie ihn nirgends öffentlich ein.</p></div>
+      <div class="note"><p><b>Jeder Nutzer braucht seinen eigenen Schlüssel.</b> Der Schlüssel ist wie ein Passwort für Ihr Groq-Konto. Diktovátko speichert ihn nur auf Ihrem Computer, im Passwortspeicher des Systems (Anmeldeinformationsverwaltung unter Windows, Schlüsselbund auf dem Mac), und gibt ihn nie weiter. Schicken Sie den Schlüssel niemandem und fügen Sie ihn nirgends öffentlich ein.</p></div>
       <h3>So bekommen Sie einen Schlüssel</h3>
       <ol class="steps">
         <li><div>Öffnen Sie <a href="https://console.groq.com/keys">console.groq.com/keys</a>.</div></li>
@@ -456,7 +456,7 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
       <h3>Auf eine neue Version aktualisieren</h3>
       <ol class="steps">
         <li><div>Beenden Sie Diktovátko: Symbol → <b>Beenden</b>.</div></li>
-        <li><div>Laden Sie die neue <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">ZIP-Datei</a> herunter und kopieren Sie ihren Inhalt über den alten Ordner. Die Dateien <code>config.json</code> (Einstellungen und Schlüssel) und <code>history.db</code> (Verlauf) werden nicht überschrieben, weil sie nicht in der ZIP-Datei sind.</div></li>
+        <li><div>Laden Sie die neue <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">ZIP-Datei</a> herunter und kopieren Sie ihren Inhalt über den alten Ordner. Die Dateien <code>config.json</code> (Einstellungen) und <code>history.db</code> (Verlauf) werden nicht überschrieben, weil sie nicht in der ZIP-Datei sind. Der Schlüssel bleibt im Passwortspeicher des Systems.</div></li>
         <li><div>Starten Sie erneut <code class="win">install.bat</code><code class="mac">install.command</code> und danach <code class="win">start.bat</code><code class="mac">start.command</code>.</div></li>
       </ol>
       <h3>Deinstallieren</h3>

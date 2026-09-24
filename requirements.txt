@@ -1,18 +1,21 @@
-faster-whisper>=1.2
-sounddevice>=0.5
-numpy>=2.0
-pyperclip>=1.9
-pystray>=0.19
-pillow>=11.0
-pywebview>=6.0
-httpx>=0.27
+# Přesné verze, se kterými je Diktovátko vyzkoušené. Nová verze se nainstaluje až po otestování
+# a úpravě tohoto souboru – nový (případně napadený) balíček se tak nedostane k uživatelům sám.
+faster-whisper==1.2.1
+sounddevice==0.5.6
+numpy==2.5.3
+pyperclip==1.11.0
+pystray==0.19.5
+pillow==12.3.0
+pywebview==6.2.1
+httpx==0.28.1
+keyring==25.7.0
 
 # Windows
-keyboard>=0.13; sys_platform == "win32"
-pycaw>=20240316; sys_platform == "win32"
-comtypes>=1.4; sys_platform == "win32"
+keyboard==0.13.5; sys_platform == "win32"
+pycaw==20260921; sys_platform == "win32"
+comtypes==1.4.17; sys_platform == "win32"
 
-# macOS
-pyobjc-framework-Cocoa>=10.0; sys_platform == "darwin"
-pyobjc-framework-Quartz>=10.0; sys_platform == "darwin"
-pyobjc-framework-ApplicationServices>=10.0; sys_platform == "darwin"
+# macOS (verze PyObjC ověříme při ladění Mac verze)
+pyobjc-framework-Cocoa>=11,<13; sys_platform == "darwin"
+pyobjc-framework-Quartz>=11,<13; sys_platform == "darwin"
+pyobjc-framework-ApplicationServices>=11,<13; sys_platform == "darwin"

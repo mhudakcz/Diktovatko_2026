@@ -4,6 +4,13 @@ __pycache__/
 
 # Osobní data a nastavení – nikdy necommitovat
 config.json
+config.tmp
 history.db
-diktovatko.log
+history.db-journal
+history.db-wal
+history.db-shm
+diktovatko.log*
+okno.log*
 exporty/
+.ui_request
+.ducked.json

@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.8.2**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.9.0**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
@@ -82,7 +82,9 @@ Nejjednodušší je nastavovat v okně aplikace (sekce *Nastavení*). Soubor se 
 | `language` | `"cs"` | kód jazyka, nebo `null` pro automatickou detekci |
 | `model` | `"large-v3-turbo"` | lokální model, `small` je rychlejší, ale méně přesný |
 | `initial_prompt` | … | slovník a styl: jména, odborné výrazy |
-| `groq_api_key` | `""` | vlastní klíč z [console.groq.com](https://console.groq.com), jde nastavit i přes proměnnou `GROQ_API_KEY` |
+| `groq_api_key` | `""` | nepoužívá se, klíč se ukládá do trezoru systému v okně Nastavení (jde nastavit i přes proměnnou `GROQ_API_KEY`) |
+| `history_days` | `0` | jak dlouho uchovávat historii ve dnech (`0` = napořád, jinak 30/90/180/365) |
+| `store_titles` | `true` | ukládat do historie i názvy oken |
 | `duck_audio` / `duck_level` | `true` / `0.1` | ztlumení zvuku během nahrávání (Mac ztiší celý výstup) |
 | `overlay` | `true` | plovoucí indikátor nahrávání |
 | `history` | `true` | ukládání historie |
@@ -105,7 +107,14 @@ Na Macu použijte `.venv/bin/python`.
 
 - Při lokálním přepisu nic neopouští počítač.
 - S Groq klíčem se nahrávka posílá na servery Groq (USA). Text ani historie se nikam neposílají.
-- `config.json` (s klíčem), `history.db` a log jsou v `.gitignore`, takže se nedostanou do gitu.
+- Groq klíč je v systémovém trezoru hesel (Správce přihlašovacích údajů / Klíčenka), ne v souboru. Do okna aplikace se neposílá.
+- Log neobsahuje nadiktovaný text, jen délky a časy, a rotuje se (max. 3 MB).
+- Nadiktovaný text se ve Windows neukládá do historie schránky (Win+V) ani do cloudové schránky. Na Macu je označený jako dočasný.
+- Když během přepisu přepnete okno, text se nevloží jinam, ale zůstane ve schránce.
+- Historii jde smazat po záznamech i celou, nastavit automatické mazání starých záznamů a vypnout ukládání názvů oken.
+- Okno aplikace nic nenačítá z internetu a smí otevřít jen stránku Groq s klíči.
+- Závislosti jsou zamčené na vyzkoušené verze (`requirements.txt`).
+- `config.json`, `history.db`, logy a dočasné soubory jsou v `.gitignore`, takže se nedostanou do gitu.
 - Historie je uložená jako čitelný text. Když ji nechcete, vypněte ji v nastavení.
 
 ## Omezení
@@ -124,7 +133,7 @@ Na Macu použijte `.venv/bin/python`.
 | `hotkeys.py` | vyhodnocení zkratek (levá a pravá klávesa, zrušení jinou klávesou), Windows obsluha |
 | `overlay.py` | vykreslení indikátoru a Windows okno. Mac okno je v `platform_mac.py` |
 | `audio_duck.py` | ztlumení aplikací ve Windows |
-| `history.py` | databáze historie, statistiky, export |
+| `history.py` | databáze historie, statistiky, export, mazání a promazávání |
 | `app_window.py`, `ui/app.html` | okno s historií, statistikami a nastavením (pywebview) |
 | `config.py` | načítání a ukládání nastavení |
 | `i18n.py`, `ui/i18n.js` | překlady aplikace (cs, en, de) |

@@ -19,6 +19,7 @@ from pathlib import Path
 from hotkeys import HotkeyCore
 
 log = logging.getLogger("diktovatko")
+STATE_FILE = Path(__file__).resolve().parent / ".ducked.json"
 
 NAME = "macos"
 PASTE_HINT = "Cmd+V"
@@ -80,6 +81,58 @@ def beep(kind):
     )
 
 
+def run_on_main(fn):
+    """AppKit (ikona v liště) smí měnit jen hlavní vlákno."""
+    from PyObjCTools import AppHelper
+
+    AppHelper.callAfter(fn)
+
+
+def foreground_id():
+    from AppKit import NSWorkspace
+
+    app = NSWorkspace.sharedWorkspace().frontmostApplication()
+    return app.processIdentifier() if app else None
+
+
+def set_clipboard(text, private=True):
+    """private=True: označí obsah jako dočasný, aby ho správci schránky neukládali."""
+    from AppKit import NSPasteboard, NSPasteboardTypeString
+
+    pb = NSPasteboard.generalPasteboard()
+    types = [NSPasteboardTypeString]
+    if private:
+        types += ["org.nspasteboard.TransientType", "org.nspasteboard.ConcealedType"]
+    pb.declareTypes_owner_(types, None)
+    pb.setString_forType_(text, NSPasteboardTypeString)
+    for extra in types[1:]:
+        pb.setString_forType_("", extra)
+
+
+def get_clipboard():
+    from AppKit import NSPasteboard, NSPasteboardTypeString
+
+    return NSPasteboard.generalPasteboard().stringForType_(NSPasteboardTypeString)
+
+
+def clipboard_seq():
+    from AppKit import NSPasteboard
+
+    return NSPasteboard.generalPasteboard().changeCount()
+
+
+def wait_modifiers_released(timeout=1.0):
+    import Quartz
+
+    mask = (Quartz.kCGEventFlagMaskCommand | Quartz.kCGEventFlagMaskControl | Quartz.kCGEventFlagMaskAlternate
+            | Quartz.kCGEventFlagMaskShift | Quartz.kCGEventFlagMaskSecondaryFn)
+    end = time.time() + timeout
+    while time.time() < end:
+        if not Quartz.CGEventSourceFlagsState(Quartz.kCGEventSourceStateHIDSystemState) & mask:
+            return
+        time.sleep(0.02)
+
+
 def paste():
     import Quartz
 
@@ -119,10 +172,12 @@ def open_path(path):
 def focus_window(proc, title):
     if proc is None or proc.poll() is not None:
         return False
-    subprocess.Popen([
-        "osascript", "-e",
-        f'tell application "System Events" to set frontmost of (first process whose unix id is {proc.pid}) to true',
-    ])
+    from AppKit import NSRunningApplication
+
+    app = NSRunningApplication.runningApplicationWithProcessIdentifier_(proc.pid)
+    if app is None:
+        return False
+    app.activateWithOptions_(2)  # NSApplicationActivateIgnoringOtherApps, bez oprávnění Automatizace
     return True
 
 
@@ -145,14 +200,19 @@ class MacHotkeyManager(HotkeyCore):
             | Quartz.CGEventMaskBit(Quartz.kCGEventKeyUp)
             | Quartz.CGEventMaskBit(Quartz.kCGEventFlagsChanged)
         )
-        self._tap = Quartz.CGEventTapCreate(
-            Quartz.kCGSessionEventTap, Quartz.kCGHeadInsertEventTap,
-            Quartz.kCGEventTapOptionListenOnly, mask, self._callback, None,
-        )
-        if not self._tap:
-            log.error("Nelze sledovat klávesnici – povolte Diktovátku (Terminálu/Pythonu) "
-                      "Zpřístupnění a Sledování vstupu v Nastavení systému")
-            return
+        warned = False
+        while True:  # dokud uživatel nepovolí oprávnění, zkoušíme to znovu každých 5 s
+            self._tap = Quartz.CGEventTapCreate(
+                Quartz.kCGSessionEventTap, Quartz.kCGHeadInsertEventTap,
+                Quartz.kCGEventTapOptionListenOnly, mask, self._callback, None,
+            )
+            if self._tap:
+                break
+            if not warned:
+                log.error("Nelze sledovat klávesnici – povolte Diktovátku (Terminálu/Pythonu) "
+                          "Zpřístupnění a Sledování vstupu v Nastavení systému")
+                warned = True
+            time.sleep(5)
         source = Quartz.CFMachPortCreateRunLoopSource(None, self._tap, 0)
         Quartz.CFRunLoopAddSource(Quartz.CFRunLoopGetCurrent(), source, Quartz.kCFRunLoopCommonModes)
         Quartz.CGEventTapEnable(self._tap, True)
@@ -218,18 +278,31 @@ class MacAudioDucker:
     def _osa(script):
         return subprocess.run(["osascript", "-e", script], capture_output=True, text=True, timeout=3).stdout.strip()
 
+    def restore_leftover(self):
+        """Po pádu během nahrávání vrátí hlasitost uloženou v .ducked.json."""
+        def job():
+            if STATE_FILE.exists():
+                try:
+                    self._osa(f"set volume output volume {int(STATE_FILE.read_text())}")
+                except ValueError:
+                    pass
+                STATE_FILE.unlink(missing_ok=True)
+        self.jobs.put(job)
+
     def _duck(self):
         if self.saved is not None:
             return
         vol = int(self._osa("output volume of (get volume settings)") or 0)
         if vol > 0:
             self.saved = vol
+            STATE_FILE.write_text(str(vol))
             self._osa(f"set volume output volume {int(vol * self.level)}")
 
     def _restore(self):
         if self.saved is not None:
             self._osa(f"set volume output volume {self.saved}")
             self.saved = None
+        STATE_FILE.unlink(missing_ok=True)
 
 
 def audio_ducker(level):
@@ -277,7 +350,7 @@ def overlay(level_source):
             self.view = AppKit.NSImageView.alloc().initWithFrame_(AppKit.NSMakeRect(0, 0, W, H))
             p.setContentView_(self.view)
             self.panel, self.visible = p, False
-            NSTimer.scheduledTimerWithTimeInterval_repeats_block_(1 / 30, True, lambda _t: self._tick())
+            NSTimer.scheduledTimerWithTimeInterval_repeats_block_(1 / 24, True, lambda _t: self._tick())
 
         def _tick(self):
             import io

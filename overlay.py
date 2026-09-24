@@ -5,11 +5,14 @@ Třída Overlay je Windows verze: běží ve vlastním vlákně s Tk, nikdy nebe
 fokus a propouští kliknutí, takže text se dál vkládá do okna s kurzorem.
 """
 
+import logging
 import math
 import threading
 import time
 
 from PIL import Image, ImageDraw, ImageFont
+
+log = logging.getLogger("diktovatko")
 
 KEY = (13, 16, 23)  # průhledná barva okna na Windows (blízká barvě pilulky, aby okraje nebyly vidět)
 INK = (27, 34, 48)
@@ -19,7 +22,8 @@ ULTRA = (141, 150, 255)
 WHITE = (240, 243, 248)
 
 W, H = 176, 44  # logická velikost (při 100 % měřítku)
-SS = 3  # supersampling kvůli vyhlazeným okrajům
+SS = 2  # supersampling kvůli vyhlazeným okrajům (2× stačí, 3× zbytečně zatěžovalo CPU)
+FRAME_MS = 42  # ~24 snímků za sekundu
 BOTTOM_MARGIN = 28
 
 _fonts = {}
@@ -179,5 +183,7 @@ class Overlay(OverlayState):
                 self._photo = self._ImageTk.PhotoImage(img)
                 self.label.config(image=self._photo)
                 self._set_visible(True)
+        except Exception:
+            log.exception("Indikátor selhal")
         finally:
-            self.root.after(33, self._tick)
+            self.root.after(FRAME_MS, self._tick)

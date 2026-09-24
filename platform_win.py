@@ -5,6 +5,7 @@ import ctypes.wintypes as wt
 import os
 import sys
 import threading
+import time
 from pathlib import Path
 
 NAME = "windows"
@@ -29,6 +30,86 @@ def paste():
     import keyboard
 
     keyboard.send("ctrl+v")
+
+
+def run_on_main(fn):
+    fn()  # pystray ve Windows zvládá změny z libovolného vlákna
+
+
+def foreground_id():
+    """Identifikátor aktivního okna – podle něj se pozná, že uživatel mezitím přepnul jinam."""
+    return ctypes.windll.user32.GetForegroundWindow()
+
+
+# --- schránka --------------------------------------------------------------------
+CF_UNICODETEXT = 13
+_u32, _k32 = ctypes.windll.user32, ctypes.windll.kernel32
+_k32.GlobalAlloc.restype = ctypes.c_void_p
+_k32.GlobalAlloc.argtypes = (ctypes.c_uint, ctypes.c_size_t)
+_k32.GlobalLock.restype = ctypes.c_void_p
+_k32.GlobalLock.argtypes = (ctypes.c_void_p,)
+_k32.GlobalUnlock.argtypes = (ctypes.c_void_p,)
+_u32.SetClipboardData.restype = ctypes.c_void_p
+_u32.SetClipboardData.argtypes = (ctypes.c_uint, ctypes.c_void_p)
+_u32.GetClipboardSequenceNumber.restype = wt.DWORD
+
+
+def _open_clipboard():
+    for _ in range(20):  # schránku může mít chvíli otevřenou jiná aplikace
+        if _u32.OpenClipboard(None):
+            return True
+        time.sleep(0.02)
+    return False
+
+
+def _global(data):
+    h = _k32.GlobalAlloc(0x0002, len(data))  # GMEM_MOVEABLE
+    p = _k32.GlobalLock(h)
+    ctypes.memmove(p, data, len(data))
+    _k32.GlobalUnlock(h)
+    return h
+
+
+def set_clipboard(text, private=True):
+    """Vloží text do schránky. private=True: text se neuloží do historie schránky (Win+V)
+    ani do cloudové schránky a správci schránky ho mají ignorovat."""
+    if not _open_clipboard():
+        raise OSError("Schránka je obsazená jinou aplikací")
+    try:
+        _u32.EmptyClipboard()
+        _u32.SetClipboardData(CF_UNICODETEXT, _global(text.encode("utf-16-le") + b"\0\0"))
+        if private:
+            zero = (0).to_bytes(4, "little")
+            for name in ("ExcludeClipboardContentFromMonitorProcessing", "CanIncludeInClipboardHistory",
+                         "CanUploadToCloudClipboard"):
+                _u32.SetClipboardData(_u32.RegisterClipboardFormatW(name), _global(zero))
+    finally:
+        _u32.CloseClipboard()
+
+
+def get_clipboard():
+    """Text ze schránky, nebo None, když v ní text není (obrázek, soubory…)."""
+    if not _u32.IsClipboardFormatAvailable(CF_UNICODETEXT):
+        return None
+    import pyperclip
+
+    try:
+        return pyperclip.paste()
+    except Exception:
+        return None
+
+
+def clipboard_seq():
+    return _u32.GetClipboardSequenceNumber()
+
+
+def wait_modifiers_released(timeout=1.0):
+    """Počká, až uživatel pustí Ctrl/Alt/Shift/Win – jinak by z Ctrl+V byla jiná zkratka."""
+    end = time.time() + timeout
+    while time.time() < end:
+        if not any(_u32.GetAsyncKeyState(vk) & 0x8000 for vk in (0x10, 0x11, 0x12, 0x5B, 0x5C)):
+            return
+        time.sleep(0.02)
 
 
 def foreground_window():
@@ -57,13 +138,45 @@ def open_path(path):
     os.startfile(path)
 
 
+def _process_name(hwnd):
+    pid = wt.DWORD()
+    ctypes.windll.user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+    handle = ctypes.windll.kernel32.OpenProcess(0x1000, False, pid.value)
+    if not handle:
+        return ""
+    try:
+        size = wt.DWORD(1024)
+        path = ctypes.create_unicode_buffer(size.value)
+        if ctypes.windll.kernel32.QueryFullProcessImageNameW(handle, 0, path, ctypes.byref(size)):
+            return Path(path.value).name.lower()
+        return ""
+    finally:
+        ctypes.windll.kernel32.CloseHandle(handle)
+
+
 def focus_window(proc, title):
-    """Vyvolá už otevřené okno aplikace do popředí. Vrací False, když okno neběží."""
-    hwnd = ctypes.windll.user32.FindWindowW(None, title)
-    if not hwnd:
+    """Vyvolá už otevřené okno aplikace do popředí. Vrací False, když okno neběží.
+
+    Hledá okno s titulkem aplikace, které patří Pythonu – ne třeba složku "Diktovátko" v Průzkumníku.
+    """
+    found = []
+
+    @ctypes.WINFUNCTYPE(wt.BOOL, wt.HWND, wt.LPARAM)
+    def check(hwnd, _):
+        if ctypes.windll.user32.IsWindowVisible(hwnd):
+            n = ctypes.windll.user32.GetWindowTextLengthW(hwnd)
+            buf = ctypes.create_unicode_buffer(n + 1)
+            ctypes.windll.user32.GetWindowTextW(hwnd, buf, n + 1)
+            if buf.value == title and _process_name(hwnd).startswith("python"):
+                found.append(hwnd)
+                return False
+        return True
+
+    ctypes.windll.user32.EnumWindows(check, 0)
+    if not found:
         return False
-    ctypes.windll.user32.ShowWindow(hwnd, 9)  # SW_RESTORE
-    ctypes.windll.user32.SetForegroundWindow(hwnd)
+    ctypes.windll.user32.ShowWindow(found[0], 9)  # SW_RESTORE
+    ctypes.windll.user32.SetForegroundWindow(found[0])
     return True
 
 

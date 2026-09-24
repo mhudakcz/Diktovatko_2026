@@ -191,7 +191,7 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
   <article>
     <h1>Návod krok za krokem</h1>
     <p class="lede">Od instalace po první nadiktovanou větu. Nepotřebujete žádné programátorské znalosti, stačí postupovat bod po bodu.</p>
-    <p class="meta">Návod platí pro <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.8.2</a>. Nahoře si přepněte, jestli máte <b>Windows</b> nebo <b>Mac</b>. Návod se podle toho upraví.</p>
+    <p class="meta">Návod platí pro <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.9.0</a>. Nahoře si přepněte, jestli máte <b>Windows</b> nebo <b>Mac</b>. Návod se podle toho upraví.</p>
 
     <div class="tldr">
       <h2 class="tldr-h">Ve zkratce</h2>
@@ -350,7 +350,7 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
         <li><b>Offline v počítači</b> funguje hned a bez registrace. Při prvním použití se ale stáhne asi 1,6 GB a přepis trvá zhruba tak dlouho jako samotná nahrávka.</li>
         <li><b>Přes službu Groq</b> je hotový za sekundu. Potřebujete k tomu <b>vlastní bezplatný klíč</b>.</li>
       </ul>
-      <div class="note"><p><b>Každý uživatel potřebuje svůj vlastní klíč.</b> Klíč je jako heslo k vašemu účtu u Groq. Diktovátko ho má uložený jen ve vašem počítači (v souboru <code>config.json</code>) a nikdy ho nesdílí. Klíč nikomu neposílejte a nevkládejte ho do veřejných míst.</p></div>
+      <div class="note"><p><b>Každý uživatel potřebuje svůj vlastní klíč.</b> Klíč je jako heslo k vašemu účtu u Groq. Diktovátko ho ukládá jen do vašeho počítače, do systémového trezoru hesel (Správce přihlašovacích údajů ve Windows, Klíčenka na Macu), a nikdy ho nesdílí. Klíč nikomu neposílejte a nevkládejte ho do veřejných míst.</p></div>
       <h3>Jak klíč získat</h3>
       <ol class="steps">
         <li><div>Otevřete <a href="https://console.groq.com/keys">console.groq.com/keys</a>.</div></li>
@@ -456,7 +456,7 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
       <h3>Aktualizace na novou verzi</h3>
       <ol class="steps">
         <li><div>Diktovátko ukončete: ikona → <b>Ukončit</b>.</div></li>
-        <li><div>Stáhněte nový <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">ZIP</a> a jeho obsah zkopírujte přes starou složku. Soubory <code>config.json</code> (nastavení a klíč) a <code>history.db</code> (historie) se nepřepíšou, v ZIPu nejsou.</div></li>
+        <li><div>Stáhněte nový <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">ZIP</a> a jeho obsah zkopírujte přes starou složku. Soubory <code>config.json</code> (nastavení) a <code>history.db</code> (historie) se nepřepíšou, v ZIPu nejsou. Klíč zůstane v trezoru systému.</div></li>
         <li><div>Spusťte znovu <code class="win">install.bat</code><code class="mac">install.command</code> a potom <code class="win">start.bat</code><code class="mac">start.command</code>.</div></li>
       </ol>
       <h3>Odinstalace</h3>
