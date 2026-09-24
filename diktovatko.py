@@ -4,8 +4,8 @@ Podržíte klávesovou zkratku, mluvíte, pustíte ji a přepsaný text
 se vloží tam, kde máte kurzor.
 """
 
+import ctypes
 import io
-import json
 import logging
 import os
 import re
@@ -16,8 +16,7 @@ import time
 import wave
 import winsound
 from collections import deque
-from datetime import date, datetime, timedelta
-from pathlib import Path
+from datetime import datetime
 
 import keyboard
 import numpy as np
@@ -26,42 +25,17 @@ import pystray
 import sounddevice as sd
 from PIL import Image, ImageDraw
 
+import config
 import history
 from audio_duck import AudioDucker
+from hotkeys import PRESETS, HotkeyManager
 from overlay import Overlay
 
-APP_DIR = Path(__file__).resolve().parent
-CONFIG_PATH = APP_DIR / "config.json"
+APP_DIR = config.APP_DIR
 LOG_PATH = APP_DIR / "diktovatko.log"
+UI_REQUEST = APP_DIR / ".ui_request"
+WINDOW_TITLE = "Diktovátko"
 SAMPLE_RATE = 16000
-
-DEFAULT_CONFIG = {
-    # Klávesová zkratka, např. "right ctrl", "ctrl+win", "f9", "ctrl+shift+space"
-    "hotkey": "right ctrl",
-    # "hold" = drž a mluv, "toggle" = stiskni pro start, znovu pro stop
-    "mode": "hold",
-    # Jazyk přepisu ("cs", "en", ...) nebo null pro automatickou detekci
-    "language": "cs",
-    # Lokální model: tiny / base / small / medium / large-v3-turbo / large-v3
-    "model": "large-v3-turbo",
-    "beam_size": 1,
-    # Nápověda pro model (styl, interpunkce, odborné výrazy, jména)
-    "initial_prompt": "Dobrý den, tohle je přepis diktovaného textu s interpunkcí.",
-    # Volitelné: API klíč Groq (zdarma na console.groq.com) = mnohem rychlejší přepis v cloudu.
-    # Když je prázdný, přepisuje se lokálně a offline.
-    "groq_api_key": "",
-    "groq_model": "whisper-large-v3-turbo",
-    "sounds": True,
-    # Za přepsaný text přidat mezeru (hodí se při diktování po kouscích)
-    "trailing_space": True,
-    # Ukládat přepisy do lokální historie (history.db) včetně času a cílového okna
-    "history": True,
-    # Plovoucí indikátor nahrávání dole uprostřed obrazovky
-    "overlay": True,
-    # Během nahrávání ztlumit ostatní aplikace (Spotify, videa…) na tento podíl hlasitosti (0 = úplně)
-    "duck_audio": True,
-    "duck_level": 0.1,
-}
 
 logging.basicConfig(
     filename=LOG_PATH,
@@ -70,15 +44,6 @@ logging.basicConfig(
     encoding="utf-8",
 )
 log = logging.getLogger("diktovatko")
-
-
-def load_config():
-    if not CONFIG_PATH.exists():
-        CONFIG_PATH.write_text(json.dumps(DEFAULT_CONFIG, indent=2, ensure_ascii=False), encoding="utf-8")
-    cfg = dict(DEFAULT_CONFIG)
-    cfg.update(json.loads(CONFIG_PATH.read_text(encoding="utf-8")))
-    cfg["groq_api_key"] = cfg["groq_api_key"] or os.environ.get("GROQ_API_KEY", "")
-    return cfg
 
 
 def beep(freq, ms):
@@ -110,16 +75,20 @@ STATUS_TEXT = {
     "transcribing": "Přepisuji…",
     "error": "Chyba – viz diktovatko.log",
 }
+HOTKEY_LABELS = dict(PRESETS)
 
 
 class Transcriber:
     def __init__(self, cfg):
         self.cfg = cfg
         self.model = None
+        self.model_name = None
 
     def load(self):
-        if self.cfg["groq_api_key"]:
+        if config.groq_key(self.cfg):
             log.info("Používám Groq API (%s)", self.cfg["groq_model"])
+            return
+        if self.model is not None and self.model_name == self.cfg["model"]:
             return
         from faster_whisper import WhisperModel
 
@@ -127,11 +96,13 @@ class Transcriber:
         self.model = WhisperModel(
             self.cfg["model"], device="cpu", compute_type="int8", cpu_threads=os.cpu_count() or 4
         )
+        self.model_name = self.cfg["model"]
         log.info("Model načten")
 
     def transcribe(self, audio):
-        if self.cfg["groq_api_key"]:
-            return self._groq(audio)
+        if config.groq_key(self.cfg):
+            # Groq přijme soubor do 25 MB (~13 min WAV), delší nahrávku dělíme v tichém místě.
+            return " ".join(t for t in (self._groq(part) for part in split_audio(audio)) if t)
         segments, _ = self.model.transcribe(
             audio,
             language=self.cfg["language"],
@@ -158,13 +129,29 @@ class Transcriber:
             data["prompt"] = self.cfg["initial_prompt"]
         r = httpx.post(
             "https://api.groq.com/openai/v1/audio/transcriptions",
-            headers={"Authorization": f"Bearer {self.cfg['groq_api_key']}"},
+            headers={"Authorization": f"Bearer {config.groq_key(self.cfg)}"},
             files={"file": ("audio.wav", buf.getvalue(), "audio/wav")},
             data=data,
             timeout=60,
         )
         r.raise_for_status()
         return r.json()["text"].strip()
+
+
+def split_audio(audio, max_seconds=600, search_seconds=60):
+    """Rozdělí dlouhou nahrávku na části do max_seconds, řez vede v nejtišším místě."""
+    parts, win = [], SAMPLE_RATE // 20
+    max_len = max_seconds * SAMPLE_RATE
+    while len(audio) > max_len:
+        lo = (max_seconds - search_seconds) * SAMPLE_RATE
+        region = audio[lo:max_len]
+        n = len(region) // win
+        energy = np.mean(region[: n * win].reshape(n, win) ** 2, axis=1)
+        cut = lo + int(np.argmin(energy)) * win + win // 2
+        parts.append(audio[:cut])
+        audio = audio[cut:]
+    parts.append(audio)
+    return parts
 
 
 def has_speech(audio, threshold=0.012, min_voiced=0.25):
@@ -203,41 +190,65 @@ def paste_text(text):
         pyperclip.copy(previous)
 
 
+def hotkey_label(hk):
+    return HOTKEY_LABELS.get(hk, hk)
+
+
 class App:
     def __init__(self):
-        self.cfg = load_config()
+        self.cfg = config.load_config()
+        self.config_mtime = config.CONFIG_PATH.stat().st_mtime
         self.transcriber = Transcriber(self.cfg)
         self.state = "loading"
-        self.hotkey_down = False
         self.chunks = []
         self.levels = deque(maxlen=40)
-        self.overlay = Overlay(lambda: list(self.levels)) if self.cfg["overlay"] else None
-        self.ducker = AudioDucker(self.cfg["duck_level"]) if self.cfg["duck_audio"] else None
+        self.overlay = None
+        self.ducker = None
+        self._apply_extras()
         self.stream = None
         self.lock = threading.Lock()
+        self.hotkeys = HotkeyManager(self.on_hotkey_press, self.on_hotkey_release, self.on_hotkey_interrupt)
+
+        export_items = [
+            pystray.MenuItem(label, (lambda k: lambda: self.export_history(k))(key))
+            for key, label in history.PERIODS
+            if key != "today"
+        ]
+        export_items += [pystray.Menu.SEPARATOR, pystray.MenuItem("Otevřít složku exportů", self.open_exports)]
         self.icon = pystray.Icon(
             "diktovatko",
             ICONS["loading"],
             "Diktovátko",
             menu=pystray.Menu(
                 pystray.MenuItem(lambda _: STATUS_TEXT[self.state], None, enabled=False),
-                pystray.MenuItem(lambda _: f"Zkratka: {self.cfg['hotkey']} ({self.cfg['mode']})", None, enabled=False),
-                pystray.Menu.SEPARATOR,
-                pystray.MenuItem("Zobrazit historii", self.open_history, default=True),
                 pystray.MenuItem(
-                    "Exportovat historii",
-                    pystray.Menu(
-                        pystray.MenuItem("Tento měsíc", lambda: self.export_history("month")),
-                        pystray.MenuItem("Minulý měsíc", lambda: self.export_history("last_month")),
-                        pystray.MenuItem("Posledních 30 dní", lambda: self.export_history("30d")),
-                        pystray.MenuItem("Otevřít složku exportů", self.open_exports),
-                    ),
+                    lambda _: "Zkratka: " + ", ".join(hotkey_label(h) for h in self.cfg["hotkeys"]),
+                    None,
+                    enabled=False,
                 ),
-                pystray.MenuItem("Otevřít nastavení", lambda: os.startfile(CONFIG_PATH)),
+                pystray.Menu.SEPARATOR,
+                pystray.MenuItem("Historie", lambda: self.open_window("history"), default=True),
+                pystray.MenuItem("Statistiky", lambda: self.open_window("stats")),
+                pystray.MenuItem("Nastavení", lambda: self.open_window("settings")),
+                pystray.MenuItem("Exportovat historii", pystray.Menu(*export_items)),
+                pystray.Menu.SEPARATOR,
                 pystray.MenuItem("Otevřít log", lambda: os.startfile(LOG_PATH)),
                 pystray.MenuItem("Ukončit", self.quit),
             ),
         )
+
+    def _apply_extras(self):
+        if self.cfg["overlay"] and self.overlay is None:
+            self.overlay = Overlay(lambda: list(self.levels))
+        elif not self.cfg["overlay"] and self.overlay is not None:
+            self.overlay.hide()
+            self.overlay = None
+        if self.cfg["duck_audio"]:
+            if self.ducker is None:
+                self.ducker = AudioDucker(self.cfg["duck_level"])
+            self.ducker.level = self.cfg["duck_level"]
+        else:
+            self.ducker = None
 
     def set_state(self, state):
         self.state = state
@@ -280,15 +291,18 @@ class App:
         if self.cfg["sounds"]:
             beep(880, 60)
 
+    def _close_stream(self):
+        self.stream.stop()
+        self.stream.close()
+        self.stream = None
+        if self.ducker:
+            self.ducker.restore()
+
     def stop_recording(self):
         with self.lock:
             if self.state != "recording":
                 return
-            self.stream.stop()
-            self.stream.close()
-            self.stream = None
-            if self.ducker:
-                self.ducker.restore()
+            self._close_stream()
             self.set_state("transcribing")
         if self.cfg["sounds"]:
             beep(600, 60)
@@ -296,6 +310,15 @@ class App:
         threading.Thread(
             target=self._process, args=(audio, self.started_at, self.target), daemon=True
         ).start()
+
+    def abort_recording(self):
+        """Zkratka byla jen součástí jiné kombinace (např. Ctrl+C) – nahrávku zahodíme."""
+        with self.lock:
+            if self.state != "recording":
+                return
+            self._close_stream()
+            self.set_state("idle")
+        log.info("Nahrávání zrušeno – během držení zkratky byla stisknuta jiná klávesa")
 
     def _process(self, audio, started_at, target):
         failed = False
@@ -316,7 +339,7 @@ class App:
             if text:
                 paste_text(text + (" " if self.cfg["trailing_space"] else ""))
                 if self.cfg["history"]:
-                    engine = "groq" if self.cfg["groq_api_key"] else self.cfg["model"]
+                    engine = "groq" if config.groq_key(self.cfg) else self.cfg["model"]
                     history.save(started_at, text, target[0], target[1], duration, engine)
         except Exception:
             log.exception("Přepis selhal")
@@ -328,62 +351,82 @@ class App:
             if failed and self.overlay:
                 self.overlay.show("error", "Přepis se nepovedl")
 
-    def on_hotkey(self):
-        # Držená klávesa posílá opakované stisky – reagujeme jen na první.
-        if self.hotkey_down:
-            return
-        self.hotkey_down = True
+    # --- zkratky -------------------------------------------------------------
+    def on_hotkey_press(self, hk):
         if self.state == "idle":
             self.start_recording()
         elif self.state == "recording" and self.cfg["mode"] == "toggle":
             self.stop_recording()
-        threading.Thread(target=self._wait_for_release, daemon=True).start()
 
-    def _wait_for_release(self):
-        while keyboard.is_pressed(self.cfg["hotkey"]):
-            time.sleep(0.02)
-        self.hotkey_down = False
+    def on_hotkey_release(self, hk):
         if self.cfg["mode"] == "hold":
             self.stop_recording()
 
-    # --- běh ---------------------------------------------------------------
-    def _init(self, icon):
-        icon.visible = True
+    def on_hotkey_interrupt(self, hk):
+        self.abort_recording()
+
+    # --- nastavení -------------------------------------------------------------
+    def _watch_config(self):
+        """Změny z okna nastavení (nebo ručně v config.json) se projeví bez restartu."""
+        while True:
+            time.sleep(1)
+            try:
+                mtime = config.CONFIG_PATH.stat().st_mtime
+                if mtime == self.config_mtime:
+                    continue
+                self.config_mtime = mtime
+                new = config.load_config()
+            except Exception:
+                log.exception("Nepodařilo se načíst config.json")
+                continue
+            engine_changed = (
+                bool(config.groq_key(new)) != bool(config.groq_key(self.cfg)) or new["model"] != self.cfg["model"]
+            )
+            self.cfg.clear()
+            self.cfg.update(new)
+            self._apply_extras()
+            self.hotkeys.set_hotkeys(self.cfg["hotkeys"])
+            self.icon.update_menu()
+            log.info("Nastavení aktualizováno, zkratky: %s (%s)", self.cfg["hotkeys"], self.cfg["mode"])
+            if engine_changed and self.state == "idle":
+                self._load_engine()
+
+    def _load_engine(self):
+        self.set_state("loading")
         try:
             self.transcriber.load()
         except Exception:
             log.exception("Nepodařilo se načíst model")
             self.set_state("error")
-            return
-        keyboard.add_hotkey(self.cfg["hotkey"], self.on_hotkey, suppress=False)
+            return False
         self.set_state("idle")
+        return True
+
+    # --- běh ---------------------------------------------------------------
+    def _init(self, icon):
+        icon.visible = True
+        threading.Thread(target=self._watch_config, daemon=True).start()
+        if not self._load_engine():
+            return
+        self.hotkeys.set_hotkeys(self.cfg["hotkeys"])
         if self.cfg["sounds"]:
             beep(1000, 80)
-        log.info("Připraveno, zkratka: %s (%s)", self.cfg["hotkey"], self.cfg["mode"])
+        log.info("Připraveno, zkratky: %s (%s)", self.cfg["hotkeys"], self.cfg["mode"])
 
-    def open_history(self):
-        import ctypes
-
-        # Už otevřené okno jen vyvoláme do popředí.
-        hwnd = ctypes.windll.user32.FindWindowW(None, "Diktovátko – historie")
+    def open_window(self, view):
+        UI_REQUEST.write_text(view, encoding="utf-8")
+        # Už otevřené okno jen vyvoláme do popředí (samo si přečte, kterou sekci ukázat).
+        hwnd = ctypes.windll.user32.FindWindowW(None, WINDOW_TITLE)
         if hwnd:
             ctypes.windll.user32.ShowWindow(hwnd, 9)  # SW_RESTORE
             ctypes.windll.user32.SetForegroundWindow(hwnd)
             return
         # Samostatný proces, aby okno nekolidovalo s ikonou v liště.
-        subprocess.Popen([sys.executable, str(APP_DIR / "history_viewer.py")], cwd=APP_DIR)
+        subprocess.Popen([sys.executable, str(APP_DIR / "app_window.py")], cwd=APP_DIR)
 
     def export_history(self, period):
-        today = date.today()
-        first_this = today.replace(day=1)
-        if period == "month":
-            start, end = first_this, today
-        elif period == "last_month":
-            end = first_this - timedelta(days=1)
-            start = end.replace(day=1)
-        else:
-            start, end = today - timedelta(days=29), today
         try:
+            start, end = history.period_range(period)
             out, n = history.export(start, end)
             log.info("Export %s–%s: %d záznamů -> %s", start, end, n, out)
             os.startfile(out)
@@ -397,7 +440,7 @@ class App:
     def quit(self):
         if self.ducker:
             self.ducker.restore_now()
-        keyboard.unhook_all()
+        self.hotkeys.stop()
         self.icon.stop()
 
     def run(self):
@@ -406,8 +449,6 @@ class App:
 
 if __name__ == "__main__":
     try:
-        import ctypes
-
         ctypes.windll.shcore.SetProcessDpiAwareness(2)  # ostrý indikátor na HiDPI displejích
     except Exception:
         pass

@@ -84,6 +84,100 @@ def fetch(date_from, date_to, search=None):
         return con.execute(sql + " ORDER BY ts", params).fetchall()
 
 
+PERIODS = [
+    ("today", "Dnes"),
+    ("7d", "Posledních 7 dní"),
+    ("10d", "Posledních 10 dní"),
+    ("14d", "Posledních 14 dní"),
+    ("20d", "Posledních 20 dní"),
+    ("30d", "Posledních 30 dní"),
+    ("month", "Tento měsíc"),
+    ("last_month", "Minulý měsíc"),
+    ("90d", "Posledních 90 dní"),
+    ("all", "Vše"),
+]
+
+
+def period_range(key, today=None):
+    """Vrátí (od, do) pro klíč období nebo vlastní rozsah ve tvaru 'YYYY-MM-DD|YYYY-MM-DD'."""
+    today = today or date.today()
+    if "|" in key:
+        a, b = key.split("|")
+        return date.fromisoformat(a), date.fromisoformat(b)
+    if key.endswith("d") and key[:-1].isdigit():
+        return today - timedelta(days=int(key[:-1]) - 1), today
+    first_this = today.replace(day=1)
+    if key == "today":
+        return today, today
+    if key == "month":
+        return first_this, today
+    if key == "last_month":
+        end = first_this - timedelta(days=1)
+        return end.replace(day=1), end
+    return date(2000, 1, 1), today
+
+
+TYPING_WPM = 40  # průměrná rychlost psaní na klávesnici, pro odhad ušetřeného času
+
+
+def _words(text):
+    return len(text.split())
+
+
+def stats(today=None):
+    today = today or date.today()
+    with connect() as con:
+        rows = con.execute("SELECT ts, app, text, audio_seconds FROM dictations ORDER BY ts").fetchall()
+
+    def summary(since):
+        sel = [r for r in rows if since is None or r[0][:10] >= since.isoformat()]
+        words = sum(_words(r[2]) for r in sel)
+        secs = sum(r[3] or 0 for r in sel)
+        return {
+            "count": len(sel),
+            "words": words,
+            "chars": sum(len(r[2]) for r in sel),
+            "audio_seconds": round(secs, 1),
+            "saved_minutes": round(max(0.0, words / TYPING_WPM - secs / 60), 1),
+        }
+
+    days = [today - timedelta(days=i) for i in range(29, -1, -1)]
+    per_day = {d.isoformat(): 0 for d in days}
+    for ts, _, text, _ in rows:
+        if ts[:10] in per_day:
+            per_day[ts[:10]] += _words(text)
+
+    apps = {}
+    for _, app, text, _ in rows:
+        a = apps.setdefault(app or "", {"app": app or "", "count": 0, "words": 0})
+        a["count"] += 1
+        a["words"] += _words(text)
+
+    total_words = sum(_words(r[2]) for r in rows)
+    total_secs = sum(r[3] or 0 for r in rows)
+    active_days = sorted({r[0][:10] for r in rows})
+    streak, d = 0, today
+    while d.isoformat() in active_days:
+        streak += 1
+        d -= timedelta(days=1)
+
+    return {
+        "periods": {
+            "today": summary(today),
+            "7d": summary(today - timedelta(days=6)),
+            "30d": summary(today - timedelta(days=29)),
+            "all": summary(None),
+        },
+        "daily": [{"date": k, "words": v} for k, v in per_day.items()],
+        "apps": sorted(apps.values(), key=lambda a: -a["words"])[:8],
+        "first_use": rows[0][0][:10] if rows else None,
+        "active_days": len(active_days),
+        "streak": streak,
+        "wpm": round(total_words / (total_secs / 60)) if total_secs > 5 else None,
+        "typing_wpm": TYPING_WPM,
+    }
+
+
 def fetch_dicts(date_from, date_to, search=None):
     sql = "SELECT id, ts, app, window_title, text, audio_seconds FROM dictations WHERE ts >= ? AND ts < ?"
     params = [date_from.isoformat(), (date_to + timedelta(days=1)).isoformat()]

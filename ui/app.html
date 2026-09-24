@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diktovátko</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fog: #EEF1F5; --paper: #FFFFFF; --ink: #1B2230; --ink-2: #4A5366; --muted: #7B8496;
+  --line: #DCE1E9; --ultra: #3847F5; --ultra-soft: #E6E8FE; --voice: #F0405A; --sel: #E9EBFE;
+  --display: "Bricolage Grotesque", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  --body: "Onest", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fog: #12151C; --paper: #1A1F29; --ink: #E8EBF2; --ink-2: #B5BCCB; --muted: #7F889B;
+    --line: #2A3140; --ultra: #8490FF; --ultra-soft: #262C4F; --sel: #1F2440; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fog: #12151C; --paper: #1A1F29; --ink: #E8EBF2; --ink-2: #B5BCCB; --muted: #7F889B;
+  --line: #2A3140; --ultra: #8490FF; --ultra-soft: #262C4F; --sel: #1F2440; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--fog); color: var(--ink); font: 14px/1.45 var(--body);
+  display: grid; grid-template-columns: 228px 1fr; overflow: hidden; -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ultra); outline-offset: 2px; }
+[hidden] { display: none !important; }
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--muted) 35%, transparent); border-radius: 10px; border: 3px solid var(--fog); }
+::-webkit-scrollbar-button { display: none; }
+
+/* ---------- postranní panel ---------- */
+aside { padding: 18px 14px 14px 16px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid var(--line); overflow-y: auto; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 16px/1 var(--display); letter-spacing: -0.01em; }
+.brand-mark { width: 24px; height: 24px; border-radius: 50%; background: var(--voice); display: grid; place-items: center; }
+.brand-mark svg { width: 12px; height: 12px; }
+.views { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.views button { border: 0; background: none; padding: 6px 4px; border-radius: 7px; cursor: pointer; color: var(--ink-2); font-size: 13px; font-weight: 500; }
+.views button[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+.search { position: relative; }
+.search svg { position: absolute; left: 10px; top: 50%; translate: 0 -50%; width: 16px; height: 16px; color: var(--muted); }
+.search input { width: 100%; padding: 7px 10px 7px 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); outline: none; }
+.search input:focus, .field:focus { border-color: var(--ultra); box-shadow: 0 0 0 3px var(--ultra-soft); }
+.group h2 { margin: 0 0 4px 8px; font: 500 12px/1 var(--body); color: var(--muted); }
+.nav { display: flex; flex-direction: column; gap: 1px; }
+.nav button { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 4px 8px; border: 0; border-radius: 6px; background: none; cursor: pointer; text-align: left; color: var(--ink-2); }
+.nav button:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+.nav button[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: 0 1px 0 var(--line); }
+.nav .n { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.range { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; padding: 0 2px; }
+.range input { width: 100%; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--paper); font-size: 12px; }
+.app-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 9px; flex: none; }
+.app-name { display: flex; align-items: center; min-width: 0; }
+.app-name span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.foot { margin-top: auto; font-size: 12px; color: var(--muted); line-height: 1.45; }
+kbd { font: 600 12px var(--body); padding: 1px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--paper); color: var(--ink-2); }
+
+/* ---------- hlavní část ---------- */
+main { overflow-y: auto; }
+.wrap { max-width: 1040px; padding: 18px 28px 110px; }
+header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
+header h1 { margin: 0; font: 700 24px/1.1 var(--display); letter-spacing: -0.02em; }
+.summary { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 8px; font-size: 13px; border: 1px solid var(--line); background: var(--paper); cursor: pointer; white-space: nowrap; font-weight: 500; }
+.btn:hover { border-color: var(--muted); }
+.btn svg { width: 14px; height: 14px; }
+.btn.primary { background: var(--ultra); border-color: var(--ultra); color: #fff; }
+.split { display: inline-flex; }
+.split .btn:first-child { border-radius: 8px 0 0 8px; }
+.split select { border: 1px solid var(--line); border-left: 0; border-radius: 0 8px 8px 0; background: var(--paper); padding: 0 6px; font-size: 13px; cursor: pointer; }
+
+.day { margin-top: 12px; }
+.day h3 { position: sticky; top: 0; z-index: 2; margin: 0; padding: 6px 0; background: var(--fog); font: 600 14px/1.2 var(--display); letter-spacing: -0.01em; }
+.day h3 small { font: 400 12.5px var(--body); color: var(--muted); margin-left: 8px; }
+.entries { position: relative; margin: 0; padding: 0; list-style: none; }
+.entries::before { content: ""; position: absolute; left: 55px; top: 10px; bottom: 10px; width: 2px; background: var(--line); border-radius: 2px; }
+.entry { position: relative; display: grid; grid-template-columns: 42px 28px 1fr auto; align-items: start; padding: 5px 8px 5px 0; border-radius: 8px; cursor: pointer; }
+.entry:hover { background: color-mix(in srgb, var(--paper) 70%, transparent); }
+.entry[aria-selected="true"] { background: var(--sel); }
+.time { font: 500 12px/21px var(--body); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.node { justify-self: center; margin-top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--paper); border: 2px solid var(--c, var(--muted)); position: relative; z-index: 1; transition: transform .15s; }
+.entry[aria-selected="true"] .node { background: var(--c); transform: scale(1.25); }
+.body { min-width: 0; }
+.text { margin: 0; font-size: 14.5px; line-height: 1.45; max-width: 110ch; user-select: text; cursor: text; }
+.meta { display: flex; align-items: center; gap: 8px; margin-top: 1px; font-size: 12px; color: var(--muted); min-width: 0; }
+.chip { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 0 7px 0 6px; border-radius: 999px; line-height: 18px; background: color-mix(in srgb, var(--c) 13%, transparent); color: color-mix(in srgb, var(--c) 70%, var(--ink)); font-weight: 600; }
+.chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+.where { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.copy1 { opacity: 0; margin-left: 6px; width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); display: grid; place-items: center; cursor: pointer; color: var(--ink-2); }
+.copy1 svg { width: 13px; height: 13px; }
+.entry:hover .copy1, .copy1:focus-visible { opacity: 1; }
+.copy1:hover { color: var(--ultra); border-color: var(--ultra); }
+mark { background: color-mix(in srgb, var(--ultra) 22%, transparent); color: inherit; border-radius: 3px; padding: 0 1px; }
+.empty { margin-top: 10vh; max-width: 440px; }
+.empty h2 { font: 700 22px/1.2 var(--display); margin: 0 0 8px; letter-spacing: -0.015em; }
+.empty p { color: var(--ink-2); margin: 0; }
+
+/* ---------- statistiky ---------- */
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
+.tile { padding: 14px 16px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); }
+.tile h3 { margin: 0; font: 500 13px var(--body); color: var(--muted); }
+.tile .big { margin-top: 4px; font: 700 30px/1 var(--display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.tile .big small { font: 500 13px var(--body); color: var(--muted); letter-spacing: 0; margin-left: 4px; }
+.tile dl { margin: 10px 0 0; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font-size: 12.5px; color: var(--ink-2); }
+.tile dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 500; }
+.tile.total { background: var(--ink); color: var(--fog); border-color: var(--ink); }
+.tile.total h3, .tile.total .big small { color: color-mix(in srgb, var(--fog) 65%, transparent); }
+.tile.total dl { color: color-mix(in srgb, var(--fog) 75%, transparent); }
+.tile.total dd { color: var(--fog); }
+.panel { margin-top: 12px; padding: 14px 16px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); }
+.panel h3 { margin: 0 0 10px; font: 600 14px var(--display); }
+.panel h3 small { font: 400 12.5px var(--body); color: var(--muted); margin-left: 6px; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: 160px; overflow: visible; }
+.chart .col { fill: var(--ultra); }
+.chart .col.today { fill: var(--voice); }
+.chart .hit { fill: transparent; cursor: default; }
+.chart .col.hover { opacity: .75; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .axis { fill: var(--muted); font-size: 11px; }
+.tip { position: absolute; pointer-events: none; padding: 6px 9px; border-radius: 8px; background: var(--ink); color: var(--fog); font-size: 12px; white-space: nowrap; translate: -50% calc(-100% - 8px); opacity: 0; transition: opacity .1s; }
+.tip.on { opacity: 1; }
+.two { display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; }
+.apps-bars { display: grid; gap: 7px; }
+.ab { display: grid; grid-template-columns: 110px 1fr 70px; align-items: center; gap: 10px; font-size: 13px; }
+.ab .lbl { display: flex; align-items: center; min-width: 0; }
+.ab .lbl span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ab .track { display: block; height: 10px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.ab .fill { display: block; height: 100%; border-radius: 3px; background: var(--ultra); min-width: 3px; }
+.ab .v { text-align: right; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.facts { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 7px 12px; font-size: 13px; color: var(--ink-2); }
+.facts dd { margin: 0; text-align: right; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.note { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+
+/* ---------- nastavení ---------- */
+.settings { display: grid; gap: 12px; margin-top: 14px; max-width: 760px; }
+.card { padding: 16px 18px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); }
+.card h2 { margin: 0 0 2px; font: 600 15px var(--display); }
+.card > p { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+.keys { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.keyopt { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); cursor: pointer; }
+.keyopt:has(input:checked) { border-color: var(--ultra); background: var(--ultra-soft); }
+.keyopt input { accent-color: var(--ultra); margin: 0; }
+.keyopt .caps { display: flex; gap: 3px; flex-wrap: wrap; }
+.keyopt .lbl { margin-left: auto; font-size: 12px; color: var(--muted); text-align: right; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 9px 0; border-top: 1px solid var(--line); }
+.row:first-of-type { border-top: 0; }
+.row .t { font-weight: 500; }
+.row .d { font-size: 12.5px; color: var(--muted); }
+.field { padding: 6px 9px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); outline: none; min-width: 220px; }
+textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6px; }
+.seg { display: inline-flex; padding: 2px; border-radius: 8px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.seg button { border: 0; background: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; color: var(--ink-2); font-size: 13px; }
+.seg button[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+.switch { position: relative; width: 36px; height: 20px; flex: none; }
+.switch input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.switch span { position: absolute; inset: 0; border-radius: 10px; background: var(--line); transition: background .15s; pointer-events: none; }
+.switch span::after { content: ""; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: translate .15s; box-shadow: 0 1px 2px rgb(0 0 0 / .2); }
+.switch input:checked + span { background: var(--ultra); }
+.switch input:checked + span::after { translate: 16px 0; }
+.switch input:focus-visible + span { outline: 2px solid var(--ultra); outline-offset: 2px; }
+.inline { display: flex; align-items: center; gap: 8px; }
+.inline input[type=range] { accent-color: var(--ultra); width: 140px; }
+.link { color: var(--ultra); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; background: none; border: 0; padding: 0; font-size: 12.5px; }
+.savebar { position: sticky; bottom: 0; display: flex; align-items: center; gap: 12px; padding: 12px 0; background: var(--fog); }
+.savebar .msg { color: var(--muted); font-size: 13px; }
+.savebar .msg.err { color: var(--voice); }
+
+/* akční lišta a toast */
+.bar { position: fixed; left: calc(228px + (100vw - 228px) / 2); bottom: 24px; translate: -50% 140%; display: flex; align-items: center; gap: 6px; padding: 6px 6px 6px 14px; border-radius: 12px; font-size: 13px; background: var(--ink); color: var(--fog); box-shadow: 0 12px 32px -8px rgb(15 20 35 / .45); transition: translate .25s cubic-bezier(.2,.8,.2,1); z-index: 5; }
+.bar:not(.on) { translate: -50% 200%; visibility: hidden; transition: translate .25s, visibility 0s .25s; }
+.bar.on { translate: -50% 0; }
+.bar .count { font-weight: 600; margin-right: 8px; white-space: nowrap; }
+.bar button { border: 0; border-radius: 8px; padding: 6px 10px; background: color-mix(in srgb, var(--fog) 12%, transparent); color: inherit; cursor: pointer; white-space: nowrap; }
+.bar button:hover { background: color-mix(in srgb, var(--fog) 22%, transparent); }
+.bar button.go { background: var(--ultra); color: #fff; }
+.toast { position: fixed; right: 24px; top: 20px; padding: 10px 16px; border-radius: 12px; background: var(--ink); color: var(--fog); font-weight: 500; opacity: 0; translate: 0 -8px; transition: .2s; pointer-events: none; z-index: 6; }
+.toast.on { opacity: 1; translate: 0 0; }
+
+@media (max-width: 960px) { .tiles { grid-template-columns: repeat(2, 1fr); } .two { grid-template-columns: 1fr; } .keys { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { body { grid-template-columns: 200px 1fr; } .wrap { padding: 16px 18px 110px; } .bar { left: calc(200px + (100vw - 200px) / 2); } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<aside>
+  <div class="brand">
+    <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="8" y="2" width="8" height="13" rx="4" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></span>
+    Diktovátko
+  </div>
+  <div class="views" role="tablist">
+    <button data-view="history" aria-pressed="true">Historie</button>
+    <button data-view="stats" aria-pressed="false">Statistiky</button>
+    <button data-view="settings" aria-pressed="false">Nastavení</button>
+  </div>
+
+  <div id="side-history">
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Hledat" aria-label="Hledat">
+    </label>
+    <div class="group" style="margin-top:14px">
+      <h2>Období</h2>
+      <div class="nav" id="periods"></div>
+      <div class="range" id="range" hidden>
+        <input type="date" id="from" aria-label="Od">
+        <input type="date" id="to" aria-label="Do">
+      </div>
+    </div>
+    <div class="group" id="apps-group" style="margin-top:14px">
+      <h2>Aplikace</h2>
+      <div class="nav" id="apps"></div>
+    </div>
+  </div>
+  <div class="foot" id="foot-history">Klikem vyberete záznam, <kbd>Ctrl</kbd>+<kbd>A</kbd> vybere vše zobrazené, <kbd>Ctrl</kbd>+<kbd>C</kbd> zkopíruje text.</div>
+</aside>
+
+<main id="main">
+  <!-- HISTORIE -->
+  <div class="wrap" id="view-history">
+    <header>
+      <div>
+        <h1 id="title">Posledních 7 dní</h1>
+        <p class="summary" id="summary"></p>
+      </div>
+      <div class="split">
+        <button class="btn" id="export">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>
+          Exportovat
+        </button>
+        <select id="fmt" aria-label="Formát exportu"><option value="md">Markdown</option><option value="csv">CSV</option></select>
+      </div>
+    </header>
+    <div id="list"></div>
+  </div>
+
+  <!-- STATISTIKY -->
+  <div class="wrap" id="view-stats" hidden>
+    <header><div><h1>Statistiky</h1><p class="summary" id="stats-sub"></p></div></header>
+    <div class="tiles" id="tiles"></div>
+    <div class="panel">
+      <h3>Slova za den<small>posledních 30 dní</small></h3>
+      <div class="chart" id="chart"><div class="tip" id="tip"></div></div>
+    </div>
+    <div class="two">
+      <div class="panel"><h3>Kam nejvíc diktujete<small>všechna data, podle počtu slov</small></h3><div class="apps-bars" id="appbars"></div></div>
+      <div class="panel"><h3>Zajímavosti</h3><dl class="facts" id="facts"></dl><p class="note" id="note"></p></div>
+    </div>
+  </div>
+
+  <!-- NASTAVENÍ -->
+  <div class="wrap" id="view-settings" hidden>
+    <header><div><h1>Nastavení</h1><p class="summary">Změny platí hned po uložení, aplikaci není potřeba restartovat.</p></div></header>
+    <form class="settings" id="settings" onsubmit="return false">
+      <section class="card">
+        <h2>Klávesová zkratka</h2>
+        <p>Když během držení zkratky stisknete jinou klávesu (třeba Ctrl+C), nahrávání se zruší, takže běžné zkratky dál fungují.</p>
+        <div class="row">
+          <div><div class="t">Zkratka pro diktování</div><div class="d" id="hotkey-caps"></div></div>
+          <select class="field" id="hotkey"></select>
+        </div>
+        <div class="row" id="custom-row" hidden>
+          <div><div class="t">Vlastní zkratka</div><div class="d">Názvy kláves spojte znakem +, např. <kbd>f10</kbd>, <kbd>ctrl+alt+d</kbd>, <kbd>right shift</kbd>.</div></div>
+          <input class="field" id="custom" placeholder="např. ctrl+alt+d">
+        </div>
+        <div class="row">
+          <div><div class="t">Způsob ovládání</div><div class="d">Držet: nahrává, dokud klávesu držíte. Přepínat: první stisk spustí, druhý zastaví.</div></div>
+          <div class="seg" id="mode"><button type="button" data-v="hold">Držet</button><button type="button" data-v="toggle">Přepínat</button></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Přepis</h2>
+        <div class="row">
+          <div><div class="t">Jazyk</div></div>
+          <select class="field" id="language"></select>
+        </div>
+        <div class="row">
+          <div><div class="t">Groq API klíč</div><div class="d">S klíčem trvá přepis kolem sekundy, nahrávka ale jde na servery Groq. Bez klíče se přepisuje offline. <button type="button" class="link" id="groq-link">Získat klíč zdarma</button></div></div>
+          <div class="inline"><input class="field" id="groq" type="password" autocomplete="off" placeholder="gsk_…"><button type="button" class="btn" id="groq-show">Zobrazit</button></div>
+        </div>
+        <div class="row">
+          <div><div class="t">Lokální model</div><div class="d">Používá se, když není vyplněný Groq klíč. Při první změně se model stáhne.</div></div>
+          <select class="field" id="model"></select>
+        </div>
+        <div class="row" style="display:block">
+          <div class="t">Slovník a styl</div>
+          <div class="d">Jména, firmy a odborné výrazy, které má přepis znát. Model podle této ukázky převezme i styl a interpunkci.</div>
+          <textarea class="field" id="prompt"></textarea>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Chování</h2>
+        <div class="row">
+          <div><div class="t">Ztlumit ostatní zvuky při diktování</div><div class="d">Spotify, videa a další aplikace se během nahrávání ztiší.</div></div>
+          <div class="inline"><input type="range" id="duck-level" min="0" max="50" step="5" aria-label="Hlasitost při ztlumení"><span id="duck-val" class="d" style="width:36px"></span><label class="switch"><input type="checkbox" id="duck"><span></span></label></div>
+        </div>
+        <div class="row"><div><div class="t">Indikátor nahrávání na obrazovce</div></div><label class="switch"><input type="checkbox" id="overlay"><span></span></label></div>
+        <div class="row"><div><div class="t">Pípnutí při startu a konci nahrávání</div></div><label class="switch"><input type="checkbox" id="sounds"><span></span></label></div>
+        <div class="row"><div><div class="t">Mezera za vloženým textem</div><div class="d">Hodí se, když diktujete po kouscích.</div></div><label class="switch"><input type="checkbox" id="trailing"><span></span></label></div>
+        <div class="row"><div><div class="t">Ukládat historii</div><div class="d">Text, čas a okno se ukládají jen do vašeho počítače.</div></div><label class="switch"><input type="checkbox" id="hist"><span></span></label></div>
+        <div class="row"><div><div class="t">Spouštět po přihlášení do Windows</div></div><label class="switch"><input type="checkbox" id="autostart"><span></span></label></div>
+      </section>
+
+      <div class="savebar"><button type="button" class="btn primary" id="save">Uložit nastavení</button><span class="msg" id="save-msg"></span></div>
+    </form>
+  </div>
+</main>
+
+<div class="bar" id="bar" role="toolbar" aria-label="Vybrané záznamy">
+  <span class="count" id="selcount"></span>
+  <button class="go" id="copy-text">Kopírovat text</button>
+  <button id="copy-meta">Kopírovat s časem a oknem</button>
+  <button id="clear">Zrušit výběr</button>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const APP_NAMES = {
+  "chrome.exe": "Chrome", "msedge.exe": "Edge", "firefox.exe": "Firefox", "slack.exe": "Slack",
+  "outlook.exe": "Outlook", "olk.exe": "Outlook", "ms-teams.exe": "Teams", "teams.exe": "Teams",
+  "code.exe": "VS Code", "cursor.exe": "Cursor", "claude.exe": "Claude", "winword.exe": "Word",
+  "excel.exe": "Excel", "powerpnt.exe": "PowerPoint", "notepad.exe": "Poznámkový blok",
+  "explorer.exe": "Průzkumník", "whatsapp.exe": "WhatsApp", "telegram.exe": "Telegram",
+  "windowsterminal.exe": "Terminál", "notion.exe": "Notion", "obsidian.exe": "Obsidian",
+};
+const TITLE_SUFFIXES = [/\s[-–—]\s(Google Chrome|Mozilla Firefox|Microsoft​? Edge|Microsoft Edge)$/, /\s[-–—]\s?Profil.*$/];
+const PALETTE = ["#3847F5", "#E0457B", "#0E9F8E", "#E08A12", "#7A4BE0", "#2F8FE0", "#C24DD1", "#5B8C1F"];
+const KEY_NAMES = { "right ctrl": "Pravý Ctrl", ctrl: "Ctrl", windows: "Win", "right shift": "Pravý Shift", shift: "Shift", alt: "Alt", space: "Mezerník", pause: "Pause", "right alt": "AltGr", menu: "Menu", "scroll lock": "Scroll Lock" };
+
+const state = { view: "history", period: "7d", q: "", app: null, rows: [], shown: [], selected: new Set(), periods: [], settings: null };
+const $ = (id) => document.getElementById(id);
+const api = () => window.pywebview.api;
+
+function appLabel(exe) { return APP_NAMES[(exe || "").toLowerCase()] || (exe || "Neznámá aplikace").replace(/\.exe$/i, ""); }
+function appColor(exe) { let h = 0; for (const ch of (exe || "").toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return PALETTE[h % PALETTE.length]; }
+function cleanTitle(t) { t = t || ""; for (const re of TITLE_SUFFIXES) t = t.replace(re, ""); return t; }
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function highlight(s) {
+  const safe = esc(s);
+  if (!state.q) return safe;
+  const re = new RegExp(esc(state.q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+  return safe.replace(re, (m) => `<mark>${m}</mark>`);
+}
+function dayLabel(iso) {
+  const d = new Date(iso + "T00:00:00"), today = new Date(); today.setHours(0, 0, 0, 0);
+  const diff = Math.round((today - d) / 864e5);
+  const full = d.toLocaleDateString("cs-CZ", { weekday: "long", day: "numeric", month: "long" });
+  if (diff === 0) return ["Dnes", full];
+  if (diff === 1) return ["Včera", full];
+  return [full.charAt(0).toUpperCase() + full.slice(1), d.getFullYear() !== today.getFullYear() ? d.getFullYear() : ""];
+}
+function plural(n, one, few, many) { return n === 1 ? one : n >= 2 && n <= 4 ? few : many; }
+function num(n) { return Math.round(n).toLocaleString("cs-CZ"); }
+function fmtDur(s) {
+  s = Math.round(s || 0);
+  if (s < 60) return `${s} s`;
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+  return h ? `${h} h ${m} min` : `${m} min${s % 60 ? " " + (s % 60) + " s" : ""}`;
+}
+function fmtMin(m) { return m >= 60 ? `${Math.floor(m / 60)} h ${Math.round(m % 60)} min` : `${Math.round(m)} min`; }
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("on"), 1800); }
+function isoDate(d) { return d.toISOString().slice(0, 10); }
+
+/* ---------------- přepínání sekcí ---------------- */
+function showView(v) {
+  state.view = v;
+  document.querySelectorAll(".views button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.view === v));
+  for (const k of ["history", "stats", "settings"]) $("view-" + k).hidden = k !== v;
+  $("side-history").hidden = $("foot-history").hidden = v !== "history";
+  if (v !== "history") { state.selected.clear(); renderBar(); }
+  $("main").scrollTop = 0;
+  if (v === "history") loadHistory();
+  if (v === "stats") loadStats();
+  if (v === "settings") loadSettings();
+}
+document.querySelector(".views").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) showView(b.dataset.view); });
+
+/* ---------------- historie ---------------- */
+function periodKey() { return state.period === "custom" ? `${$("from").value}|${$("to").value}` : state.period; }
+function periodTitle() {
+  if (state.period !== "custom") return state.periods.find(([k]) => k === state.period)[1];
+  const f = (s) => new Date(s + "T00:00:00").toLocaleDateString("cs-CZ", { day: "numeric", month: "numeric", year: "numeric" });
+  return `${f($("from").value)} – ${f($("to").value)}`;
+}
+function renderPeriods() {
+  $("periods").innerHTML = [...state.periods, ["custom", "Vlastní rozsah"]]
+    .map(([k, l]) => `<button aria-pressed="${k === state.period}" data-p="${k}">${l}</button>`).join("");
+  $("range").hidden = state.period !== "custom";
+}
+function renderApps() {
+  const counts = {};
+  for (const r of state.rows) counts[r.app] = (counts[r.app] || 0) + 1;
+  const apps = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  $("apps-group").hidden = apps.length === 0;
+  $("apps").innerHTML =
+    `<button aria-pressed="${state.app === null}" data-a=""><span class="app-name"><span>Všechny aplikace</span></span><span class="n">${state.rows.length}</span></button>` +
+    apps.map(([a, n]) => `<button aria-pressed="${state.app === a}" data-a="${esc(a || "")}"><span class="app-name"><span class="app-dot" style="background:${appColor(a)}"></span><span>${esc(appLabel(a))}</span></span><span class="n">${n}</span></button>`).join("");
+}
+function renderList() {
+  state.shown = state.rows.filter((r) => state.app === null || r.app === state.app);
+  const secs = state.shown.reduce((s, r) => s + (r.audio_seconds || 0), 0);
+  const words = state.shown.reduce((s, r) => s + r.text.split(/\s+/).filter(Boolean).length, 0);
+  const n = state.shown.length;
+  $("title").textContent = periodTitle();
+  $("summary").textContent = n ? `${n} ${plural(n, "záznam", "záznamy", "záznamů")}, ${num(words)} ${plural(words, "slovo", "slova", "slov")}, nadiktováno za ${fmtDur(secs)}` : "";
+  if (!n) {
+    const keys = (state.settings?.config.hotkeys || ["right ctrl"]).map(keyText).join(" nebo ");
+    $("list").innerHTML = state.q || state.app
+      ? `<div class="empty"><h2>Nic neodpovídá hledání</h2><p>Zkuste jiné slovo nebo delší období v levém panelu.</p></div>`
+      : `<div class="empty"><h2>V tomhle období nic není</h2><p>Klikněte do libovolného textového pole, podržte <b>${esc(keys)}</b>, řekněte, co potřebujete, a klávesu pusťte. Přepis se vloží na místo kurzoru a objeví se tady.</p></div>`;
+    return;
+  }
+  const byDay = new Map();
+  for (const r of state.shown) { const d = r.ts.slice(0, 10); if (!byDay.has(d)) byDay.set(d, []); byDay.get(d).push(r); }
+  let html = "";
+  for (const [d, rows] of byDay) {
+    const [label, sub] = dayLabel(d);
+    html += `<section class="day"><h3>${label}<small>${sub}</small></h3><ol class="entries">`;
+    for (const r of rows) {
+      html += `<li class="entry" data-id="${r.id}" aria-selected="${state.selected.has(r.id)}" style="--c:${appColor(r.app)}">
+        <span class="time">${r.ts.slice(11, 16)}</span><span class="node"></span>
+        <div class="body"><p class="text">${highlight(r.text)}</p>
+          <div class="meta"><span class="chip">${esc(appLabel(r.app))}</span><span class="where" title="${esc(r.window_title)}">${highlight(cleanTitle(r.window_title))}</span></div>
+        </div>
+        <button class="copy1" title="Kopírovat tento text" aria-label="Kopírovat tento text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
+      </li>`;
+    }
+    html += `</ol></section>`;
+  }
+  $("list").innerHTML = html;
+}
+function renderBar() { const n = state.selected.size; $("bar").classList.toggle("on", n > 0); if (n) $("selcount").textContent = `Vybráno ${n}`; }
+async function loadHistory() {
+  if (state.period === "custom" && (!$("from").value || !$("to").value)) return;
+  state.rows = await api().entries(periodKey(), state.q);
+  if (state.app !== null && !state.rows.some((r) => r.app === state.app)) state.app = null;
+  const ids = new Set(state.rows.map((r) => r.id));
+  for (const id of [...state.selected]) if (!ids.has(id)) state.selected.delete(id);
+  renderPeriods(); renderApps(); renderList(); renderBar();
+}
+function selectedRows() { return [...state.shown].reverse().filter((r) => state.selected.has(r.id)); }
+async function copyRows(rows, withMeta) {
+  if (!rows.length) return;
+  const out = withMeta
+    ? rows.map((r) => `[${r.ts.replace("T", " ").slice(0, 16)}] ${appLabel(r.app)}: ${cleanTitle(r.window_title)}\n${r.text}`).join("\n\n")
+    : rows.map((r) => r.text).join("\n");
+  await api().copy(out);
+  toast(rows.length === 1 ? "Zkopírováno" : `Zkopírováno ${rows.length} ${plural(rows.length, "záznam", "záznamy", "záznamů")}`);
+}
+$("periods").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.period = b.dataset.p; state.selected.clear();
+  if (state.period === "custom" && !$("from").value) {
+    const t = new Date(), f = new Date(); f.setDate(t.getDate() - 13);
+    $("from").value = isoDate(f); $("to").value = isoDate(t);
+  }
+  loadHistory();
+});
+$("from").addEventListener("change", loadHistory);
+$("to").addEventListener("change", loadHistory);
+$("apps").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { state.app = b.dataset.a === "" ? null : b.dataset.a; renderApps(); renderList(); } });
+let qTimer;
+$("q").addEventListener("input", (e) => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.q = e.target.value.trim(); loadHistory(); }, 150); });
+$("list").addEventListener("click", (e) => {
+  const li = e.target.closest(".entry"); if (!li) return;
+  const id = +li.dataset.id;
+  if (e.target.closest(".copy1")) { copyRows(state.shown.filter((r) => r.id === id), false); return; }
+  if (String(window.getSelection())) return;
+  state.selected.has(id) ? state.selected.delete(id) : state.selected.add(id);
+  li.setAttribute("aria-selected", state.selected.has(id));
+  renderBar();
+});
+$("copy-text").onclick = () => copyRows(selectedRows(), false);
+$("copy-meta").onclick = () => copyRows(selectedRows(), true);
+$("clear").onclick = () => { state.selected.clear(); renderList(); renderBar(); };
+$("export").onclick = async () => { const n = await api().export(periodKey(), state.q, $("fmt").value); toast(`Exportováno ${n} ${plural(n, "záznam", "záznamy", "záznamů")}`); };
+
+/* ---------------- statistiky ---------------- */
+async function loadStats() {
+  const s = await api().stats();
+  const P = s.periods;
+  const tile = (title, p, cls = "") => `<div class="tile ${cls}"><h3>${title}</h3>
+    <div class="big">${num(p.words)}<small>${plural(p.words, "slovo", "slova", "slov")}</small></div>
+    <dl><dt>Záznamy</dt><dd>${num(p.count)}</dd><dt>Mluvení</dt><dd>${fmtDur(p.audio_seconds)}</dd><dt>Ušetřeno</dt><dd>~${fmtMin(p.saved_minutes)}</dd></dl></div>`;
+  $("tiles").innerHTML = tile("Dnes", P.today) + tile("Posledních 7 dní", P["7d"]) + tile("Posledních 30 dní", P["30d"]) + tile("Od začátku", P.all, "total");
+  $("stats-sub").textContent = s.first_use
+    ? `Diktovátko používáte od ${new Date(s.first_use + "T00:00:00").toLocaleDateString("cs-CZ", { day: "numeric", month: "long", year: "numeric" })}`
+    : "Statistiky se začnou plnit po prvním nadiktování.";
+  renderChart(s.daily);
+  const max = Math.max(1, ...s.apps.map((a) => a.words));
+  $("appbars").innerHTML = s.apps.length
+    ? s.apps.map((a) => `<div class="ab"><span class="lbl"><span class="app-dot" style="background:${appColor(a.app)}"></span><span>${esc(appLabel(a.app))}</span></span><span class="track"><span class="fill" style="width:${(a.words / max) * 100}%"></span></span><span class="v">${num(a.words)} slov</span></div>`).join("")
+    : `<p class="note">Zatím žádná data.</p>`;
+  const avgPerDay = s.active_days ? P.all.words / s.active_days : 0;
+  $("facts").innerHTML = `
+    <dt>Dny, kdy jste diktoval</dt><dd>${num(s.active_days)}</dd>
+    <dt>Série dní v řadě</dt><dd>${num(s.streak)}</dd>
+    <dt>Průměrně za aktivní den</dt><dd>${num(avgPerDay)} slov</dd>
+    <dt>Rychlost mluvení</dt><dd>${s.wpm ? s.wpm + " slov/min" : "–"}</dd>
+    <dt>Znaků celkem</dt><dd>${num(P.all.chars)}</dd>`;
+  $("note").textContent = `Ušetřený čas počítá rozdíl proti psaní na klávesnici rychlostí ${s.typing_wpm} slov za minutu.`;
+}
+function renderChart(daily) {
+  const el = $("chart"), tip = $("tip");
+  const W = el.clientWidth || 800, H = 160, padL = 34, padB = 20, padT = 6;
+  const max = Math.max(...daily.map((d) => d.words));
+  const top = max <= 0 ? 10 : niceCeil(max);
+  const n = daily.length, slot = (W - padL) / n, bw = Math.max(4, Math.min(22, slot - 4));
+  const y = (v) => padT + (H - padT - padB) * (1 - v / top);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Počet nadiktovaných slov za posledních 30 dní">`;
+  for (const g of [0, top / 2, top]) svg += `<line class="grid" x1="${padL}" x2="${W}" y1="${y(g)}" y2="${y(g)}"/><text class="axis" x="${padL - 6}" y="${y(g) + 4}" text-anchor="end">${num(g)}</text>`;
+  daily.forEach((d, i) => {
+    const x = padL + i * slot + (slot - bw) / 2, h = Math.max(0, y(0) - y(d.words));
+    const today = i === n - 1;
+    if (h > 0) svg += `<path class="col${today ? " today" : ""}" data-i="${i}" d="${roundTop(x, y(0), bw, h, Math.min(4, bw / 2, h))}"/>`;
+    svg += `<rect class="hit" data-i="${i}" x="${padL + i * slot}" y="${padT}" width="${slot}" height="${H - padT - padB}"/>`;
+    if (i % 5 === 4 || today) {
+      const dt = new Date(d.date + "T00:00:00");
+      svg += `<text class="axis" x="${x + bw / 2}" y="${H - 4}" text-anchor="middle">${today ? "dnes" : dt.getDate() + ". " + (dt.getMonth() + 1) + "."}</text>`;
+    }
+  });
+  svg += `</svg>`;
+  el.querySelector("svg")?.remove();
+  el.insertAdjacentHTML("afterbegin", svg);
+  el.querySelectorAll(".hit").forEach((r) => {
+    r.addEventListener("mouseenter", () => {
+      const d = daily[+r.dataset.i], dt = new Date(d.date + "T00:00:00");
+      el.querySelectorAll(".col").forEach((b) => b.classList.toggle("hover", b.dataset.i === r.dataset.i));
+      tip.innerHTML = `<b>${num(d.words)}</b> ${plural(d.words, "slovo", "slova", "slov")} · ${dt.toLocaleDateString("cs-CZ", { weekday: "short", day: "numeric", month: "numeric" })}`;
+      const rect = r.getBoundingClientRect(), host = el.getBoundingClientRect();
+      tip.style.left = rect.left - host.left + rect.width / 2 + "px";
+      tip.style.top = y(d.words) + "px";
+      tip.classList.add("on");
+    });
+    r.addEventListener("mouseleave", () => { tip.classList.remove("on"); el.querySelectorAll(".col").forEach((b) => b.classList.remove("hover")); });
+  });
+}
+function niceCeil(v) { const p = 10 ** Math.floor(Math.log10(v)); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p; return 10 * p; }
+function roundTop(x, base, w, h, r) { return `M${x},${base} V${base - h + r} Q${x},${base - h} ${x + r},${base - h} H${x + w - r} Q${x + w},${base - h} ${x + w},${base - h + r} V${base} Z`; }
+window.addEventListener("resize", () => { if (state.view === "stats") loadStats(); });
+
+/* ---------------- nastavení ---------------- */
+function keyText(hk) {
+  const preset = state.settings?.presets.find(([k]) => k === hk);
+  return preset ? preset[1].replace(/\s*\(.*\)$/, "") : hk.split("+").map((p) => KEY_NAMES[p] || p.toUpperCase()).join(" + ");
+}
+function caps(hk) { return hk.split("+").map((p) => `<kbd>${esc(KEY_NAMES[p] || p.toUpperCase())}</kbd>`).join(""); }
+async function loadSettings() {
+  state.settings = await api().get_settings();
+  const { config: c, presets, languages, models, autostart } = state.settings;
+  const current = c.hotkeys[0] || "right ctrl";
+  const isPreset = presets.some(([k]) => k === current);
+  $("hotkey").innerHTML = presets.map(([k, label]) => `<option value="${esc(k)}" ${k === current ? "selected" : ""}>${esc(label)}</option>`).join("")
+    + `<option value="__custom" ${isPreset ? "" : "selected"}>Vlastní…</option>`;
+  $("custom").value = isPreset ? "" : current;
+  hotkeyChanged();
+  setSeg(c.mode);
+  $("language").innerHTML = languages.map(([v, l]) => `<option value="${v ?? ""}" ${(c.language ?? "") === (v ?? "") ? "selected" : ""}>${l}</option>`).join("");
+  $("model").innerHTML = models.map(([v, l]) => `<option value="${v}" ${c.model === v ? "selected" : ""}>${l}</option>`).join("");
+  $("groq").value = c.groq_api_key || "";
+  $("prompt").value = c.initial_prompt || "";
+  $("duck").checked = c.duck_audio; $("duck-level").value = Math.round(c.duck_level * 100); duckLabel();
+  $("overlay").checked = c.overlay; $("sounds").checked = c.sounds; $("trailing").checked = c.trailing_space; $("hist").checked = c.history;
+  $("autostart").checked = autostart;
+  $("save-msg").textContent = ""; $("save-msg").className = "msg";
+}
+function chosenHotkey() { return $("hotkey").value === "__custom" ? $("custom").value.trim().toLowerCase() : $("hotkey").value; }
+function hotkeyChanged() {
+  $("custom-row").hidden = $("hotkey").value !== "__custom";
+  const hk = chosenHotkey();
+  $("hotkey-caps").innerHTML = hk ? "Stiskněte " + caps(hk) : "Zadejte vlastní zkratku níže.";
+}
+$("hotkey").addEventListener("change", () => { hotkeyChanged(); if ($("hotkey").value === "__custom") $("custom").focus(); });
+$("custom").addEventListener("input", hotkeyChanged);
+function setSeg(v) { $("mode").dataset.v = v; $("mode").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === v)); }
+function duckLabel() { const v = +$("duck-level").value; $("duck-val").textContent = v === 0 ? "ticho" : v + " %"; }
+$("mode").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) setSeg(b.dataset.v); });
+$("duck-level").addEventListener("input", duckLabel);
+$("groq-show").onclick = () => { const i = $("groq"); const show = i.type === "password"; i.type = show ? "text" : "password"; $("groq-show").textContent = show ? "Skrýt" : "Zobrazit"; };
+$("groq-link").onclick = () => api().open_url("https://console.groq.com/keys");
+$("save").onclick = async () => {
+  const hotkeys = chosenHotkey() ? [chosenHotkey()] : [];
+  const cfg = {
+    hotkeys, mode: $("mode").dataset.v, language: $("language").value || null, model: $("model").value,
+    groq_api_key: $("groq").value.trim(), initial_prompt: $("prompt").value.trim(),
+    duck_audio: $("duck").checked, duck_level: +$("duck-level").value / 100,
+    overlay: $("overlay").checked, sounds: $("sounds").checked, trailing_space: $("trailing").checked, history: $("hist").checked,
+  };
+  const res = await api().save_settings(cfg, $("autostart").checked);
+  const m = $("save-msg");
+  m.className = "msg" + (res.ok ? "" : " err");
+  m.textContent = res.ok ? "Uloženo. Změny už platí." : res.error;
+  if (res.ok) { toast("Nastavení uloženo"); state.settings.config = { ...state.settings.config, ...cfg }; }
+};
+
+/* ---------------- klávesy a okno ---------------- */
+document.addEventListener("keydown", (e) => {
+  if (state.view !== "history") return;
+  const inInput = /INPUT|TEXTAREA|SELECT/.test(e.target.tagName);
+  if (e.key === "/" && !inInput) { e.preventDefault(); $("q").focus(); }
+  else if (e.key === "Escape") { if (inInput && e.target.value) return; state.selected.clear(); renderList(); renderBar(); }
+  else if (e.ctrlKey && e.key.toLowerCase() === "a" && !inInput) { e.preventDefault(); state.shown.forEach((r) => state.selected.add(r.id)); renderList(); renderBar(); }
+  else if (e.ctrlKey && e.key.toLowerCase() === "c" && !inInput && !String(window.getSelection()) && state.selected.size) { e.preventDefault(); copyRows(selectedRows(), false); }
+  else if (e.key === "F5") { e.preventDefault(); loadHistory(); }
+});
+async function checkPending() {
+  const v = await api().pending_view();
+  if (v && v !== state.view) showView(v);
+  else if (state.view === "history") loadHistory();
+  else if (state.view === "stats") loadStats();
+}
+window.addEventListener("focus", () => window.pywebview && checkPending());
+window.addEventListener("pywebviewready", async () => {
+  state.periods = await api().periods();
+  state.settings = await api().get_settings();
+  const v = await api().pending_view();
+  showView(v || "history");
+});
+</script>
+</body>
+</html>
