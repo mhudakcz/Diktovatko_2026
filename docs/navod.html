@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Návod k Diktovátku</title>
+<meta name="description" content="Podrobný návod krok za krokem: instalace Diktovátka na Windows a Mac, vlastní Groq klíč, nastavení, historie a řešení problémů.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23F0405A'/%3E%3Crect x='9' y='5' width='6' height='10' rx='3' fill='white'/%3E%3Cpath d='M7 12a5 5 0 0 0 10 0M12 17v2.5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fog: #EEF1F5; --paper: #FFFFFF; --ink: #1B2230; --ink-2: #4A5366; --muted: #6F788A;
+  --line: #DCE1E9; --ultra: #3847F5; --ultra-soft: #E6E8FE; --voice: #F0405A; --warn-bg: #FFF4E5; --warn: #8A4B00;
+  --display: "Bricolage Grotesque", "Segoe UI", sans-serif; --body: "Onest", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fog: #12151C; --paper: #1A1F29; --ink: #E8EBF2; --ink-2: #B5BCCB; --muted: #8A93A6;
+    --line: #2A3140; --ultra: #8490FF; --ultra-soft: #262C4F; --warn-bg: #33260F; --warn: #F5C27A; color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body { margin: 0; background: var(--fog); color: var(--ink); font: 16.5px/1.65 var(--body); -webkit-font-smoothing: antialiased; }
+a { color: var(--ultra); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--ultra); outline-offset: 3px; border-radius: 4px; }
+
+.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--fog) 90%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top-in { width: min(1120px, 100% - 32px); margin: 0 auto; display: flex; align-items: center; gap: 20px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 9px; font: 800 17px/1 var(--display); color: var(--ink); text-decoration: none; }
+.mark { width: 24px; height: 24px; border-radius: 50%; background: var(--voice); display: grid; place-items: center; }
+.mark svg { width: 12px; height: 12px; }
+.os { margin-left: auto; display: inline-flex; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.os button { border: 0; background: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; font: 500 14px var(--body); color: var(--ink-2); }
+.os button[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .1); }
+
+.layout { width: min(1120px, 100% - 32px); margin: 0 auto; display: grid; grid-template-columns: 230px 1fr; gap: 56px; padding: 40px 0 100px; }
+.toc { position: sticky; top: 90px; align-self: start; font-size: 14.5px; }
+.toc p { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+.toc ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; counter-reset: t; }
+.toc li { counter-increment: t; }
+.toc a { display: flex; gap: 10px; padding: 5px 8px; border-radius: 7px; color: var(--ink-2); text-decoration: none; }
+.toc a::before { content: counter(t); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 1.2em; }
+.toc a:hover, .toc a.on { background: var(--paper); color: var(--ink); }
+
+article { max-width: 720px; min-width: 0; }
+h1 { margin: 0; font: 800 clamp(34px, 5vw, 48px)/1.05 var(--display); letter-spacing: -0.03em; }
+.lede { margin: 14px 0 0; font-size: 19px; color: var(--ink-2); }
+.meta { margin: 18px 0 0; font-size: 14px; color: var(--muted); }
+section { margin-top: 56px; }
+h2 { margin: 0 0 12px; font: 800 28px/1.15 var(--display); letter-spacing: -0.02em; display: flex; gap: 12px; align-items: baseline; }
+h2 .n { color: var(--ultra); }
+h3 { margin: 28px 0 8px; font: 600 19px/1.3 var(--display); }
+p { margin: 0 0 14px; }
+ul { padding-left: 22px; margin: 0 0 14px; }
+li { margin-bottom: 6px; }
+
+.steps { list-style: none; padding: 0; margin: 18px 0; counter-reset: s; display: grid; gap: 14px; }
+.steps > li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 14px; margin: 0; }
+.steps > li::before { content: counter(s); width: 34px; height: 34px; border-radius: 50%; background: var(--ultra-soft); color: var(--ultra); display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+.steps > li > div { padding-top: 4px; }
+.steps b { font-weight: 600; }
+
+kbd { font: 600 0.82em var(--body); padding: 2px 7px; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; background: var(--paper); white-space: nowrap; }
+code { font: 500 0.88em "Cascadia Code", "SF Mono", Consolas, monospace; padding: 2px 6px; border-radius: 6px; background: var(--paper); border: 1px solid var(--line); }
+.path { font-weight: 600; }
+.note, .warn { padding: 14px 16px; border-radius: 12px; margin: 18px 0; font-size: 15.5px; }
+.note { background: var(--ultra-soft); }
+.warn { background: var(--warn-bg); color: var(--warn); }
+.note p:last-child, .warn p:last-child { margin: 0; }
+.shot { margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+.shot img { display: block; width: 100%; height: auto; }
+.faq details { border-top: 1px solid var(--line); padding: 12px 0; }
+.faq details:last-child { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+.faq summary::after { content: "+"; color: var(--muted); font-weight: 400; font-size: 20px; line-height: 1; }
+.faq details[open] summary::after { content: "–"; }
+.faq details > div { padding-top: 10px; color: var(--ink-2); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 14px 0; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 13.5px; }
+
+.mac { display: none; }
+body.is-mac .mac { display: revert; }
+body.is-mac .win { display: none; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; gap: 0; padding-top: 24px; }
+  .toc { display: none; }
+  .brand span:last-child { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="top-in">
+    <a class="brand" href="./"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="8" y="2" width="8" height="13" rx="4" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></span><span>Diktovátko</span></a>
+    <div class="os" role="group" aria-label="Operační systém">
+      <button type="button" data-os="win" aria-pressed="true">Windows</button>
+      <button type="button" data-os="mac" aria-pressed="false">Mac</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="toc" aria-label="Obsah">
+    <p>Obsah</p>
+    <ol>
+      <li><a href="#potrebujete">Co budete potřebovat</a></li>
+      <li><a href="#python">Instalace Pythonu</a></li>
+      <li><a href="#stazeni">Stažení a instalace</a></li>
+      <li><a href="#spusteni">První spuštění</a></li>
+      <li><a href="#groq">Vlastní Groq klíč</a></li>
+      <li><a href="#diktovani">Jak diktovat</a></li>
+      <li><a href="#nastaveni">Nastavení</a></li>
+      <li><a href="#historie">Historie a statistiky</a></li>
+      <li><a href="#problemy">Řešení problémů</a></li>
+      <li><a href="#aktualizace">Aktualizace a odinstalace</a></li>
+    </ol>
+  </nav>
+
+  <article>
+    <h1>Návod krok za krokem</h1>
+    <p class="lede">Od instalace po první nadiktovanou větu. Nepotřebujete žádné programátorské znalosti, stačí postupovat bod po bodu.</p>
+    <p class="meta">Nahoře si přepněte, jestli máte <b>Windows</b> nebo <b>Mac</b>. Návod se podle toho upraví.</p>
+
+    <div class="warn mac">
+      <p><b>Mac verze je nová.</b> Ladíme ji. Když vám něco nebude fungovat, dejte vědět přes <a href="https://github.com/mhudakcz/Diktovatko_2026/issues">GitHub Issues</a>.</p>
+    </div>
+
+    <section id="potrebujete">
+      <h2><span class="n">1</span>Co budete potřebovat</h2>
+      <ul>
+        <li class="win">Počítač s <b>Windows 10 nebo 11</b>.</li>
+        <li class="mac">Mac s <b>macOS 12 Monterey</b> nebo novějším (Apple Silicon i Intel).</li>
+        <li><b>Mikrofon</b>: vestavěný v notebooku, ve sluchátkách nebo samostatný.</li>
+        <li><b>Python</b>: bezplatný program, na kterém Diktovátko běží. Jak ho nainstalovat, je v dalším kroku.</li>
+        <li><b>Internet</b> pro instalaci. Pro diktování jen v případě, že použijete rychlý přepis přes Groq.</li>
+        <li>Zhruba <b>10 minut</b> času.</li>
+      </ul>
+    </section>
+
+    <section id="python">
+      <h2><span class="n">2</span>Instalace Pythonu</h2>
+      <p>Pokud Python už máte, tento krok přeskočte.</p>
+      <ol class="steps win">
+        <li><div>Otevřete <a href="https://www.python.org/downloads/">python.org/downloads</a> a klikněte na žluté tlačítko <b>Download Python</b>.</div></li>
+        <li><div>Spusťte stažený soubor.</div></li>
+        <li><div><b>Důležité:</b> dole v prvním okně instalace zaškrtněte <b>Add python.exe to PATH</b>.</div></li>
+        <li><div>Klikněte na <b>Install Now</b> a počkejte, až instalace doběhne. Pak okno zavřete.</div></li>
+      </ol>
+      <ol class="steps mac">
+        <li><div>Otevřete <a href="https://www.python.org/downloads/macos/">python.org/downloads/macos</a> a stáhněte nejnovější <b>macOS 64-bit universal2 installer</b>.</div></li>
+        <li><div>Otevřete stažený soubor <code>.pkg</code> a projděte instalaci tlačítky <b>Pokračovat</b> a <b>Instalovat</b>.</div></li>
+        <li><div>Na konci se otevře složka Python. V ní dvakrát klikněte na <b>Install Certificates.command</b>, aby šlo stahovat z internetu.</div></li>
+      </ol>
+    </section>
+
+    <section id="stazeni">
+      <h2><span class="n">3</span>Stažení a instalace Diktovátka</h2>
+      <ol class="steps">
+        <li><div>Stáhněte <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">Diktovátko jako ZIP</a>.</div></li>
+        <li><div>Rozbalte ho do složky, kde ho necháte natrvalo, třeba <span class="path">Dokumenty/Diktovatko</span>. Ze složky Stažené soubory ho později nemazejte.</div></li>
+        <li class="win"><div>Ve složce dvakrát klikněte na <code>install.bat</code>. Otevře se černé okno a začnou se stahovat potřebné součásti, trvá to 1–3 minuty. Na konci uvidíte „Hotovo“.</div></li>
+        <li class="mac"><div>Ve složce klikněte na <code>install.command</code> <b>pravým tlačítkem</b> (nebo s klávesou Control) a zvolte <b>Otevřít</b>. V dotazu znovu potvrďte <b>Otevřít</b>. Mac se ptá, protože soubor nepochází z App Store. Pak se otevře Terminál a začne instalace, trvá to 1–3 minuty.</div></li>
+      </ol>
+      <div class="note win"><p>Pokud Windows zobrazí modré okno <b>Systém Windows ochránil váš počítač</b>, klikněte na <b>Další informace</b> a potom na <b>Přesto spustit</b>.</p></div>
+    </section>
+
+    <section id="spusteni">
+      <h2><span class="n">4</span>První spuštění</h2>
+      <ol class="steps win">
+        <li><div>Dvakrát klikněte na <code>start.bat</code>.</div></li>
+        <li><div>Vpravo dole vedle hodin se objeví ikona mikrofonu. Když ji nevidíte, klikněte na šipku <kbd>^</kbd> vedle hodin, ikona bude tam. Můžete ji přetáhnout přímo do lišty, aby byla pořád vidět.</div></li>
+        <li><div>Krátké pípnutí znamená, že je Diktovátko připravené.</div></li>
+      </ol>
+      <ol class="steps mac">
+        <li><div>Klikněte na <code>start.command</code> pravým tlačítkem a zvolte <b>Otevřít</b> (napoprvé, potom už stačí dvojklik).</div></li>
+        <li><div>Nahoře v liště vpravo se objeví ikona mikrofonu.</div></li>
+        <li><div>Mac se zeptá na několik oprávnění. Bez nich Diktovátko nemůže fungovat, postup je hned níže.</div></li>
+      </ol>
+
+      <div class="mac">
+        <h3>Oprávnění na Macu</h3>
+        <p>Otevřete <span class="path">Nastavení systému → Soukromí a zabezpečení</span> a u každé položky níže zapněte přepínač u aplikace <b>Terminál</b> (případně <b>Python</b>, pokud se objeví):</p>
+        <table>
+          <tr><th>Položka</th><th>K čemu je potřeba</th></tr>
+          <tr><td><b>Mikrofon</b></td><td>nahrávání hlasu</td></tr>
+          <tr><td><b>Zpřístupnění</b></td><td>vložení textu na místo kurzoru a sledování zkratky</td></tr>
+          <tr><td><b>Sledování vstupu</b></td><td>rozpoznání, že držíte zkratku</td></tr>
+          <tr><td><b>Nahrávání obrazovky</b> (nepovinné)</td><td>jen pro názvy oken v historii. Bez něj se uloží jen název aplikace.</td></tr>
+        </table>
+        <p>Po povolení Diktovátko ukončete (ikona v liště → <b>Ukončit</b>) a spusťte znovu přes <code>start.command</code>.</p>
+        <h3>Klávesa Fn (🌐)</h3>
+        <p>Diktovátko na Macu ve výchozím nastavení reaguje na <kbd>Fn</kbd>, stejně jako Wispr Flow. Aby se po stisku neotevíral výběr emoji, otevřete <span class="path">Nastavení systému → Klávesnice</span> a u volby <b>Stisknutím klávesy 🌐</b> vyberte <b>Nedělat nic</b>.</p>
+      </div>
+    </section>
+
+    <section id="groq">
+      <h2><span class="n">5</span>Vlastní Groq klíč (doporučeno)</h2>
+      <p>Diktovátko umí přepisovat dvěma způsoby:</p>
+      <ul>
+        <li><b>Offline v počítači</b> funguje hned a bez registrace. Při prvním použití se ale stáhne asi 1,6 GB a přepis trvá zhruba tak dlouho jako samotná nahrávka.</li>
+        <li><b>Přes službu Groq</b> je hotový za sekundu. Potřebujete k tomu <b>vlastní bezplatný klíč</b>.</li>
+      </ul>
+      <div class="note"><p><b>Každý uživatel potřebuje svůj vlastní klíč.</b> Klíč je jako heslo k vašemu účtu u Groq. Diktovátko ho má uložený jen ve vašem počítači (v souboru <code>config.json</code>) a nikdy ho nesdílí. Klíč nikomu neposílejte a nevkládejte ho do veřejných míst.</p></div>
+      <h3>Jak klíč získat</h3>
+      <ol class="steps">
+        <li><div>Otevřete <a href="https://console.groq.com/keys">console.groq.com/keys</a>.</div></li>
+        <li><div>Přihlaste se: nejjednodušeji tlačítkem <b>Continue with Google</b>, nebo e-mailem. Platební kartu nezadáváte.</div></li>
+        <li><div>Klikněte na <b>Create API Key</b>, jako název napište třeba <i>Diktovátko</i> a potvrďte.</div></li>
+        <li><div>Zobrazí se klíč začínající <code>gsk_</code>. Klikněte na <b>Copy</b>. Klíč se ukáže jen jednou, kdybyste ho ztratili, jednoduše vytvoříte nový.</div></li>
+        <li><div>Klikněte na ikonu Diktovátka a nahoře zvolte <b>Nastavení</b>.</div></li>
+        <li><div>Klíč vložte do pole <b>Groq API klíč</b> (<kbd class="win">Ctrl</kbd><kbd class="mac">⌘</kbd> + <kbd>V</kbd>) a dole klikněte na <b>Uložit nastavení</b>. Hotovo, další diktování už půjde přes Groq.</div></li>
+      </ol>
+      <h3>Co je dobré vědět</h3>
+      <ul>
+        <li><b>Zdarma:</b> bezplatný tarif Groq stačí na několik hodin diktování denně. Bez zadané karty vám nikdy nic nenaúčtují, při překročení limitu jen chvíli počkáte.</li>
+        <li><b>Soukromí:</b> s klíčem se nahrávka posílá na servery Groq v USA. Citlivé věci můžete diktovat offline, stačí klíč z nastavení smazat.</li>
+        <li><b>Když klíč unikne</b>, na <a href="https://console.groq.com/keys">console.groq.com/keys</a> ho u koše smažte a vytvořte nový.</li>
+      </ul>
+    </section>
+
+    <section id="diktovani">
+      <h2><span class="n">6</span>Jak diktovat</h2>
+      <ol class="steps">
+        <li><div>Klikněte tam, kam chcete psát: do e-mailu, chatu, dokumentu, vyhledávání…</div></li>
+        <li><div>Podržte <kbd class="win">pravý Ctrl</kbd><kbd class="mac">Fn</kbd>. Zazní pípnutí a dole na obrazovce se objeví tmavá pilulka se sloupečky, které se hýbou podle vašeho hlasu. Hudba a videa se ztiší.</div></li>
+        <li><div>Mluvte normálně, v celých větách. Čárky a tečky doplní přepis sám.</div></li>
+        <li><div>Pusťte klávesu. Pilulka ukáže vlnu a za chvilku se text objeví na místě kurzoru.</div></li>
+      </ol>
+      <h3>Tipy</h3>
+      <ul>
+        <li>Chvilku po stisku počkejte, než začnete mluvit (stačí pípnutí), ať se neusekne první slovo.</li>
+        <li>Diktovat jde i několik minut v kuse. Delší nahrávky se automaticky rozdělí.</li>
+        <li>Když do zkratky omylem přimáčknete jinou klávesu (třeba <kbd class="win">Ctrl</kbd><kbd class="mac">⌘</kbd>+<kbd>C</kbd>), nahrávání se zruší a nic se nevloží.</li>
+        <li>Jména a odborné výrazy, které se přepisují špatně, doplňte do pole <b>Slovník a styl</b> v nastavení.</li>
+      </ul>
+    </section>
+
+    <section id="nastaveni">
+      <h2><span class="n">7</span>Nastavení</h2>
+      <p>Klikněte na ikonu Diktovátka a nahoře zvolte <b>Nastavení</b>. Změny platí hned po kliknutí na <b>Uložit nastavení</b>.</p>
+      <figure class="shot win"><img src="img/settings-light.png" alt="Nastavení Diktovátka" loading="lazy"></figure>
+      <table>
+        <tr><th>Volba</th><th>Co dělá</th></tr>
+        <tr><td><b>Zkratka pro diktování</b></td><td>
+          <span class="win">Pravý Ctrl, Ctrl + Win (jako Wispr Flow), Ctrl + Alt + mezerník a další. Volba <i>Vlastní…</i> umožní zadat jakoukoli kombinaci, třeba <code>ctrl+alt+d</code>.</span>
+          <span class="mac">Fn / 🌐 (jako Wispr Flow), pravý ⌘ Cmd, pravý ⌥ Option, Ctrl + Option a další. Volba <i>Vlastní…</i> umožní zadat jakoukoli kombinaci.</span></td></tr>
+        <tr><td><b>Způsob ovládání</b></td><td><i>Držet</i> nahrává, dokud klávesu držíte. <i>Přepínat</i>: první stisk spustí, druhý zastaví, hodí se na delší diktování.</td></tr>
+        <tr><td><b>Jazyk</b></td><td>čeština, slovenština, angličtina a další, nebo automatické rozpoznání</td></tr>
+        <tr><td><b>Groq API klíč</b></td><td>viz <a href="#groq">krok 5</a>. Prázdné pole znamená přepis offline.</td></tr>
+        <tr><td><b>Lokální model</b></td><td>přesnost a rychlost offline přepisu</td></tr>
+        <tr><td><b>Slovník a styl</b></td><td>jména, firmy a výrazy, které má přepis znát</td></tr>
+        <tr><td><b>Ztlumit ostatní zvuky</b></td><td>na kolik se ztiší hudba a videa během diktování <span class="mac">(na Macu se ztiší celý zvuk počítače)</span></td></tr>
+        <tr><td><b>Indikátor, pípnutí, mezera</b></td><td>vzhled a drobnosti při diktování</td></tr>
+        <tr><td><b>Ukládat historii</b></td><td>vypnutím se přestane ukládat, co diktujete</td></tr>
+        <tr><td><b>Spouštět po přihlášení</b></td><td>Diktovátko se zapne samo po startu počítače</td></tr>
+      </table>
+    </section>
+
+    <section id="historie">
+      <h2><span class="n">8</span>Historie a statistiky</h2>
+      <p>Každý přepis se uloží <b>jen do vašeho počítače</b>, i s časem a názvem okna, kam šel (konverzace ve Slacku, předmět e-mailu, název tiketu…). Hodí se to, když potřebujete zpětně dohledat, na čem jste pracoval.</p>
+      <ul>
+        <li><b>Historie:</b> klikněte na ikonu. Vlevo vyberete období (dnes, 7, 10, 14, 20, 30 dní, tento či minulý měsíc nebo vlastní rozsah dat), aplikaci nebo můžete hledat podle slova.</li>
+        <li><b>Kopírování:</b> klikem označíte záznamy a dole zvolíte <i>Kopírovat text</i> nebo <i>Kopírovat s časem a oknem</i>.</li>
+        <li><b>Export:</b> tlačítko <i>Exportovat</i> uloží zobrazené záznamy do Markdownu nebo CSV (otevřete v Excelu). Hodí se jako podklad pro AI, například s pokynem „shrň, na čem jsem minulý měsíc pracoval“.</li>
+        <li><b>Statistiky:</b> počet slov, záznamů, čas mluvení a ušetřený čas za dnešek, týden, měsíc i celkem, graf po dnech a přehled aplikací.</li>
+      </ul>
+      <figure class="shot"><img src="img/stats-light.png" alt="Statistiky diktování" loading="lazy"></figure>
+    </section>
+
+    <section id="problemy" class="faq">
+      <h2><span class="n">9</span>Řešení problémů</h2>
+      <details><summary>Po stisku zkratky se nic neděje</summary><div>
+        <p class="win">Zkontrolujte, že ikona Diktovátka je vedle hodin a je tmavá (ne šedá ani černo-červená). Šedá znamená, že se ještě načítá. Když ikona chybí, spusťte znovu <code>start.bat</code>.</p>
+        <p class="mac">Téměř vždy jde o oprávnění. Zkontrolujte <b>Zpřístupnění</b> a <b>Sledování vstupu</b> v <span class="path">Nastavení systému → Soukromí a zabezpečení</span>, pak Diktovátko ukončete a spusťte znovu.</p>
+        <p>Zkuste v nastavení jinou zkratku. Některé klávesnice nemají pravý Ctrl nebo klávesu Menu.</p></div></details>
+      <details><summary>Nahrává se, ale text se nevloží</summary><div>
+        <p>Klikněte před diktováním opravdu do textového pole, ať v něm bliká kurzor.</p>
+        <p class="win">Do oken spuštěných „jako správce“ (třeba některé instalátory) Windows vkládání nedovolí.</p>
+        <p class="mac">Chybí oprávnění <b>Zpřístupnění</b>.</p>
+        <p>Text najdete i v historii, odkud ho můžete zkopírovat.</p></div></details>
+      <details><summary>Zazní hluboké pípnutí a objeví se „Přepis se nepovedl“</summary><div>
+        <p>Nejčastěji je špatně zkopírovaný Groq klíč. Vytvořte nový a vložte ho znovu (<a href="#groq">krok 5</a>). Jinou příčinou může být výpadek internetu nebo dočasně vyčerpaný bezplatný limit. Podrobnosti najdete v logu: ikona → <b>Otevřít log</b>.</p></div></details>
+      <details><summary>Přepis špatně píše jména nebo odborné výrazy</summary><div>
+        <p>Napište je do pole <b>Slovník a styl</b> v nastavení, například: „Ahoj, píše Michal z MageXo. Řešíme Shopify, Jiru a Slack.“ Přepis se tím řídí.</p></div></details>
+      <details><summary>Vložila se nesmyslná věta, kterou jsem neřekl</summary><div>
+        <p>Whisper si občas z ticha vymyslí větu typu „Titulky vytvořil…“. Diktovátko nejčastější z nich zachytí a zahodí. Když narazíte na novou, dejte vědět a doplníme ji.</p></div></details>
+      <details class="mac"><summary>Po stisku Fn se otevře výběr emoji nebo diktování Apple</summary><div>
+        <p><span class="path">Nastavení systému → Klávesnice</span> → <b>Stisknutím klávesy 🌐</b> nastavte na <b>Nedělat nic</b>. Případně v Diktovátku zvolte jinou zkratku, třeba pravý ⌘.</p></div></details>
+      <details class="win"><summary>Po Ctrl + Win se otevře nabídka Start</summary><div>
+        <p>Diktovátko to blokuje, ale na některých počítačích se to přesto stane. Použijte raději pravý Ctrl nebo Ctrl + Alt + mezerník.</p></div></details>
+    </section>
+
+    <section id="aktualizace">
+      <h2><span class="n">10</span>Aktualizace a odinstalace</h2>
+      <h3>Aktualizace na novou verzi</h3>
+      <ol class="steps">
+        <li><div>Diktovátko ukončete: ikona → <b>Ukončit</b>.</div></li>
+        <li><div>Stáhněte nový <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">ZIP</a> a jeho obsah zkopírujte přes starou složku. Soubory <code>config.json</code> (nastavení a klíč) a <code>history.db</code> (historie) se nepřepíšou, v ZIPu nejsou.</div></li>
+        <li><div>Spusťte znovu <code class="win">install.bat</code><code class="mac">install.command</code> a potom <code class="win">start.bat</code><code class="mac">start.command</code>.</div></li>
+      </ol>
+      <h3>Odinstalace</h3>
+      <p>V nastavení vypněte <b>Spouštět po přihlášení</b>, Diktovátko ukončete a smažte celou jeho složku. Tím zmizí i historie a klíč. Python můžete ponechat, nebo odinstalovat běžným způsobem.</p>
+    </section>
+  </article>
+</div>
+
+<script>
+(() => {
+  const setOs = (os) => {
+    document.body.classList.toggle("is-mac", os === "mac");
+    document.querySelectorAll(".os button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.os === os));
+    try { localStorage.setItem("diktovatko-os", os); } catch (e) {}
+  };
+  let saved = null;
+  try { saved = localStorage.getItem("diktovatko-os"); } catch (e) {}
+  const fromHash = location.search.includes("os=mac") ? "mac" : null;
+  setOs(fromHash || saved || (/Mac/.test(navigator.platform) ? "mac" : "win"));
+  document.querySelector(".os").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) setOs(b.dataset.os); });
+
+  const links = [...document.querySelectorAll(".toc a")];
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) links.forEach((a) => a.classList.toggle("on", a.getAttribute("href") === "#" + en.target.id)); });
+  }, { rootMargin: "-30% 0px -60% 0px" });
+  document.querySelectorAll("article section[id]").forEach((s) => io.observe(s));
+})();
+</script>
+</body>
+</html>

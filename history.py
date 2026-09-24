@@ -9,8 +9,6 @@ Použití z příkazové řádky:
 
 import argparse
 import csv
-import ctypes
-import ctypes.wintypes as wt
 import sqlite3
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -24,7 +22,7 @@ CREATE TABLE IF NOT EXISTS dictations (
     id INTEGER PRIMARY KEY,
     ts TEXT NOT NULL,            -- ISO čas začátku nahrávání (lokální)
     text TEXT NOT NULL,
-    app TEXT,                    -- např. chrome.exe, slack.exe
+    app TEXT,                    -- např. chrome.exe, slack.exe (na Macu název aplikace)
     window_title TEXT,           -- titulek okna (záložka, konverzace, dokument)
     audio_seconds REAL,
     engine TEXT
@@ -45,32 +43,6 @@ def save(ts, text, app, window_title, audio_seconds, engine):
             "INSERT INTO dictations (ts, text, app, window_title, audio_seconds, engine) VALUES (?,?,?,?,?,?)",
             (ts.isoformat(timespec="seconds"), text, app, window_title, round(audio_seconds, 1), engine),
         )
-
-
-# --- informace o aktivním okně ----------------------------------------------
-_user32 = ctypes.windll.user32
-_kernel32 = ctypes.windll.kernel32
-
-
-def foreground_window():
-    """Vrátí (název procesu, titulek okna) aktuálně aktivního okna."""
-    hwnd = _user32.GetForegroundWindow()
-    length = _user32.GetWindowTextLengthW(hwnd)
-    buf = ctypes.create_unicode_buffer(length + 1)
-    _user32.GetWindowTextW(hwnd, buf, length + 1)
-    title = buf.value
-
-    pid = wt.DWORD()
-    _user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
-    app = ""
-    handle = _kernel32.OpenProcess(0x1000, False, pid.value)  # PROCESS_QUERY_LIMITED_INFORMATION
-    if handle:
-        size = wt.DWORD(1024)
-        path = ctypes.create_unicode_buffer(size.value)
-        if _kernel32.QueryFullProcessImageNameW(handle, 0, path, ctypes.byref(size)):
-            app = Path(path.value).name
-        _kernel32.CloseHandle(handle)
-    return app, title
 
 
 # --- export -------------------------------------------------------------------

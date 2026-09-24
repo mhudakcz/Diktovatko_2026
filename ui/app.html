@@ -44,9 +44,12 @@ aside { padding: 18px 14px 14px 16px; display: flex; flex-direction: column; gap
 .brand { display: flex; align-items: center; gap: 10px; font: 700 16px/1 var(--display); letter-spacing: -0.01em; }
 .brand-mark { width: 24px; height: 24px; border-radius: 50%; background: var(--voice); display: grid; place-items: center; }
 .brand-mark svg { width: 12px; height: 12px; }
-.views { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
-.views button { border: 0; background: none; padding: 6px 4px; border-radius: 7px; cursor: pointer; color: var(--ink-2); font-size: 13px; font-weight: 500; }
-.views button[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+.views { display: flex; flex-direction: column; gap: 1px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.views button { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; padding: 7px 8px; border-radius: 8px; cursor: pointer; color: var(--ink-2); font-weight: 500; text-align: left; }
+.views button svg { width: 16px; height: 16px; flex: none; color: var(--muted); }
+.views button:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+.views button[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: 0 1px 0 var(--line); }
+.views button[aria-pressed="true"] svg { color: var(--ultra); }
 .search { position: relative; }
 .search svg { position: absolute; left: 10px; top: 50%; translate: 0 -50%; width: 16px; height: 16px; color: var(--muted); }
 .search input { width: 100%; padding: 7px 10px 7px 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); outline: none; }
@@ -174,6 +177,11 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
 .link { color: var(--ultra); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; background: none; border: 0; padding: 0; font-size: 12.5px; }
 .savebar { position: sticky; bottom: 0; display: flex; align-items: center; gap: 12px; padding: 12px 0; background: var(--fog); }
 .savebar .msg { color: var(--muted); font-size: 13px; }
+.savebar .msg.dirty { color: var(--ink); font-weight: 500; }
+#save { min-width: 160px; justify-content: center; transition: background .2s, border-color .2s; }
+#save.saved { background: #0E9F6E; border-color: #0E9F6E; cursor: default; }
+#save.saved:hover { filter: none; }
+#save:disabled { opacity: .7; }
 .savebar .msg.err { color: var(--voice); }
 
 /* akční lišta a toast */
@@ -198,11 +206,11 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
     <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="8" y="2" width="8" height="13" rx="4" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></span>
     Diktovátko
   </div>
-  <div class="views" role="tablist">
-    <button data-view="history" aria-pressed="true">Historie</button>
-    <button data-view="stats" aria-pressed="false">Statistiky</button>
-    <button data-view="settings" aria-pressed="false">Nastavení</button>
-  </div>
+  <nav class="views" aria-label="Sekce">
+    <button data-view="history" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Historie</button>
+    <button data-view="stats" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>Statistiky</button>
+    <button data-view="settings" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Nastavení</button>
+  </nav>
 
   <div id="side-history">
     <label class="search">
@@ -264,7 +272,8 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
     <form class="settings" id="settings" onsubmit="return false">
       <section class="card">
         <h2>Klávesová zkratka</h2>
-        <p>Když během držení zkratky stisknete jinou klávesu (třeba Ctrl+C), nahrávání se zruší, takže běžné zkratky dál fungují.</p>
+        <p>Když během držení zkratky stisknete jinou klávesu (třeba <span class="copy-key">Ctrl</span>+C), nahrávání se zruší, takže běžné zkratky dál fungují.</p>
+        <p class="mac-only" hidden>Na Macu u klávesy Fn nastavte v <b>Nastavení systému → Klávesnice</b> volbu „Stisknutím klávesy 🌐“ na <b>Nedělat nic</b>, jinak se místo diktování otevře výběr emoji.</p>
         <div class="row">
           <div><div class="t">Zkratka pro diktování</div><div class="d" id="hotkey-caps"></div></div>
           <select class="field" id="hotkey"></select>
@@ -337,7 +346,10 @@ const APP_NAMES = {
 };
 const TITLE_SUFFIXES = [/\s[-–—]\s(Google Chrome|Mozilla Firefox|Microsoft​? Edge|Microsoft Edge)$/, /\s[-–—]\s?Profil.*$/];
 const PALETTE = ["#3847F5", "#E0457B", "#0E9F8E", "#E08A12", "#7A4BE0", "#2F8FE0", "#C24DD1", "#5B8C1F"];
-const KEY_NAMES = { "right ctrl": "Pravý Ctrl", ctrl: "Ctrl", windows: "Win", "right shift": "Pravý Shift", shift: "Shift", alt: "Alt", space: "Mezerník", pause: "Pause", "right alt": "AltGr", menu: "Menu", "scroll lock": "Scroll Lock" };
+const KEY_NAMES = { "right ctrl": "Pravý Ctrl", ctrl: "Ctrl", windows: "Win", "right shift": "Pravý Shift", shift: "Shift", alt: "Alt", space: "Mezerník", pause: "Pause", "right alt": "AltGr", menu: "Menu", "scroll lock": "Scroll Lock",
+  fn: "Fn 🌐", cmd: "⌘ Cmd", "right cmd": "Pravý ⌘", option: "⌥ Option", "right option": "Pravý ⌥" };
+Object.assign(APP_NAMES, { "google chrome": "Chrome", "microsoft outlook": "Outlook", "microsoft teams": "Teams",
+  "code": "VS Code", "microsoft word": "Word", "microsoft excel": "Excel", "safari": "Safari", "mail": "Mail", "notes": "Poznámky" });
 
 const state = { view: "history", period: "7d", q: "", app: null, rows: [], shown: [], selected: new Set(), periods: [], settings: null };
 const $ = (id) => document.getElementById(id);
@@ -559,7 +571,9 @@ function keyText(hk) {
 function caps(hk) { return hk.split("+").map((p) => `<kbd>${esc(KEY_NAMES[p] || p.toUpperCase())}</kbd>`).join(""); }
 async function loadSettings() {
   state.settings = await api().get_settings();
-  const { config: c, presets, languages, models, autostart } = state.settings;
+  const { config: c, presets, languages, models, autostart, platform } = state.settings;
+  document.querySelectorAll(".mac-only").forEach((el) => (el.hidden = platform !== "macos"));
+  document.querySelectorAll(".copy-key").forEach((el) => (el.textContent = platform === "macos" ? "⌘" : "Ctrl"));
   const current = c.hotkeys[0] || "right ctrl";
   const isPreset = presets.some(([k]) => k === current);
   $("hotkey").innerHTML = presets.map(([k, label]) => `<option value="${esc(k)}" ${k === current ? "selected" : ""}>${esc(label)}</option>`).join("")
@@ -574,8 +588,17 @@ async function loadSettings() {
   $("duck").checked = c.duck_audio; $("duck-level").value = Math.round(c.duck_level * 100); duckLabel();
   $("overlay").checked = c.overlay; $("sounds").checked = c.sounds; $("trailing").checked = c.trailing_space; $("hist").checked = c.history;
   $("autostart").checked = autostart;
-  $("save-msg").textContent = ""; $("save-msg").className = "msg";
+  setDirty(false);
 }
+function setDirty(dirty, savedAt) {
+  const b = $("save"), m = $("save-msg");
+  b.classList.toggle("saved", !dirty);
+  b.textContent = dirty ? "Uložit nastavení" : "✓ Uloženo";
+  m.className = "msg" + (dirty ? " dirty" : "");
+  m.textContent = dirty ? "Máte neuložené změny." : savedAt ? `Uloženo v ${savedAt}. Změny už platí.` : "Vše je uložené.";
+}
+$("settings").addEventListener("input", () => setDirty(true));
+$("settings").addEventListener("change", () => setDirty(true));
 function chosenHotkey() { return $("hotkey").value === "__custom" ? $("custom").value.trim().toLowerCase() : $("hotkey").value; }
 function hotkeyChanged() {
   $("custom-row").hidden = $("hotkey").value !== "__custom";
@@ -586,11 +609,13 @@ $("hotkey").addEventListener("change", () => { hotkeyChanged(); if ($("hotkey").
 $("custom").addEventListener("input", hotkeyChanged);
 function setSeg(v) { $("mode").dataset.v = v; $("mode").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === v)); }
 function duckLabel() { const v = +$("duck-level").value; $("duck-val").textContent = v === 0 ? "ticho" : v + " %"; }
-$("mode").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) setSeg(b.dataset.v); });
+$("mode").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && b.dataset.v !== $("mode").dataset.v) { setSeg(b.dataset.v); setDirty(true); } });
 $("duck-level").addEventListener("input", duckLabel);
 $("groq-show").onclick = () => { const i = $("groq"); const show = i.type === "password"; i.type = show ? "text" : "password"; $("groq-show").textContent = show ? "Skrýt" : "Zobrazit"; };
 $("groq-link").onclick = () => api().open_url("https://console.groq.com/keys");
 $("save").onclick = async () => {
+  if ($("save").classList.contains("saved")) return;
+  $("save").disabled = true; $("save").textContent = "Ukládám…";
   const hotkeys = chosenHotkey() ? [chosenHotkey()] : [];
   const cfg = {
     hotkeys, mode: $("mode").dataset.v, language: $("language").value || null, model: $("model").value,
@@ -598,11 +623,19 @@ $("save").onclick = async () => {
     duck_audio: $("duck").checked, duck_level: +$("duck-level").value / 100,
     overlay: $("overlay").checked, sounds: $("sounds").checked, trailing_space: $("trailing").checked, history: $("hist").checked,
   };
-  const res = await api().save_settings(cfg, $("autostart").checked);
-  const m = $("save-msg");
-  m.className = "msg" + (res.ok ? "" : " err");
-  m.textContent = res.ok ? "Uloženo. Změny už platí." : res.error;
-  if (res.ok) { toast("Nastavení uloženo"); state.settings.config = { ...state.settings.config, ...cfg }; }
+  let res;
+  try { res = await api().save_settings(cfg, $("autostart").checked); }
+  catch (e) { res = { ok: false, error: "Uložení se nepovedlo: " + e }; }
+  $("save").disabled = false;
+  if (res.ok) {
+    state.settings.config = { ...state.settings.config, ...cfg };
+    setDirty(false, new Date().toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" }));
+    toast("✓ Nastavení uloženo");
+  } else {
+    $("save").textContent = "Uložit nastavení";
+    $("save-msg").className = "msg err";
+    $("save-msg").textContent = res.error;
+  }
 };
 
 /* ---------------- klávesy a okno ---------------- */

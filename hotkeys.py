@@ -1,16 +1,14 @@
 """Klávesové zkratky pro diktování.
 
-Vlastní obsluha nad knihovnou `keyboard`, protože její add_hotkey nerozliší
-levý a pravý Ctrl a neumí poznat, že jste jen stiskli běžnou zkratku (Ctrl+C).
+HotkeyCore vyhodnocuje zkratky nezávisle na systému: dostává názvy kláves
+(stisk/puštění) a hlásí stisk zkratky, její puštění a přerušení jinou klávesou.
+HotkeyManager je Windows verze nad knihovnou `keyboard` (její add_hotkey nerozliší
+levý a pravý Ctrl a neumí poznat, že jste jen stiskli běžnou zkratku jako Ctrl+C).
 """
 
-import ctypes
 import threading
 
-import keyboard
-
-# Nabídka zkratek v nastavení: (zkratka, popis)
-# Vybrané tak, aby nepřekážely psaní ani běžným zkratkám.
+# Nabídka zkratek ve Windows – vybrané tak, aby nepřekážely psaní ani běžným zkratkám.
 PRESETS = [
     ("right ctrl", "Pravý Ctrl"),
     ("ctrl+windows", "Ctrl + Win (jako Wispr Flow)"),
@@ -28,6 +26,8 @@ GENERIC = {
     "shift": {"shift", "left shift", "right shift"},
     "alt": {"alt", "left alt"},
     "windows": {"windows", "left windows", "right windows"},
+    "cmd": {"cmd", "left cmd", "right cmd"},
+    "option": {"option", "left option", "right option"},
 }
 
 
@@ -39,14 +39,7 @@ def _matches(part, name):
     return name in GENERIC.get(part, {part})
 
 
-def _mask_start_menu():
-    """Po puštění Win by se otevřela nabídka Start – "neutrální" klávesa to zablokuje."""
-    VK_NONAME = 0xE8
-    ctypes.windll.user32.keybd_event(VK_NONAME, 0, 0, 0)
-    ctypes.windll.user32.keybd_event(VK_NONAME, 0, 2, 0)
-
-
-class HotkeyManager:
+class HotkeyCore:
     def __init__(self, on_press, on_release, on_interrupt):
         self.on_press = on_press  # (hotkey) – zkratka stisknuta
         self.on_release = on_release  # (hotkey) – zkratka puštěna
@@ -55,28 +48,27 @@ class HotkeyManager:
         self.pressed = set()
         self.active = None
         self.lock = threading.Lock()
-        self._hook = None
 
     def set_hotkeys(self, hotkeys):
         with self.lock:
             self.hotkeys = [(h, parse(h)) for h in hotkeys if parse(h)]
             self.active = None
-        if self._hook is None:
-            self._hook = keyboard.hook(self._on_event)
+        self.start()
+
+    def start(self):
+        pass
 
     def stop(self):
-        if self._hook is not None:
-            keyboard.unhook(self._hook)
-            self._hook = None
+        pass
 
-    def _on_event(self, e):
-        # Uměle vložené události (maska nabídky Start) nemají scan kód.
-        if not e.name or e.scan_code == 0:
-            return
-        name = e.name.lower()
+    def after_press(self, parts):
+        """Háček pro systémové úpravy po stisku zkratky (Windows: maska nabídky Start)."""
+
+    def feed(self, name, down):
+        name = name.lower()
         fire = None
         with self.lock:
-            if e.event_type == keyboard.KEY_DOWN:
+            if down:
                 repeat = name in self.pressed
                 self.pressed.add(name)
                 if self.active:
@@ -91,8 +83,7 @@ class HotkeyManager:
                         ):
                             self.active = (hk, parts)
                             fire = (self.on_press, hk)
-                            if "windows" in parts:
-                                _mask_start_menu()
+                            self.after_press(parts)
                             break
             else:
                 self.pressed.discard(name)
@@ -102,3 +93,38 @@ class HotkeyManager:
                     fire = (self.on_release, hk)
         if fire:
             threading.Thread(target=fire[0], args=(fire[1],), daemon=True).start()
+
+
+class HotkeyManager(HotkeyCore):
+    """Windows: události z knihovny `keyboard`."""
+
+    _hook = None
+
+    def start(self):
+        import keyboard
+
+        if self._hook is None:
+            self._hook = keyboard.hook(self._on_event)
+
+    def stop(self):
+        import keyboard
+
+        if self._hook is not None:
+            keyboard.unhook(self._hook)
+            self._hook = None
+
+    def after_press(self, parts):
+        if "windows" in parts:
+            # Po puštění Win by se otevřela nabídka Start – "neutrální" klávesa to zablokuje.
+            import ctypes
+
+            ctypes.windll.user32.keybd_event(0xE8, 0, 0, 0)
+            ctypes.windll.user32.keybd_event(0xE8, 0, 2, 0)
+
+    def _on_event(self, e):
+        import keyboard
+
+        # Uměle vložené události (maska nabídky Start) nemají scan kód.
+        if not e.name or e.scan_code == 0:
+            return
+        self.feed(e.name, e.event_type == keyboard.KEY_DOWN)

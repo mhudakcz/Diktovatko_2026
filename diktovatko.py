@@ -4,7 +4,6 @@ Podržíte klávesovou zkratku, mluvíte, pustíte ji a přepsaný text
 se vloží tam, kde máte kurzor.
 """
 
-import ctypes
 import io
 import logging
 import os
@@ -14,11 +13,9 @@ import sys
 import threading
 import time
 import wave
-import winsound
 from collections import deque
 from datetime import datetime
 
-import keyboard
 import numpy as np
 import pyperclip
 import pystray
@@ -27,9 +24,7 @@ from PIL import Image, ImageDraw
 
 import config
 import history
-from audio_duck import AudioDucker
-from hotkeys import PRESETS, HotkeyManager
-from overlay import Overlay
+import plat
 
 APP_DIR = config.APP_DIR
 LOG_PATH = APP_DIR / "diktovatko.log"
@@ -44,10 +39,6 @@ logging.basicConfig(
     encoding="utf-8",
 )
 log = logging.getLogger("diktovatko")
-
-
-def beep(freq, ms):
-    threading.Thread(target=winsound.Beep, args=(freq, ms), daemon=True).start()
 
 
 def make_icon(color):
@@ -75,7 +66,7 @@ STATUS_TEXT = {
     "transcribing": "Přepisuji…",
     "error": "Chyba – viz diktovatko.log",
 }
-HOTKEY_LABELS = dict(PRESETS)
+HOTKEY_LABELS = dict(plat.presets())
 
 
 class Transcriber:
@@ -184,7 +175,7 @@ def paste_text(text):
         previous = None
     pyperclip.copy(text)
     time.sleep(0.05)
-    keyboard.send("ctrl+v")
+    plat.paste()
     time.sleep(0.3)
     if previous is not None:
         pyperclip.copy(previous)
@@ -206,8 +197,9 @@ class App:
         self.ducker = None
         self._apply_extras()
         self.stream = None
+        self.window_proc = None
         self.lock = threading.Lock()
-        self.hotkeys = HotkeyManager(self.on_hotkey_press, self.on_hotkey_release, self.on_hotkey_interrupt)
+        self.hotkeys = plat.hotkey_manager(self.on_hotkey_press, self.on_hotkey_release, self.on_hotkey_interrupt)
 
         export_items = [
             pystray.MenuItem(label, (lambda k: lambda: self.export_history(k))(key))
@@ -232,20 +224,20 @@ class App:
                 pystray.MenuItem("Nastavení", lambda: self.open_window("settings")),
                 pystray.MenuItem("Exportovat historii", pystray.Menu(*export_items)),
                 pystray.Menu.SEPARATOR,
-                pystray.MenuItem("Otevřít log", lambda: os.startfile(LOG_PATH)),
+                pystray.MenuItem("Otevřít log", lambda: plat.open_path(LOG_PATH)),
                 pystray.MenuItem("Ukončit", self.quit),
             ),
         )
 
     def _apply_extras(self):
         if self.cfg["overlay"] and self.overlay is None:
-            self.overlay = Overlay(lambda: list(self.levels))
+            self.overlay = plat.overlay(lambda: list(self.levels))
         elif not self.cfg["overlay"] and self.overlay is not None:
             self.overlay.hide()
             self.overlay = None
         if self.cfg["duck_audio"]:
             if self.ducker is None:
-                self.ducker = AudioDucker(self.cfg["duck_level"])
+                self.ducker = plat.audio_ducker(self.cfg["duck_level"])
             self.ducker.level = self.cfg["duck_level"]
         else:
             self.ducker = None
@@ -276,7 +268,7 @@ class App:
             self.levels.clear()
             self.started_at = datetime.now()
             try:
-                self.target = history.foreground_window()
+                self.target = plat.foreground_window()
             except Exception:
                 log.exception("Nepodařilo se zjistit aktivní okno")
                 self.target = ("", "")
@@ -289,7 +281,7 @@ class App:
                 self.ducker.duck()
             self.set_state("recording")
         if self.cfg["sounds"]:
-            beep(880, 60)
+            plat.beep("start")
 
     def _close_stream(self):
         self.stream.stop()
@@ -305,7 +297,7 @@ class App:
             self._close_stream()
             self.set_state("transcribing")
         if self.cfg["sounds"]:
-            beep(600, 60)
+            plat.beep("stop")
         audio = np.concatenate(self.chunks) if self.chunks else np.zeros(0, dtype=np.float32)
         threading.Thread(
             target=self._process, args=(audio, self.started_at, self.target), daemon=True
@@ -345,7 +337,7 @@ class App:
             log.exception("Přepis selhal")
             failed = True
             if self.cfg["sounds"]:
-                beep(200, 300)
+                plat.beep("error")
         finally:
             self.set_state("idle")
             if failed and self.overlay:
@@ -410,32 +402,29 @@ class App:
             return
         self.hotkeys.set_hotkeys(self.cfg["hotkeys"])
         if self.cfg["sounds"]:
-            beep(1000, 80)
+            plat.beep("ready")
         log.info("Připraveno, zkratky: %s (%s)", self.cfg["hotkeys"], self.cfg["mode"])
 
     def open_window(self, view):
         UI_REQUEST.write_text(view, encoding="utf-8")
         # Už otevřené okno jen vyvoláme do popředí (samo si přečte, kterou sekci ukázat).
-        hwnd = ctypes.windll.user32.FindWindowW(None, WINDOW_TITLE)
-        if hwnd:
-            ctypes.windll.user32.ShowWindow(hwnd, 9)  # SW_RESTORE
-            ctypes.windll.user32.SetForegroundWindow(hwnd)
+        if plat.focus_window(self.window_proc, WINDOW_TITLE):
             return
         # Samostatný proces, aby okno nekolidovalo s ikonou v liště.
-        subprocess.Popen([sys.executable, str(APP_DIR / "app_window.py")], cwd=APP_DIR)
+        self.window_proc = subprocess.Popen([sys.executable, str(APP_DIR / "app_window.py")], cwd=APP_DIR)
 
     def export_history(self, period):
         try:
             start, end = history.period_range(period)
             out, n = history.export(start, end)
             log.info("Export %s–%s: %d záznamů -> %s", start, end, n, out)
-            os.startfile(out)
+            plat.open_path(out)
         except Exception:
             log.exception("Export selhal")
 
     def open_exports(self):
         history.EXPORT_DIR.mkdir(exist_ok=True)
-        os.startfile(history.EXPORT_DIR)
+        plat.open_path(history.EXPORT_DIR)
 
     def quit(self):
         if self.ducker:
@@ -448,10 +437,7 @@ class App:
 
 
 if __name__ == "__main__":
-    try:
-        ctypes.windll.shcore.SetProcessDpiAwareness(2)  # ostrý indikátor na HiDPI displejích
-    except Exception:
-        pass
+    plat.init_process()
     try:
         App().run()
     except Exception:

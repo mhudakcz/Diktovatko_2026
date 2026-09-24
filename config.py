@@ -9,8 +9,9 @@ APP_DIR = Path(__file__).resolve().parent
 CONFIG_PATH = APP_DIR / "config.json"
 
 DEFAULT_CONFIG = {
-    # Zapnuté klávesové zkratky (viz hotkeys.PRESETS), např. "right ctrl", "ctrl+windows", "f9"
-    "hotkeys": ["right ctrl"],
+    # Zapnuté klávesové zkratky (viz PRESETS v hotkeys.py a platform_mac.py),
+    # např. "right ctrl", "ctrl+windows", "f9", na Macu "fn", "right cmd"
+    "hotkeys": ["fn"] if sys.platform == "darwin" else ["right ctrl"],
     # "hold" = drž a mluv, "toggle" = stiskni pro start, znovu pro stop
     "mode": "hold",
     # Jazyk přepisu ("cs", "en", ...) nebo null pro automatickou detekci
@@ -61,26 +62,14 @@ def groq_key(cfg):
     return cfg["groq_api_key"] or os.environ.get("GROQ_API_KEY", "")
 
 
-# --- automatické spouštění po přihlášení -----------------------------------------
-def _startup_link():
-    return Path(os.environ["APPDATA"]) / "Microsoft/Windows/Start Menu/Programs/Startup/Diktovatko.lnk"
-
-
+# --- automatické spouštění po přihlášení (implementace je v platform_*.py) ----------
 def autostart_enabled():
-    return _startup_link().exists()
+    import plat
+
+    return plat.autostart_enabled()
 
 
 def set_autostart(on):
-    link = _startup_link()
-    if not on:
-        link.unlink(missing_ok=True)
-        return
-    import comtypes.client
+    import plat
 
-    shell = comtypes.client.CreateObject("WScript.Shell", dynamic=True)
-    sc = shell.CreateShortcut(str(link))
-    pythonw = Path(sys.executable).with_name("pythonw.exe")
-    sc.TargetPath = str(pythonw if pythonw.exists() else sys.executable)
-    sc.Arguments = f'"{APP_DIR / "diktovatko.py"}"'
-    sc.WorkingDirectory = str(APP_DIR)
-    sc.Save()
+    plat.set_autostart(on, APP_DIR)

@@ -2,42 +2,54 @@
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
-Bezplatná open-source alternativa k [Wispr Flow](https://wisprflow.ai) pro Windows. Funguje v jakékoli aplikaci, třeba ve Slacku, Outlooku, prohlížeči, Teams nebo VS Code. Umí česky i dalších 90+ jazyků.
+Bezplatná open-source alternativa k [Wispr Flow](https://wisprflow.ai) pro **Windows a Mac**. Funguje v jakékoli aplikaci, třeba ve Slacku, Outlooku, prohlížeči, Teams, Jiře nebo v chatu s AI. Umí česky i dalších 90+ jazyků.
 
-**[Web projektu](https://mhudakcz.github.io/Diktovatko_2026/)**
+**[Web projektu](https://mhudakcz.github.io/Diktovatko_2026/)** · **[Návod krok za krokem](https://mhudakcz.github.io/Diktovatko_2026/navod.html)**
 
 ![Historie diktování](docs/img/history-light.png)
 
+## Proč diktovat
+
+Mluvíme kolem 150 slov za minutu, na klávesnici většina lidí zvládne asi 40. Když denně napíšete 2 000 slov, ušetříte diktováním přes půl hodiny denně, tedy zhruba 12 hodin měsíčně. Na [webu](https://mhudakcz.github.io/Diktovatko_2026/#uspora) si to můžete spočítat pro sebe.
+
 ## Co umí
 
-- **Diktování kamkoliv.** Podržíte pravý Ctrl, mluvíte, pustíte a přepis se vloží do aktivního pole. Schránka se potom vrátí do původního stavu.
+- **Diktování kamkoliv.** Podržíte zkratku, mluvíte, pustíte a přepis se vloží do aktivního pole. Schránka se potom vrátí do původního stavu.
+- **Zkratka podle vás.** Windows: pravý Ctrl, Ctrl + Win (jako Wispr Flow), Ctrl + Alt + mezerník a další. Mac: Fn / 🌐, pravý ⌘, pravý ⌥ a další. Jde nastavit i vlastní. Když během držení stisknete jinou klávesu (Ctrl+C), nahrávání se zruší, takže běžné zkratky dál fungují.
 - **Indikátor nahrávání.** Dole uprostřed obrazovky se objeví malá „pilulka“. Při nahrávání ukazuje hlasitost vašeho hlasu, při přepisu animaci. Nebere fokus, takže text jde tam, kam má.
-- **Ztlumení ostatních zvuků.** Spotify, videa a další aplikace se během nahrávání ztlumí na 10 % a potom vrátí zpátky.
-- **Statistiky.** Slova, záznamy, čas mluvení a odhad ušetřeného času za dnešek, týden, měsíc i celkem. K tomu graf posledních 30 dní a přehled, do kterých aplikací diktujete nejvíc.
-- **Nastavení v okně.** Zkratka (pravý Ctrl, Ctrl+Win a další nebo vlastní), jazyk, Groq klíč, ztlumení zvuku a automatické spouštění. Změny platí hned bez restartu.
-- **Historie.** Každý přepis se uloží lokálně i s časem, aplikací a názvem okna (konverzace, dokument, tiket). Hodí se, když potřebujete zpětně dohledat, na čem jste pracoval. V okně historie jde hledat, filtrovat podle období (dnes, 7/10/14/20/30/90 dní, tento či minulý měsíc, vlastní rozsah) a aplikací, kopírovat a exportovat do Markdownu nebo CSV.
+- **Ztlumení ostatních zvuků.** Spotify, videa a další aplikace se během nahrávání ztiší a potom vrátí zpátky.
+- **Historie.** Každý přepis se uloží lokálně i s časem, aplikací a názvem okna (konverzace, dokument, tiket). Jde v ní hledat, filtrovat podle období (dnes, 7/10/14/20/30/90 dní, tento či minulý měsíc, vlastní rozsah) a aplikací, kopírovat a exportovat do Markdownu nebo CSV.
+- **Statistiky.** Slova, záznamy, čas mluvení a odhad ušetřeného času za dnešek, týden, měsíc i celkem. K tomu graf posledních 30 dní a přehled aplikací.
+- **Nastavení v okně.** Změny platí hned po uložení, bez restartu.
 - **Dva způsoby přepisu:**
   - **lokálně a offline** (Whisper large-v3-turbo na CPU), zdarma a nic neopouští počítač,
-  - **přes [Groq](https://console.groq.com)** (free tier), přepis trvá kolem 1 sekundy.
+  - **přes [Groq](https://console.groq.com)** (free tier, **vlastní klíč** každého uživatele), přepis trvá kolem 1 sekundy.
+- **Dlouhé diktování.** Delší nahrávky se pro Groq automaticky rozdělí v tichém místě.
 - **Ochrana před „halucinacemi“.** Ticho se k přepisu vůbec neposílá a typické vymyšlené věty Whisperu (třeba „Titulky vytvořil…“) se zahodí.
 
 ## Instalace
 
-Potřebujete Windows 10/11 a [Python 3.11+](https://www.python.org/downloads/). Při instalaci Pythonu zaškrtněte „Add to PATH“.
+Podrobně s obrázky a řešením problémů: **[návod krok za krokem](https://mhudakcz.github.io/Diktovatko_2026/navod.html)**.
 
-1. Stáhněte repozitář (*Code → Download ZIP*) a rozbalte ho.
-2. Spusťte `install.bat`.
-3. Spusťte `start.bat`. V oznamovací oblasti vedle hodin se objeví ikona mikrofonu.
+Potřebujete [Python 3.11+](https://www.python.org/downloads/). Ve Windows při instalaci Pythonu zaškrtněte „Add python.exe to PATH“.
 
-Při prvním spuštění bez Groq klíče se stáhne model Whisper (~1,6 GB).
+| | Windows 10/11 | macOS 12+ |
+|---|---|---|
+| 1. | Stáhněte [ZIP](https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip) a rozbalte ho | stejně |
+| 2. | Spusťte `install.bat` | `install.command` (poprvé přes pravé tlačítko → Otevřít) |
+| 3. | Spusťte `start.bat`, ikona se objeví vedle hodin | `start.command`, ikona se objeví v horní liště |
 
-Automatické spouštění po přihlášení:
+**Mac:** v *Nastavení systému → Soukromí a zabezpečení* povolte Terminálu **Mikrofon**, **Zpřístupnění** a **Sledování vstupu** (volitelně **Nahrávání obrazovky** pro názvy oken v historii). U klávesy Fn nastavte v *Klávesnice → Stisknutím klávesy 🌐* volbu **Nedělat nic**. Mac verze je nová, chyby prosím hlaste v [Issues](https://github.com/mhudakcz/Diktovatko_2026/issues).
 
-```
-powershell -ExecutionPolicy Bypass -File autostart.ps1
-```
+### Groq klíč
 
-Odebrání z automatického spouštění: přidejte na konec `-Remove`.
+Každý si vytváří **vlastní** bezplatný klíč. V repozitáři žádný klíč není a výchozí nastavení je prázdné.
+
+1. Na [console.groq.com/keys](https://console.groq.com/keys) se přihlaste (Google nebo e-mail, bez karty).
+2. Klikněte na **Create API Key** a klíč (`gsk_…`) zkopírujte.
+3. V Diktovátku otevřete **Nastavení**, klíč vložte do pole **Groq API klíč** a klikněte na **Uložit nastavení**.
+
+Bez klíče se přepisuje offline. Při prvním použití se stáhne model Whisper (~1,6 GB).
 
 ## Používání
 
@@ -48,31 +60,29 @@ Odebrání z automatického spouštění: přidejte na konec `-Remove`.
 | červená, pilulka se sloupečky | nahrává |
 | modrá, pilulka s vlnou | přepisuje |
 
-**Kliknutím na ikonu** otevřete okno s historií, statistikami a nastavením. **Pravým tlačítkem** se dostanete k jednotlivým sekcím, exportu, logu a ukončení.
-
-Když během držení zkratky stisknete jinou klávesu (třeba Ctrl+C), nahrávání se zruší. Běžné zkratky tak fungují dál. Diktovat jde i dlouho, delší nahrávky se pro Groq automaticky rozdělí.
+**Kliknutím na ikonu** otevřete okno s historií, statistikami a nastavením. Přes **menu ikony** se dostanete k jednotlivým sekcím, exportu, logu a ukončení.
 
 ## Nastavení (`config.json`)
 
-Nejjednodušší je nastavovat v okně aplikace (sekce *Nastavení*). Soubor se vytvoří při prvním spuštění a jde upravit i ručně. Změny se projeví do sekundy.
+Nejjednodušší je nastavovat v okně aplikace (sekce *Nastavení*). Soubor se vytvoří při prvním spuštění a jde upravit i ručně, změny se projeví do sekundy.
 
 | Klíč | Výchozí | Popis |
 |---|---|---|
-| `hotkeys` | `["right ctrl"]` | seznam zkratek, např. `"ctrl+windows"`, `"ctrl+alt+space"`, `"scroll lock"` |
+| `hotkeys` | `["right ctrl"]` (Mac `["fn"]`) | zkratka, např. `"ctrl+windows"`, `"ctrl+alt+space"`, `"right cmd"` |
 | `mode` | `"hold"` | `"hold"` = drž a mluv, `"toggle"` = stisk start, další stisk stop |
 | `language` | `"cs"` | kód jazyka, nebo `null` pro automatickou detekci |
 | `model` | `"large-v3-turbo"` | lokální model, `small` je rychlejší, ale méně přesný |
-| `initial_prompt` | … | nápověda pro model: jména, odborné výrazy, styl |
-| `groq_api_key` | `""` | klíč z [console.groq.com](https://console.groq.com), jde nastavit i přes proměnnou `GROQ_API_KEY` |
-| `duck_audio` / `duck_level` | `true` / `0.1` | ztlumení ostatních aplikací během nahrávání |
+| `initial_prompt` | … | slovník a styl: jména, odborné výrazy |
+| `groq_api_key` | `""` | vlastní klíč z [console.groq.com](https://console.groq.com), jde nastavit i přes proměnnou `GROQ_API_KEY` |
+| `duck_audio` / `duck_level` | `true` / `0.1` | ztlumení zvuku během nahrávání (Mac ztiší celý výstup) |
 | `overlay` | `true` | plovoucí indikátor nahrávání |
 | `history` | `true` | ukládání historie |
 | `sounds` | `true` | pípnutí při startu a konci nahrávání |
 | `trailing_space` | `true` | mezera za vloženým textem |
 
-## Historie a export
+## Historie a export z příkazové řádky
 
-Historie je v souboru `history.db` (SQLite) ve složce aplikace. Export z příkazové řádky:
+Historie je v souboru `history.db` (SQLite) ve složce aplikace.
 
 ```
 .venv\Scripts\python.exe history.py --month 2026-09
@@ -80,31 +90,35 @@ Historie je v souboru `history.db` (SQLite) ve složce aplikace. Export z přík
 .venv\Scripts\python.exe history.py --search "faktura"
 ```
 
+Na Macu použijte `.venv/bin/python`.
+
 ## Soukromí
 
 - Při lokálním přepisu nic neopouští počítač.
 - S Groq klíčem se nahrávka posílá na servery Groq (USA). Text ani historie se nikam neposílají.
-- `config.json`, `history.db` a log jsou v `.gitignore`, takže se nedostanou do gitu.
-- Historie je uložená jako čitelný text. Když ji nechcete, vypněte ji přes `"history": false`.
+- `config.json` (s klíčem), `history.db` a log jsou v `.gitignore`, takže se nedostanou do gitu.
+- Historie je uložená jako čitelný text. Když ji nechcete, vypněte ji v nastavení.
 
 ## Omezení
 
-- Pouze Windows.
-- Do oken spuštěných jako správce se vkládá, jen pokud Diktovátko také běží jako správce.
+- Windows: do oken spuštěných jako správce se vkládá, jen pokud Diktovátko také běží jako správce.
+- Mac: ztlumení ztiší celý zvuk počítače (macOS nemá hlasitost po aplikacích). Názvy oken vyžadují oprávnění Nahrávání obrazovky.
 - Lokální přepis na CPU trvá zhruba 1–1,5× délku nahrávky.
 
 ## Struktura
 
 | Soubor | Účel |
 |---|---|
-| `diktovatko.py` | hlavní aplikace: ikona v liště, zkratka, nahrávání, přepis, vložení textu |
-| `overlay.py` | plovoucí indikátor nahrávání |
-| `audio_duck.py` | ztlumení ostatních aplikací |
-| `history.py` | databáze historie, zjištění aktivního okna, export |
+| `diktovatko.py` | hlavní aplikace: ikona v liště, nahrávání, přepis, vložení textu |
+| `plat.py` | vybere implementaci pro aktuální systém |
+| `platform_win.py`, `platform_mac.py` | vše systémové: zkratky, vkládání, aktivní okno, zvuky, ztlumení, automatické spouštění |
+| `hotkeys.py` | vyhodnocení zkratek (levá a pravá klávesa, zrušení jinou klávesou), Windows obsluha |
+| `overlay.py` | vykreslení indikátoru a Windows okno. Mac okno je v `platform_mac.py` |
+| `audio_duck.py` | ztlumení aplikací ve Windows |
+| `history.py` | databáze historie, statistiky, export |
 | `app_window.py`, `ui/app.html` | okno s historií, statistikami a nastavením (pywebview) |
-| `hotkeys.py` | zkratky: rozlišení levé a pravé klávesy, zrušení při jiné klávese |
-| `config.py` | načítání a ukládání nastavení, automatické spouštění |
-| `docs/` | propagační stránka (GitHub Pages) |
+| `config.py` | načítání a ukládání nastavení |
+| `docs/` | web projektu a návod (GitHub Pages) |
 
 ## Licence
 

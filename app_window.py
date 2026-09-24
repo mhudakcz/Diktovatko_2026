@@ -1,13 +1,11 @@
 """Okno aplikace: historie, statistiky a nastavení (pywebview + HTML)."""
 
-import os
-
 import pyperclip
 import webview
 
 import config
 import history
-from hotkeys import PRESETS
+import plat
 
 APP_DIR = config.APP_DIR
 UI_REQUEST = APP_DIR / ".ui_request"
@@ -41,7 +39,7 @@ class Api:
     def export(self, period, search, fmt="md"):
         start, end = history.period_range(period)
         out, n = history.export(start, end, fmt, search.strip() or None)
-        os.startfile(out)
+        plat.open_path(out)
         return n
 
     # --- statistiky ---
@@ -52,7 +50,8 @@ class Api:
     def get_settings(self):
         return {
             "config": config.load_config(),
-            "presets": PRESETS,
+            "presets": plat.presets(),
+            "platform": plat.NAME,
             "languages": LANGUAGES,
             "models": MODELS,
             "autostart": config.autostart_enabled(),

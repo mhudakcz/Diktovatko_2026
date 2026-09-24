@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Diktovátko – diktování do jakéhokoli okna, zdarma</title>
-<meta name="description" content="Podržte pravý Ctrl, mluvte a pusťte. Diktovátko přepíše, co řeknete, a vloží text tam, kde máte kurzor. Zdarma a open source pro Windows.">
+<meta name="description" content="Podržte pravý Ctrl, mluvte a pusťte. Diktovátko přepíše, co řeknete, a vloží text tam, kde máte kurzor. Zdarma a open source pro Windows i Mac.">
 <meta property="og:title" content="Diktovátko – diktování do jakéhokoli okna, zdarma">
-<meta property="og:description" content="Bezplatná open-source alternativa k Wispr Flow pro Windows. Česky, offline nebo přes Groq, s historií toho, co jste nadiktovali.">
+<meta property="og:description" content="Bezplatná open-source alternativa k Wispr Flow pro Windows i Mac. Česky, offline nebo přes Groq, s historií toho, co jste nadiktovali.">
 <meta property="og:image" content="https://mhudakcz.github.io/Diktovatko_2026/img/history-light.png">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23F0405A'/%3E%3Crect x='9' y='5' width='6' height='10' rx='3' fill='white'/%3E%3Cpath d='M7 12a5 5 0 0 0 10 0M12 17v2.5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -115,6 +115,8 @@ h2 { margin: 0 0 14px; font: 700 clamp(32px, 4vw, 46px)/1.05 var(--display); let
 .f-private { grid-column: span 5; }
 .f-free { grid-column: span 5; }
 .f-guard { grid-column: span 7; }
+.f-stats { grid-column: span 6; }
+.f-keys { grid-column: span 6; }
 .meter { display: flex; align-items: center; gap: 14px; margin-top: 22px; font-size: 14px; }
 .meter .track { flex: 1; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--fog) 18%, transparent); overflow: hidden; }
 .meter .fill { height: 100%; width: 100%; background: #1DB954; border-radius: 4px; animation: duck 5s ease-in-out infinite; }
@@ -138,6 +140,25 @@ code { font: 500 0.9em "Cascadia Code", Consolas, monospace; padding: 2px 6px; b
 .req { padding: 26px; border-radius: 18px; border: 1px dashed var(--line); color: var(--ink-2); }
 .req h3 { margin: 0 0 10px; font: 700 19px var(--display); color: var(--ink); }
 .req p { margin: 0 0 10px; }
+
+.save { --fog: #EEF1F5; background: #1B2230; color: #EEF1F5; }
+.save .intro { color: color-mix(in srgb, var(--fog) 72%, transparent); }
+.calc { display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; align-items: center; margin-top: 40px; padding: 32px; border-radius: 22px; background: color-mix(in srgb, var(--fog) 7%, transparent); border: 1px solid color-mix(in srgb, var(--fog) 14%, transparent); }
+.calc label { display: block; font-weight: 600; font-size: 18px; line-height: 1.4; }
+.calc-row { display: flex; align-items: center; gap: 16px; margin-top: 18px; }
+.calc-row input { flex: 1; accent-color: var(--voice); height: 28px; }
+.calc-row output { min-width: 110px; text-align: right; font: 700 20px var(--display); font-variant-numeric: tabular-nums; }
+.calc-hint { margin: 12px 0 0; font-size: 14px; color: color-mix(in srgb, var(--fog) 60%, transparent); }
+.calc-out { display: grid; gap: 18px; }
+.calc-out > div { display: flex; align-items: baseline; gap: 14px; }
+.calc-out .big { font: 800 clamp(40px, 5.4vw, 64px)/1 var(--display); letter-spacing: -0.03em; color: #fff; min-width: 3.6em; font-variant-numeric: tabular-nums; }
+.calc-out > div:first-child .big { color: var(--voice); }
+.calc-out span:last-child { color: color-mix(in srgb, var(--fog) 72%, transparent); }
+.why { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; margin-top: 48px; }
+.why h3 { margin: 0 0 8px; font: 700 19px/1.25 var(--display); color: #fff; }
+.why p { margin: 0; font-size: 15.5px; color: color-mix(in srgb, var(--fog) 70%, transparent); }
+@media (max-width: 900px) { .calc { grid-template-columns: 1fr; padding: 22px; } .why { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .why { grid-template-columns: 1fr; } .calc-out .big { min-width: 3em; } }
 
 footer { padding: 40px 0 56px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
 footer a { color: var(--ink-2); }
@@ -167,7 +188,8 @@ footer a { color: var(--ink-2); }
     <div class="links">
       <a href="#jak">Jak to funguje</a>
       <a href="#historie">Historie</a>
-      <a href="#instalace">Instalace</a>
+      <a href="#uspora">Úspora času</a>
+      <a href="navod.html">Návod</a>
       <a href="https://github.com/mhudakcz/Diktovatko_2026">GitHub</a>
     </div>
   </nav>
@@ -179,7 +201,7 @@ footer a { color: var(--ink-2); }
       <div class="cta">
         <a class="btn primary" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>
-          Stáhnout pro Windows
+          Stáhnout zdarma
         </a>
         <a class="btn" href="https://github.com/mhudakcz/Diktovatko_2026">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.7 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
@@ -190,6 +212,7 @@ footer a { color: var(--ink-2); }
         <li>Zdarma a open source</li>
         <li>Česky a v 90+ jazycích</li>
         <li>Offline, nebo přepis za sekundu</li>
+        <li>Windows i Mac</li>
       </ul>
     </div>
 
@@ -206,10 +229,35 @@ footer a { color: var(--ink-2); }
   </header>
 </div>
 
+<section id="uspora" class="save">
+  <div class="container">
+    <h2>Proč mluvit místo psaní</h2>
+    <p class="intro">Mluvíme kolem 150 slov za minutu, na klávesnici většina lidí zvládne asi 40. Studie Stanfordovy univerzity zjistila, že diktování je zhruba třikrát rychlější než psaní, a to i s opravami.</p>
+    <div class="calc">
+      <div class="calc-in">
+        <label for="words">Kolik slov denně napíšete do e-mailů, chatů, tiketů a dokumentů?</label>
+        <div class="calc-row"><input type="range" id="words" min="300" max="6000" step="100" value="2000"><output id="words-out">2 000 slov</output></div>
+        <p class="calc-hint">Pro představu: běžný pracovní e-mail má kolem 100 slov, odpověď ve Slacku 20–40.</p>
+      </div>
+      <div class="calc-out" aria-live="polite">
+        <div><span class="big" id="per-day">37 min</span><span>ušetříte každý den</span></div>
+        <div><span class="big" id="per-month">13 h</span><span>za měsíc (21 pracovních dní)</span></div>
+        <div><span class="big" id="per-year">20 dní</span><span>za rok, počítáno v osmihodinových pracovních dnech</span></div>
+      </div>
+    </div>
+    <div class="why">
+      <div><h3>Rychleji z hlavy do textu</h3><p>Myšlenku řeknete celou, bez přerušování překlepy a hledáním kláves. Zprávy jsou pak úplnější a méně strohé.</p></div>
+      <div><h3>Méně klikání, méně únavy</h3><p>Ruce a zápěstí si odpočinou. Hodí se po dlouhém dni u klávesnice i při bolesti zápěstí.</p></div>
+      <div><h3>Funguje všude, kde píšete</h3><p>Slack, Outlook, Jira, Notion, ChatGPT, Claude i obyčejný poznámkový blok. Žádné kopírování z jiné aplikace.</p></div>
+      <div><h3>Nejlepší pro prompty do AI</h3><p>Dlouhé zadání pro AI s kontextem nadiktujete za pár vteřin. Čím víc kontextu dáte, tím lepší odpověď dostanete.</p></div>
+    </div>
+  </div>
+</section>
+
 <section id="jak">
   <div class="container">
-    <h2>Rychlejší než psaní</h2>
-    <p class="intro">Mluvíte zhruba třikrát rychleji, než píšete. Diktovátko běží potichu v liště a ozve se, jen když ho potřebujete.</p>
+    <h2>Jak to funguje</h2>
+    <p class="intro">Diktovátko běží potichu v liště a ozve se, jen když ho potřebujete.</p>
     <ol class="steps">
       <li><h3>Klikněte do pole a podržte pravý Ctrl</h3><p>Funguje v jakékoli aplikaci. Hudba a videa se samy ztlumí, aby nerušily.</p></li>
       <li><h3>Mluvte přirozeně</h3><p>Dole na obrazovce se objeví malý indikátor, který ukazuje, že vás slyší.</p></li>
@@ -259,6 +307,14 @@ footer a { color: var(--ink-2); }
         <div class="price">0 Kč<small>navždy</small></div>
         <div class="strike"><span><s>měsíční tarif</s></span><span><s>limit slov</s></span><span><s>účet</s></span></div>
       </article>
+      <article class="feat f-stats">
+        <h3>Statistiky, které motivují</h3>
+        <p>Kolik slov jste nadiktovali dnes, za týden i od začátku, kolik času jste tím ušetřili a kam diktujete nejvíc.</p>
+      </article>
+      <article class="feat f-keys">
+        <h3>Zkratka podle vás</h3>
+        <p>Pravý Ctrl, Ctrl + Win jako ve Wispr Flow, na Macu Fn, nebo jakákoli vlastní kombinace. Běžným zkratkám jako Ctrl+C nepřekáží.</p>
+      </article>
       <article class="feat f-guard">
         <h3>Nevymýšlí si</h3>
         <p>Whisper má ve zvyku vložit do ticha větu typu „Titulky vytvořil…“. Diktovátko pozná, že jste nic neřekli, a nic nevloží.</p>
@@ -279,9 +335,10 @@ footer a { color: var(--ink-2); }
     </div>
     <div class="req">
       <h3>Co budete potřebovat</h3>
-      <p>Windows 10 nebo 11 a <a href="https://www.python.org/downloads/">Python 3.11+</a>.</p>
-      <p>Pro nejrychlejší přepis si zdarma vytvořte klíč na <a href="https://console.groq.com">console.groq.com</a> a vložte ho do <code>config.json</code>. Bez klíče se přepisuje offline.</p>
-      <p>Zkratku, jazyk a další nastavení najdete v <a href="https://github.com/mhudakcz/Diktovatko_2026#nastaven%C3%AD-configjson">README</a>.</p>
+      <p><b>Windows 10/11</b> nebo <b>macOS 12+</b> a <a href="https://www.python.org/downloads/">Python 3.11+</a>. Na Macu se místo <code>.bat</code> spouští <code>install.command</code> a <code>start.command</code>.</p>
+      <p><b><a href="navod.html">Podrobný návod krok za krokem</a></b>, včetně oprávnění na Macu a řešení problémů.</p>
+      <p>Pro nejrychlejší přepis si zdarma vytvořte <b>vlastní</b> klíč na <a href="https://console.groq.com">console.groq.com</a> a vložte ho v aplikaci do <i>Nastavení</i> (<a href="navod.html#groq">jak na to</a>). Bez klíče se přepisuje offline.</p>
+      
     </div>
   </div>
 </section>
@@ -294,6 +351,22 @@ footer a { color: var(--ink-2); }
 </div>
 
 <script>
+(() => {
+  // Kalkulačka úspory času: psaní 40 slov/min, diktování 150 slov/min + 20 % na kontrolu a opravy.
+  const words = document.getElementById("words");
+  const fmt = (m) => m >= 60 ? `${Math.floor(m / 60)} h ${Math.round(m % 60)} min`.replace(" 0 min", "") : `${Math.round(m)} min`;
+  function calc() {
+    const w = +words.value;
+    const saved = w / 40 - (w / 150) * 1.2;
+    document.getElementById("words-out").textContent = w.toLocaleString("cs-CZ") + " slov";
+    document.getElementById("per-day").textContent = fmt(saved);
+    document.getElementById("per-month").textContent = Math.round((saved * 21) / 60) + " h";
+    const days = Math.round((saved * 21 * 11) / 60 / 8);
+    document.getElementById("per-year").textContent = days + (days === 1 ? " den" : days >= 2 && days <= 4 ? " dny" : " dní");
+  }
+  words.addEventListener("input", calc);
+  calc();
+})();
 (() => {
   const TEXT = "Košík je hotový, zítra ráno to nasadím na staging. Klientovi můžeš napsat, že v pátek jdeme na produkci.";
   const typed = document.getElementById("typed"), pill = document.getElementById("pill"), key = document.getElementById("key");
