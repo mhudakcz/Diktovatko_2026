@@ -198,10 +198,10 @@ def audio_ducker(level):
     return AudioDucker(level)
 
 
-def overlay(level_source, engine_source, on_toggle):
+def overlay(level_source, engine_source, on_toggle, position=None, on_moved=None):
     from overlay import Overlay
 
-    return Overlay(level_source, engine_source, on_toggle)
+    return Overlay(level_source, engine_source, on_toggle, position, on_moved)
 
 
 # --- automatické spouštění po přihlášení -----------------------------------------

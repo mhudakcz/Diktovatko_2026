@@ -78,7 +78,16 @@ header h1 { margin: 0; font: 700 24px/1.1 var(--display); letter-spacing: -0.02e
 .btn:hover { border-color: var(--muted); }
 .btn svg { width: 14px; height: 14px; }
 .btn.primary { background: var(--ultra); border-color: var(--ultra); color: #fff; }
-.notes { white-space: pre-wrap; margin: 8px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--fog); font: 13px/1.5 var(--body); color: var(--ink-2); max-height: 220px; overflow: auto; }
+.notes { margin: 8px 0 0; padding: 4px 14px; border-radius: 10px; background: var(--fog); font: 13px/1.5 var(--body); color: var(--ink-2); max-height: 320px; overflow: auto; }
+.notes .rel { padding: 10px 0; }
+.notes .rel + .rel { border-top: 1px solid var(--line); }
+.notes h4 { margin: 0 0 4px; font: 600 13px/1.4 var(--body); color: var(--ink); }
+.notes h4 span { font-weight: 400; color: var(--ink-3, var(--ink-2)); margin-left: 6px; }
+.notes ul { margin: 0; padding-left: 18px; }
+.notes p { margin: 0 0 4px; }
+#upd-card.flash { animation: flash 1.6s ease-out; }
+@keyframes flash { from { box-shadow: 0 0 0 3px var(--accent, #3847F5); } to { box-shadow: 0 0 0 3px transparent; } }
+@media (prefers-reduced-motion: reduce) { #upd-card.flash { animation: none; } }
 .btn.danger { color: #B42318; border-color: color-mix(in srgb, #B42318 40%, var(--line)); }
 .btn.danger:hover { background: #B42318; color: #fff; }
 .split { display: inline-flex; }
@@ -347,7 +356,7 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
           <div><div class="t" id="upd-status"></div><div class="d" id="upd-detail"></div></div>
           <div class="inline"><button type="button" class="btn" id="upd-check" data-i18n="set.upd.check">Zkontrolovat</button><button type="button" class="btn primary" id="upd-install" data-i18n="set.upd.install" hidden>Aktualizovat teď</button></div>
         </div>
-        <div class="row" id="upd-notes-row" hidden style="display:block"><div class="t" data-i18n="set.upd.notes">Co je nového</div><pre class="notes" id="upd-notes"></pre></div>
+        <div class="row" id="upd-notes-row" hidden style="display:block"><div class="t" id="upd-notes-t"></div><div class="notes" id="upd-notes"></div></div>
         <div class="row"><div><div class="t" data-i18n="set.upd.auto">Automaticky kontrolovat aktualizace</div><div class="d" data-i18n="set.upd.autoD"></div></div><label class="switch"><input type="checkbox" id="check-updates"><span></span></label></div>
       </section>
 
@@ -424,8 +433,16 @@ function showView(v) {
   $("main").scrollTop = 0;
   if (v === "history") loadHistory();
   if (v === "stats") loadStats();
-  if (v === "settings") loadSettings();
+  if (v === "settings") return loadSettings();
 }
+// Z menu ikony „Aktualizovat…“: nastavení, sekce Aktualizace s přehledem změn.
+async function showUpdates() {
+  await showView("settings");
+  const card = $("upd-card");
+  card.scrollIntoView({ block: "start" });
+  card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
+}
+function openView(v) { return v === "updates" ? showUpdates() : showView(v); }
 document.querySelector(".views").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) showView(b.dataset.view); });
 
 /* ---------------- historie ---------------- */
@@ -617,8 +634,32 @@ function renderUpdate(u) {
   $("upd-status").textContent = latest ? t("set.upd.available", { v: latest.version }) : t("set.upd.current", { v: u.current });
   $("upd-detail").textContent = u.dev ? t("set.upd.dev") : latest ? t("set.upd.availableD") : u.error ? t("set.upd.error") : u.checked ? t("set.upd.uptodate") : "";
   $("upd-install").hidden = !latest || u.dev;
-  $("upd-notes-row").hidden = !latest || !latest.notes;
-  $("upd-notes").textContent = latest ? latest.notes : "";
+  const changes = latest ? latest.changes || [{ version: latest.version, date: "", notes: latest.notes || "" }] : [];
+  $("upd-notes-row").hidden = !changes.length;
+  $("upd-notes-t").textContent = changes.length > 1
+    ? t("set.upd.since", { v: u.current }) + " · " + tp("version", changes.length) : t("set.upd.notes");
+  $("upd-notes").replaceChildren(...changes.map(releaseBlock));
+}
+// Popis vydání z GitHubu (Markdown) jako bezpečné DOM uzly: odrážky → seznam, ostatní řádky → odstavce.
+function releaseBlock(c) {
+  const box = document.createElement("div"); box.className = "rel";
+  const h = document.createElement("h4"); h.textContent = t("set.upd.ver", { v: c.version });
+  if (c.date) { const d = document.createElement("span"); d.textContent = new Date(c.date).toLocaleDateString(I18N[LANG].locale); h.append(d); }
+  box.append(h);
+  let ul = null;
+  for (const raw of (c.notes || "").split(/\r?\n/)) {
+    const line = raw.replace(/\*\*|__|`/g, "").trim();
+    if (!line || /^#+\s*$/.test(line)) { ul = null; continue; }
+    const m = line.match(/^[-*•]\s+(.*)/);
+    if (m) {
+      if (!ul) { ul = document.createElement("ul"); box.append(ul); }
+      const li = document.createElement("li"); li.textContent = m[1]; ul.append(li);
+    } else {
+      ul = null;
+      const p = document.createElement("p"); p.textContent = line.replace(/^#+\s*/, ""); box.append(p);
+    }
+  }
+  return box;
 }
 async function waitUpdateInfo(prev) {
   for (let i = 0; i < 20; i++) {
@@ -737,7 +778,8 @@ document.addEventListener("keydown", (e) => {
 });
 async function checkPending() {
   const v = await api().pending_view();
-  if (v && v !== state.view && ["history", "stats", "settings"].includes(v)) showView(v);
+  if (v === "updates") showUpdates();
+  else if (v && v !== state.view && ["history", "stats", "settings"].includes(v)) showView(v);
   else if (state.view === "history") loadHistory();
   else if (state.view === "stats") loadStats();
 }
@@ -752,7 +794,7 @@ window.addEventListener("pywebviewready", async () => {
   await initLang();
   $("ver").textContent = state.settings.version ? "v" + state.settings.version : "";
   const v = await api().pending_view();
-  showView(v || "history");
+  openView(v || "history");
 });
 </script>
 </body>

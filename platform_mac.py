@@ -310,8 +310,8 @@ def audio_ducker(level):
 
 
 # --- indikátor nahrávání -----------------------------------------------------------------
-def overlay(level_source, engine_source, on_toggle):
-    from overlay import OverlayState, W, H, BOTTOM_MARGIN, render_pill
+def overlay(level_source, engine_source, on_toggle, position=None, on_moved=None):
+    from overlay import ALPHA, OverlayState, W, H, BOTTOM_MARGIN, render_pill
 
     class MacOverlay(OverlayState):
         """NSPanel, který nebere fokus, propouští kliknutí a je vidět na všech plochách.
@@ -339,6 +339,7 @@ def overlay(level_source, engine_source, on_toggle):
             )
             p.setLevel_(AppKit.NSStatusWindowLevel)
             p.setOpaque_(False)
+            p.setAlphaValue_(ALPHA)
             p.setBackgroundColor_(AppKit.NSColor.clearColor())
             p.setIgnoresMouseEvents_(True)
             p.setHasShadow_(True)

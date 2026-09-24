@@ -1,6 +1,7 @@
 """Aktualizace Diktovátka z GitHubu.
 
-Kontroluje poslední vydání (GitHub Release) v repozitáři projektu. Aktualizace stáhne ZIP
+Kontroluje vydání (GitHub Releases) v repozitáři projektu a sbírá popisy všech verzí
+novějších než nainstalovaná, aby uživatel viděl i novinky z verzí, které přeskočil. Aktualizace stáhne ZIP
 dané verze přímo z GitHubu (HTTPS), přepíše jen soubory programu – nastavení, historie,
 logy, exporty ani virtuální prostředí nemění – a když se změnily knihovny, doinstaluje je.
 Vývojovou kopii (složka s .git) nepřepisuje nikdy.
@@ -21,7 +22,7 @@ from version import VERSION
 log = logging.getLogger("diktovatko")
 
 REPO = "mhudakcz/Diktovatko_2026"
-API_LATEST = f"https://api.github.com/repos/{REPO}/releases/latest"
+API_RELEASES = f"https://api.github.com/repos/{REPO}/releases"
 ZIP_URL = f"https://github.com/{REPO}/archive/refs/tags/v{{version}}.zip"
 RELEASES_URL = f"https://github.com/{REPO}/releases"
 APP_DIR = config.APP_DIR
@@ -43,16 +44,30 @@ def is_dev_checkout():
 
 
 def check():
-    """Vrátí {"version", "notes", "url"} nejnovějšího vydání, když je novější než nainstalované, jinak None."""
+    """Když na GitHubu je novější verze, vrátí {"version", "changes", "notes", "url"}, jinak None.
+
+    changes = všechny vydané verze novější než nainstalovaná, od nejnovější:
+    [{"version", "date", "notes"}]. notes = totéž jako jeden text (pro starší okna).
+    """
     import httpx
 
-    r = httpx.get(API_LATEST, headers={"Accept": "application/vnd.github+json"}, timeout=15, follow_redirects=True)
+    r = httpx.get(API_RELEASES, params={"per_page": 50}, headers={"Accept": "application/vnd.github+json"},
+                  timeout=15, follow_redirects=True)
     r.raise_for_status()
-    data = r.json()
-    latest = data.get("tag_name", "").lstrip("v")
-    if not latest or parse(latest) <= parse(VERSION):
+    current = parse(VERSION)
+    changes = []
+    for rel in r.json():
+        v = str(rel.get("tag_name", "")).lstrip("v")
+        if rel.get("draft") or rel.get("prerelease") or not re.fullmatch(r"\d+\.\d+\.\d+", v) or parse(v) <= current:
+            continue
+        changes.append({"version": v, "date": str(rel.get("published_at") or "")[:10],
+                        "notes": str(rel.get("body") or "").replace("﻿", "").strip()[:3000]})
+    if not changes:
         return None
-    return {"version": latest, "notes": (data.get("body") or "")[:4000], "url": data.get("html_url") or RELEASES_URL}
+    changes.sort(key=lambda c: parse(c["version"]), reverse=True)
+    changes = changes[:30]
+    notes = "\n\n".join(f"{c['version']}\n{c['notes']}" for c in changes)[:8000]
+    return {"version": changes[0]["version"], "changes": changes, "notes": notes, "url": RELEASES_URL}
 
 
 def write_state(**state):

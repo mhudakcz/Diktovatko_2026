@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.11.1**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.12.0**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
@@ -63,7 +63,7 @@ S klíčem jde mezi Groq a offline přepínat bez mazání klíče: kliknutím n
 
 ## Aktualizace
 
-Od verze 0.10.0 se Diktovátko aktualizuje samo. Jednou za 2 hodiny se podívá na [GitHub Releases](https://github.com/mhudakcz/Diktovatko_2026/releases), a když je k dispozici nová verze, zobrazí upozornění. Instaluje se po kliknutí na *Aktualizovat* v menu ikony nebo v *Nastavení → Aktualizace*: stáhne se ZIP dané verze, přepíší se jen soubory programu (nastavení, klíč, historie a `.venv` zůstanou), doinstalují se případné nové knihovny a aplikace se restartuje. Vývojová kopie z gitu (složka s `.git`) se takto nepřepisuje, aktualizuje se přes `git pull`.
+Od verze 0.10.0 se Diktovátko aktualizuje samo. Jednou za 2 hodiny se podívá na [GitHub Releases](https://github.com/mhudakcz/Diktovatko_2026/releases), a když je k dispozici nová verze, zobrazí upozornění. Instaluje se po kliknutí na *Aktualizovat* v menu ikony nebo v *Nastavení → Aktualizace*: stáhne se ZIP dané verze, přepíší se jen soubory programu (nastavení, klíč, historie a `.venv` zůstanou), doinstalují se případné nové knihovny a aplikace se restartuje. Před instalací je v *Nastavení → Aktualizace* přehled změn ze všech verzí novějších než ta nainstalovaná (text z GitHub Releases), takže i kdo pár verzí přeskočí, vidí všechny novinky. Vývojová kopie z gitu (složka s `.git`) se takto nepřepisuje, aktualizuje se přes `git pull`.
 
 Starší verze (do 0.9.x) je potřeba jednou aktualizovat ručně: stáhnout nový ZIP, přepsat soubory a spustit `install.bat` / `install.command`.
 
@@ -98,6 +98,7 @@ Nejjednodušší je nastavovat v okně aplikace (sekce *Nastavení*). Soubor se 
 | `history` | `true` | ukládání historie |
 | `sounds` | `true` | pípnutí při startu a konci nahrávání |
 | `trailing_space` | `true` | mezera za vloženým textem |
+| `overlay_pos` | `null` | poloha indikátoru `[x, y]` po přetažení myší, `null` = dole uprostřed |
 | `offline` | `false` | přepisovat v počítači i s uloženým Groq klíčem |
 | `check_updates` | `true` | jednou za 2 hodiny zkontrolovat, jestli nevyšla nová verze |
 

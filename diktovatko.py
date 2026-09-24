@@ -262,7 +262,7 @@ class App:
                 ),
                 pystray.MenuItem(
                     lambda _: t("menu.update", v=self.update["version"]) if self.update else "",
-                    lambda: threading.Thread(target=self.install_update, daemon=True).start(),
+                    lambda: self.open_window("updates"),  # nejdřív přehled změn, instaluje se tam
                     visible=lambda _: bool(self.update),
                 ),
                 pystray.Menu.SEPARATOR,
@@ -285,7 +285,8 @@ class App:
 
     def _ensure_extras(self):
         if self.cfg["overlay"] and self.overlay is None:
-            self.overlay = plat.overlay(lambda: list(self.levels), self.engine_badge, self.toggle_offline)
+            self.overlay = plat.overlay(lambda: list(self.levels), self.engine_badge, self.toggle_offline,
+                                        self.cfg["overlay_pos"], self.save_overlay_pos)
         if self.ducker is None:
             self.ducker = plat.audio_ducker(self.cfg["duck_level"])
             self.ducker.restore_leftover()  # hlasitost ztlumená před pádem aplikace se vrátí
@@ -501,6 +502,14 @@ class App:
         has_key = bool(config.groq_key(self.cfg))
         return ("offline" if self.cfg["offline"] or not has_key else "groq"), has_key
 
+    def save_overlay_pos(self, pos):
+        with self.lock:
+            new = config.validate(dict(self.cfg, overlay_pos=pos))
+            self.cfg = new
+            self.transcriber.cfg = new
+            config.save_config(new)
+        log.info("Indikátor přesunut na %s", pos or "výchozí místo")
+
     def toggle_offline(self):
         """Přepnout Groq ↔ offline (menu ikony, štítek v indikátoru).
 
@@ -562,7 +571,9 @@ class App:
         if self.update and self._notified != self.update["version"]:
             self._notified = self.update["version"]
             log.info("Je k dispozici verze %s", self.update["version"])
-            self._notify(t("notify.update.body", v=self.update["version"]), t("notify.update.title"))
+            n = len(self.update.get("changes") or [1])
+            key = "notify.update.many" if n > 1 else "notify.update.body"
+            self._notify(t(key, v=self.update["version"], n=n, cur=VERSION), t("notify.update.title"))
 
     def _notify(self, text, title="Diktovátko"):
         try:

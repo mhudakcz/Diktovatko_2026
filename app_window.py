@@ -21,7 +21,7 @@ from version import VERSION
 APP_DIR = config.APP_DIR
 UI_REQUEST = APP_DIR / ".ui_request"
 WINDOW_TITLE = "Diktovátko"
-VIEWS = ("history", "stats", "settings")
+VIEWS = ("history", "stats", "settings", "updates")  # updates = nastavení, sekce Aktualizace
 URLS = {"groq_keys": "https://console.groq.com/keys", "releases": updater.RELEASES_URL}  # jediné adresy, které okno smí otevřít
 UI_LANGUAGES = [("cs", "Čeština"), ("en", "English"), ("de", "Deutsch")]  # každý ve svém jazyce
 

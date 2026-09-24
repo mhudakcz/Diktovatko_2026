@@ -2,8 +2,9 @@
 
 render_pill() kreslí samotnou pilulku a sdílí ho Windows i macOS.
 Třída Overlay je Windows verze: běží ve vlastním vlákně s Tk a nikdy nebere
-fokus, takže text se dál vkládá do okna s kurzorem. Kliknout jde jen na štítek
-Groq / Offline vpravo, který přepíná způsob přepisu.
+fokus, takže text se dál vkládá do okna s kurzorem. Kliknutí na štítek
+Cloud · fast / Local · slow vpravo přepne způsob přepisu, za zbytek jde indikátor
+přetáhnout jinam (dvojklik ho vrátí dole doprostřed). Je napůl průhledný.
 """
 
 import logging
@@ -29,6 +30,8 @@ BADGE_X0, BADGE_X1 = 166, 272  # štítek Cloud / Local (logické souřadnice)
 SS = 2  # supersampling kvůli vyhlazeným okrajům (2× stačí, 3× zbytečně zatěžovalo CPU)
 FRAME_MS = 42  # ~24 snímků za sekundu
 BOTTOM_MARGIN = 28
+ALPHA = 0.7  # krytí indikátoru, ať je vidět, co je pod ním (pod myší je plně vidět)
+DRAG_PX = 4  # posun myši, od kterého je kliknutí přetažení
 
 _fonts = {}
 
@@ -175,8 +178,12 @@ class OverlayState:
 class Overlay(OverlayState):
     """Windows: Tk okno s průhlednou barvou, které nebere fokus ani při kliknutí."""
 
-    def __init__(self, level_source, engine_source=lambda: (None, False), on_toggle=None):
+    def __init__(self, level_source, engine_source=lambda: (None, False), on_toggle=None,
+                 position=None, on_moved=None):
         super().__init__(level_source, engine_source, on_toggle)
+        self.position = position  # [x, y] levého horního rohu, None = dole uprostřed
+        self.on_moved = on_moved  # po přetažení: on_moved([x, y]), dvojklik: on_moved(None)
+        self._drag = None
         self._ready = threading.Event()
         threading.Thread(target=self._run, daemon=True).start()
         self._ready.wait(5)
@@ -195,19 +202,21 @@ class Overlay(OverlayState):
         self.root.attributes("-topmost", True)
         self.root.config(bg=key_hex)
         self.root.attributes("-transparentcolor", key_hex)
+        self.root.attributes("-alpha", ALPHA)
         self.scale = self.root.winfo_fpixels("1i") / 96
         self.w, self.h = int(W * self.scale), int(H * self.scale)
 
-        work = ctypes.wintypes.RECT()
-        ctypes.windll.user32.SystemParametersInfoW(0x30, 0, ctypes.byref(work), 0)  # SPI_GETWORKAREA
-        x = (work.left + work.right - self.w) // 2
-        y = work.bottom - self.h - int(BOTTOM_MARGIN * self.scale)
-        self.root.geometry(f"{self.w}x{self.h}+{x}+{y}")
+        self._place(self.position)
 
         self.label = tk.Label(self.root, bg=key_hex, bd=0, highlightthickness=0)
         self.label.pack()
-        self.label.bind("<Button-1>", self._click)
+        self.label.bind("<ButtonPress-1>", self._press)
+        self.label.bind("<B1-Motion>", self._drag_move)
+        self.label.bind("<ButtonRelease-1>", self._release)
+        self.label.bind("<Double-Button-1>", self._reset_position)
         self.label.bind("<Motion>", self._motion)
+        self.label.bind("<Enter>", lambda _e: self.root.attributes("-alpha", 1.0))
+        self.label.bind("<Leave>", lambda _e: self._drag or self.root.attributes("-alpha", ALPHA))
         self.root.update_idletasks()
 
         self.hwnd = ctypes.windll.user32.GetParent(self.root.winfo_id())
@@ -228,12 +237,66 @@ class Overlay(OverlayState):
         return bool(engine and clickable and self.current() == "recording"
                     and BADGE_X0 <= x / self.scale <= BADGE_X1)
 
-    def _click(self, e):
-        if self._on_badge(e.x) and self.on_toggle:
+    def _default_pos(self):
+        import ctypes
+        import ctypes.wintypes
+
+        work = ctypes.wintypes.RECT()
+        ctypes.windll.user32.SystemParametersInfoW(0x30, 0, ctypes.byref(work), 0)  # SPI_GETWORKAREA
+        return (work.left + work.right - self.w) // 2, work.bottom - self.h - int(BOTTOM_MARGIN * self.scale)
+
+    def _place(self, pos):
+        """Umístí okno na pos, nebo dole doprostřed, když pos chybí či je mimo všechny monitory."""
+        import ctypes
+
+        m = ctypes.windll.user32.GetSystemMetrics
+        vx, vy, vw, vh = m(76), m(77), m(78), m(79)  # virtuální plocha přes všechny monitory
+        if pos and vx <= pos[0] <= vx + vw - self.w // 2 and vy <= pos[1] <= vy + vh - self.h // 2:
+            x, y = pos
+        else:
+            x, y = self._default_pos()
+        self.root.geometry(f"{self.w}x{self.h}+{x}+{y}")
+
+    def _press(self, e):
+        self._drag = {"x": e.x_root, "y": e.y_root, "wx": self.root.winfo_x(), "wy": self.root.winfo_y(),
+                      "moved": False, "badge": self._on_badge(e.x)}
+
+    def _drag_move(self, e):
+        d = self._drag
+        if not d:
+            return
+        dx, dy = e.x_root - d["x"], e.y_root - d["y"]
+        if not d["moved"] and abs(dx) < DRAG_PX and abs(dy) < DRAG_PX:
+            return
+        d["moved"] = True
+        self.label.config(cursor="fleur")
+        self.root.geometry(f"+{d['wx'] + dx}+{d['wy'] + dy}")
+
+    def _release(self, e):
+        d, self._drag = self._drag, None
+        if not d:
+            return
+        if d["moved"]:
+            self.position = [self.root.winfo_x(), self.root.winfo_y()]
+            if self.on_moved:
+                threading.Thread(target=self.on_moved, args=(self.position,), daemon=True).start()
+        elif d["badge"] and self.on_toggle:
             threading.Thread(target=self.on_toggle, daemon=True).start()
+        self._motion(e)
+
+    def _reset_position(self, e):
+        """Dvojklik mimo štítek vrátí indikátor dole doprostřed."""
+        if self._on_badge(e.x):
+            return
+        self.position = None
+        self._place(None)
+        if self.on_moved:
+            threading.Thread(target=self.on_moved, args=(None,), daemon=True).start()
 
     def _motion(self, e):
-        cur = "hand2" if self._on_badge(e.x) else ""
+        if self._drag and self._drag["moved"]:
+            return
+        cur = "hand2" if self._on_badge(e.x) else "fleur"
         if self.label.cget("cursor") != cur:
             self.label.config(cursor=cur)
 

@@ -2,6 +2,12 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.12.0 – 2026-09-24
+
+- Aktualizace: před instalací je v Nastavení → Aktualizace přehled změn ze **všech** verzí od té nainstalované, rozdělený po verzích. Položka „Aktualizovat na verzi…“ v menu ikony otevře tenhle přehled, instaluje se až tlačítkem. Oznámení říká, kolik verzí vyšlo.
+- Indikátor je napůl průhledný (70 %), pod myší se zobrazí celý.
+- Indikátor jde myší přetáhnout kamkoli na obrazovku, poloha se pamatuje (`overlay_pos`). Dvojklik ho vrátí dole doprostřed.
+
 ## 0.11.1 – 2026-09-24
 
 - Oprava: po přepnutí Cloud / Local během nahrávání aplikace nepoznala puštění zkratky a nahrávala dál. Uložení nastavení teď drženou zkratku nezruší, pokud se zkratky nezměnily.

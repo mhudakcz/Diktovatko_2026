@@ -5,4 +5,4 @@ nová funkce = prostřední číslo (0.9.2), oprava = poslední číslo (0.7.1).
 Verze 1.0.0 bude první, kterou prohlásíme za hotovou. Změny popisuje CHANGELOG.md.
 """
 
-VERSION = "0.11.1"
+VERSION = "0.12.0"
