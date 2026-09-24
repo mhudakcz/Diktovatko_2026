@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.12.7**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.13.0**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
@@ -161,4 +161,14 @@ Pomoct jde i zdarma: sdílejte Diktovátko s kolegy, hlaste chyby a nápady v [I
 
 ## Licence
 
-MIT. Autor: Michal Hudák.
+Copyright © 2026 Michal Hudák
+
+Diktovátko je open source pod licencí **[GNU AGPL-3.0](LICENSE)** (od verze 0.13.0). Zjednodušeně:
+
+- Diktovátko můžete zdarma používat, i v práci a ve firmě, upravovat ho a šířit dál.
+- Kdo šíří upravenou verzi, nebo ji nabízí jako online službu, musí její zdrojový kód zveřejnit pod stejnou licencí. Z Diktovátka tedy nejde udělat uzavřený komerční produkt.
+- Kdo by Diktovátko chtěl použít jinak, třeba zabudovat do vlastního uzavřeného produktu, může se domluvit na samostatné licenci. Ozvěte se přes [Issues](https://github.com/mhudakcz/Diktovatko_2026/issues).
+
+Název Diktovátko a logo nejsou součástí licence. Upravené verze se nesmí vydávat za originál.
+
+Verze do 0.12.7 vyšly pod licencí MIT a pro ně MIT platí dál.

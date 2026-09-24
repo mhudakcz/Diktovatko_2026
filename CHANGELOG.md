@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.13.0 – 2026-09-25
+
+- Nová licence **GNU AGPL-3.0** místo MIT. Diktovátko zůstává open source a zdarma i pro firmy, ale upravené verze musí zůstat otevřené pod stejnou licencí. Verze do 0.12.7 zůstávají pod MIT. Název a logo nejsou součástí licence.
+
 ## 0.12.7 – 2026-09-25
 
 - Web a README: nový text u podpory na Ko-fi – kafe je povzbuzení pro tvůrce, ne platba za čas.
