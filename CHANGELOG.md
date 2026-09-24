@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.9.2 – 2026-09-24
+
+- Žluté tlačítko „☕ Podpořit“ v horní liště všech stránek (web i návod, CZ, EN, DE) vede rovnou na Ko-fi. Je vidět i na telefonu.
+
 ## 0.9.1 – 2026-09-24
 
 - Možnost podpořit projekt: sekce „Podpořit“ s odkazem na Ko-fi na webu (CZ, EN, DE), odkaz v menu webu, položka „Podpořit projekt ☕“ v menu ikony aplikace a sekce v README.

@@ -327,6 +327,12 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
   .shot { transform: none; }
   html { scroll-behavior: auto; }
 }
+
+/* tlačítko na kafe v horní liště, vždy vidět */
+a.coffee { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 999px; background: var(--sun); color: #16133A !important; font: 700 14px/1 var(--display); text-decoration: none; white-space: nowrap; box-shadow: 0 6px 18px -8px rgb(255 210 63 / .9); transition: transform .2s; }
+a.coffee:hover { transform: translateY(-1px) rotate(-2deg); color: #16133A; }
+a.coffee .cup { font-size: 16px; line-height: 1; }
+@media (max-width: 359px) { a.coffee .txt { display: none; } a.coffee { padding: 7px 10px; } }
 </style>
 </head>
 <body>
@@ -346,7 +352,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
         <a href="#uspora">Time saved</a>
         <a href="#historie">History</a>
         <a href="#instalace">Install</a>
-        <a href="#podpora">Support</a>
+        <a class="coffee keep" href="https://ko-fi.com/michalhudak" target="_blank" rel="noopener" title="Support Diktovátko on Ko-fi"><span class="cup" aria-hidden="true">☕</span><span class="txt">Support</span></a>
         <a href="navod.html" class="keep">Guide</a>
         <div class="lang" aria-label="Jazyk / Language"><a href="../">CZ</a><a href="./" aria-current="page">EN</a><a href="../de/">DE</a></div>
       </nav>
@@ -535,7 +541,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
 <footer class="bigfoot">
   <div class="wrap">
     <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
-    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">version 0.9.1</a> by Michal Hudák. MIT licence.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">version 0.9.2</a> by Michal Hudák. MIT licence.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
   </div>
 </footer>
 

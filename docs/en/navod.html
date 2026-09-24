@@ -34,7 +34,7 @@ a { color: var(--ultra); text-underline-offset: 2px; }
 .brand { display: flex; align-items: center; gap: 9px; font: 800 17px/1 var(--display); color: var(--ink); text-decoration: none; }
 .mark { width: 24px; height: 24px; border-radius: 50%; background: var(--voice); display: grid; place-items: center; }
 .mark svg { width: 12px; height: 12px; }
-.lang { margin-left: auto; display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.lang { margin-left: 10px; display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
 .lang a { padding: 5px 10px; border-radius: 8px; font: 600 13px var(--body); color: var(--ink-2); text-decoration: none; }
 .lang a[aria-current="page"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .1); }
 .os { margin-left: 10px; display: inline-flex; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
@@ -153,12 +153,19 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
 .shot { border-radius: 16px; box-shadow: 0 30px 60px -34px rgb(26 20 70 / .5); }
 .faq summary::after { color: var(--coral); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tldr { background: var(--paper); border-color: var(--line); } }
+
+/* tlačítko na kafe v horní liště, vždy vidět */
+a.coffee { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 999px; background: var(--sun); color: #16133A !important; font: 700 14px/1 var(--display); text-decoration: none; white-space: nowrap; box-shadow: 0 6px 18px -8px rgb(255 210 63 / .9); transition: transform .2s; }
+a.coffee:hover { transform: translateY(-1px) rotate(-2deg); color: #16133A; }
+a.coffee .cup { font-size: 16px; line-height: 1; }
+@media (max-width: 420px) { a.coffee .txt { display: none; } a.coffee { padding: 6px 11px; } a.coffee .cup { font-size: 20px; } }
 </style>
 </head>
 <body>
 <div class="top">
   <div class="top-in">
     <a class="brand" href="./"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="8" y="2" width="8" height="13" rx="4" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></span><span>Diktovátko</span></a>
+    <a class="coffee keep" href="https://ko-fi.com/michalhudak" target="_blank" rel="noopener" title="Support Diktovátko on Ko-fi"><span class="cup" aria-hidden="true">☕</span><span class="txt">Support</span></a>
     <div class="lang" aria-label="Jazyk / Language">
       <a href="../navod.html" hreflang="cs" lang="cs">CZ</a>
       <a href="navod.html" hreflang="en" lang="en" aria-current="page">EN</a>
@@ -191,7 +198,7 @@ body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
   <article>
     <h1>Step-by-step guide</h1>
     <p class="lede">From installation to your first dictated sentence. You don't need any technical skills, just follow the steps one by one.</p>
-    <p class="meta">This guide is for <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">version 0.9.1</a>. Use the switch at the top to choose <b>Windows</b> or <b>Mac</b>, and the guide adjusts to match.</p>
+    <p class="meta">This guide is for <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">version 0.9.2</a>. Use the switch at the top to choose <b>Windows</b> or <b>Mac</b>, and the guide adjusts to match.</p>
 
     <div class="tldr">
       <h2 class="tldr-h">In short</h2>
