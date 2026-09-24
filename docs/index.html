@@ -423,6 +423,28 @@ a.coffee::before { animation-delay: 2.6s; }
 .news:nth-child(3)::after, .free-help::after { animation-duration: 52s; }
 .price > .wrap { position: relative; }
 
+/* ukázka rychlosti pod mikrofonem: nahrávání, přepis, vložení a srovnání s psaním */
+.demo-out { position: absolute; z-index: 3; left: 50%; bottom: -8%; translate: -50% 0; width: min(420px, 92vw); padding: 14px 16px 14px; border-radius: 18px; text-align: left; background: rgb(22 19 58 / .84); border: 1px solid rgb(185 179 255 / .25); box-shadow: 0 24px 60px -24px rgb(0 0 0 / .6); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); animation: fade .35s both; }
+.demo-out[hidden] { display: none; }
+.mic-zone.demo .mic-tip { opacity: 0; }
+.do-head { display: flex; align-items: center; gap: 8px; font: 600 13px var(--body); color: var(--lilac); }
+.do-head .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--coral); animation: dotp 1s ease-in-out infinite; }
+@keyframes dotp { 50% { opacity: .35; } }
+.do-head.done .dot { background: #5ED6A0; animation: none; }
+.do-head.done #do-state { color: #5ED6A0; }
+.do-head .t { margin-left: auto; font-variant-numeric: tabular-nums; color: #AAB2C4; }
+.do-text { margin: 8px 0 0; min-height: 3em; font-size: 15px; line-height: 1.45; color: #fff; }
+.do-text.typing::after { content: ""; display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; vertical-align: -0.2em; background: var(--sun); animation: dotp .8s steps(2) infinite; }
+.do-text:empty::before { content: none; }
+.do-race { display: grid; gap: 6px; margin-top: 10px; font-size: 12.5px; color: var(--lilac); }
+.do-race[hidden] { display: none; }
+.do-race .r { display: grid; grid-template-columns: 90px 1fr 48px; gap: 8px; align-items: center; }
+.do-race i { height: 6px; border-radius: 3px; background: rgb(255 255 255 / .1); overflow: hidden; }
+.do-race em { display: block; height: 100%; width: 0; border-radius: 3px; transition: width 1.4s cubic-bezier(.2,.7,.2,1); }
+.do-race .me em { background: linear-gradient(90deg, var(--coral), var(--sun)); }
+.do-race .kb em { background: var(--lilac-2); transition-duration: 2.6s; }
+.do-race b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; color: #fff; }
+
 /* tlačítko na kafe v horní liště, vždy vidět */
 a.coffee { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 999px; background: var(--sun); color: #16133A !important; font: 700 14px/1 var(--display); text-decoration: none; white-space: nowrap; box-shadow: 0 6px 18px -8px rgb(255 210 63 / .9); transition: transform .2s; }
 a.coffee:hover { transform: translateY(-1px) rotate(-2deg); color: #16133A; }
@@ -469,6 +491,7 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
         <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
         <button type="button" class="mic" id="mic" aria-label="Poslechnout si ukázku diktování"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
         <span class="mic-tip" id="mic-tip">Klikněte a poslechněte si ukázku</span>
+        <div class="demo-out" id="demo-out" aria-live="polite" aria-label="Ukázka přepisu" hidden><div class="do-head" id="do-head"><span class="dot"></span><span id="do-state">Píšu, co říkáte</span><span class="t" id="do-time">0:00</span></div><p class="do-text" id="do-text"></p><div class="do-race" id="do-race" hidden><div class="r me"><span>Diktovátko</span><i><em id="do-b1"></em></i><b id="do-t1"></b></div><div class="r kb"><span>Na klávesnici</span><i><em id="do-b2"></em></i><b id="do-t2"></b></div></div></div>
       </div>
     </div>
   </div>
@@ -667,7 +690,7 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
 <footer class="bigfoot">
   <div class="wrap">
     <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
-    <div class="foot-row"><span>Diktovátko <a href="zmeny.html">verze 0.13.0</a> vytvořil Michal Hudák. <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/LICENSE">Licence AGPL-3.0</a>.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+    <div class="foot-row"><span>Diktovátko <a href="zmeny.html">verze 0.13.1</a> vytvořil Michal Hudák. <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/LICENSE">Licence AGPL-3.0</a>.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
   </div>
 </footer>
 
@@ -811,14 +834,69 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
   const zone = document.getElementById("mic-zone"), mic = document.getElementById("mic"), tip = document.getElementById("mic-tip");
   const synth = window.speechSynthesis;
   const voiceCs = () => { const v = (synth?.getVoices() || []).filter((x) => x.lang.toLowerCase().startsWith("cs")); return v.find((x) => /natural|online|google/i.test(x.name)) || v[0] || null; };
+  const out = document.getElementById("demo-out"), head = document.getElementById("do-head"), st = document.getElementById("do-state");
+  const tm = document.getElementById("do-time"), tx = document.getElementById("do-text"), race = document.getElementById("do-race");
+  const L = { rec: "Píšu, co říkáte", done: "✓ Hotovo, {n} slov za {s} s", dec: "," };
+  const pickVoice = typeof voiceCs === "function" ? voiceCs : voiceFor;
+  const nWords = TEXT.split(/\s+/).length, fmt = (s) => s.toFixed(1).replace(".", L.dec);
+  const wordEnds = [...TEXT.matchAll(/\S+/g)].map((m) => m.index + m[0].length);
+  let run = 0, t0 = 0, timer = null, finished = 0, shown = 0, auto = null;
+  // Text se vypisuje průběžně, jak zní řeč: slovo po slovu podle hlasu, jinak podle odhadu tempa.
+  const reveal = (n) => { if (n > shown) { shown = n; tx.textContent = TEXT.slice(0, n); } };
+  function autoReveal(id, msPerWord) {
+    clearInterval(auto);
+    let w = wordEnds.findIndex((e) => e > shown);
+    if (w < 0) return;
+    auto = setInterval(() => { if (id !== run || w >= wordEnds.length) return clearInterval(auto); reveal(wordEnds[w++]); }, msPerWord);
+  }
+  function start() {
+    run++; out.hidden = false; zone.classList.add("demo", "speaking"); head.classList.remove("done");
+    st.textContent = L.rec; tx.textContent = ""; tx.classList.add("typing"); shown = 0; race.hidden = true;
+    document.getElementById("do-b1").style.width = document.getElementById("do-b2").style.width = "0";
+    t0 = performance.now(); clearInterval(timer); clearInterval(auto);
+    timer = setInterval(() => { tm.textContent = "0:" + String(Math.floor((performance.now() - t0) / 1000)).padStart(2, "0"); }, 200);
+    return run;
+  }
+  function finish(id) {
+    if (id !== run || finished === id) return;
+    finished = id; clearInterval(timer); clearInterval(auto); zone.classList.remove("speaking");
+    const speech = (performance.now() - t0) / 1000;
+    reveal(TEXT.length); tx.classList.remove("typing"); head.classList.add("done");
+    st.textContent = L.done.replace("{n}", nWords).replace("{s}", fmt(speech));
+    const typing = nWords / 40 * 60;  // psaní na klávesnici zhruba 40 slov za minutu
+    document.getElementById("do-t1").textContent = fmt(speech) + " s";
+    document.getElementById("do-t2").textContent = Math.round(typing) + " s";
+    race.hidden = false;
+    setTimeout(() => {
+      document.getElementById("do-b1").style.width = Math.max(4, speech / typing * 100) + "%";
+      document.getElementById("do-b2").style.width = "100%";
+    }, 30);
+  }
   mic.addEventListener("click", () => {
-    if (!synth) { tip.textContent = "Prohlížeč neumí přehrát ukázku"; return; }
-    if (synth.speaking) { synth.cancel(); return; }
+    if (zone.classList.contains("speaking")) { run++; clearInterval(timer); clearInterval(auto); synth?.cancel(); zone.classList.remove("speaking", "demo"); out.hidden = true; return; }
+    const id = start();
+    const silent = nWords / 230 * 60 * 1000;  // bez zvuku: tempo rychlé řeči
+    if (!synth) { autoReveal(id, silent / nWords); setTimeout(() => finish(id), silent + 200); return; }
+    synth.cancel();
     const u = new SpeechSynthesisUtterance(TEXT);
-    u.lang = "cs-CZ"; u.rate = 1.45; const v = voiceCs(); if (v) u.voice = v;
-    u.onstart = () => { zone.classList.add("speaking"); tip.textContent = "Takhle rychle diktujete…"; };
-    u.onend = u.onerror = () => { zone.classList.remove("speaking"); tip.textContent = "Pár vteřin mluvení. Na klávesnici by to trvalo půl minuty."; };
+    u.lang = "cs-CZ"; u.rate = 2.1; const v = pickVoice(); if (v) u.voice = v;
+    let started = false, bounded = false;
+    u.onstart = () => {
+      started = true; if (id !== run) return;
+      t0 = performance.now();
+      // Když hlas nehlásí slova, vypisujeme podle tempa řeči (rate 2,1 ≈ 300 slov za minutu).
+      setTimeout(() => { if (!bounded && id === run) autoReveal(id, 60000 / 300); }, 700);
+    };
+    u.onboundary = (e) => {
+      if (id !== run || (e.name && e.name !== "word")) return;
+      bounded = true; clearInterval(auto);
+      reveal(wordEnds.find((end) => end > e.charIndex) ?? TEXT.length);
+    };
+    u.onend = u.onerror = () => finish(id);
     synth.speak(u);
+    // Pojistka: prohlížeč bez hlasu řeč nespustí ani neukončí, ukázka pak proběhne bez zvuku.
+    setTimeout(() => { if (!started && id === run) { synth.cancel(); autoReveal(id, silent / nWords); setTimeout(() => finish(id), silent + 200); } }, 1500);
+    setTimeout(() => finish(id), silent * 3 + 4000);
   });
 })();
 </script>

@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.13.1 – 2026-09-25
+
+- Web (CZ, EN, DE): ukázka s mikrofonem vypisuje text průběžně, jak zní řeč (podle slov, která hlas hlásí, jinak podle tempa), rychlejší řeč. Na konci počet slov, čas a srovnání s psaním na klávesnici. Bez hlasu v prohlížeči proběhne ukázka potichu.
+
 ## 0.13.0 – 2026-09-25
 
 - Nová licence **GNU AGPL-3.0** místo MIT. Diktovátko zůstává open source a zdarma i pro firmy, ale upravené verze musí zůstat otevřené pod stejnou licencí. Verze do 0.12.7 zůstávají pod MIT. Název a logo nejsou součástí licence.
