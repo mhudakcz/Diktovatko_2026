@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.12.3 – 2026-09-25
+
+- Web (CZ, EN, DE): efekty na úvodní stránce – plující barevné záře a zvukové vlny v úvodu, přelévající se barvy v nadpisu, odlesk na žlutých tlačítkách, pomalu kroužící světlo v tmavých panelech. Při omezených animacích v systému se nehýbe nic.
+
 ## 0.12.2 – 2026-09-24
 
 - Jazyk aplikace jde přepnout hned vlevo dole v okně (CZ / EN / DE), platí okamžitě. V Nastavení je volba jazyka nahoře a také platí hned.
