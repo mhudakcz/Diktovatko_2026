@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="cs">
+<html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Diktovátko – mluvte, píše se to samo</title>
-<meta name="description" content="Podržte klávesu, mluvte a pusťte. Diktovátko přepíše, co řeknete, a vloží text tam, kde máte kurzor. Zdarma a open source pro Windows i Mac.">
-<meta property="og:title" content="Diktovátko – mluvte, píše se to samo">
-<meta property="og:description" content="Bezplatná open-source alternativa k Wispr Flow pro Windows i Mac. Česky, offline nebo přes Groq, s historií a statistikami.">
+<title>Diktovátko – sprechen, und es schreibt sich von selbst</title>
+<meta name="description" content="Taste gedrückt halten, sprechen, loslassen. Diktovátko schreibt mit, was Sie sagen, und fügt den Text dort ein, wo Ihr Cursor steht. Kostenlos und Open Source für Windows und Mac.">
+<meta property="og:title" content="Diktovátko – sprechen, und es schreibt sich von selbst">
+<meta property="og:description" content="Die kostenlose Alternative zu Wispr Flow für Windows und Mac. Open Source, auf Deutsch, Englisch und in 90+ Sprachen, offline oder über Groq, mit Verlauf und Statistiken.">
 <meta property="og:image" content="https://mhudakcz.github.io/Diktovatko_2026/img/history-light.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23FF5A6E'/%3E%3Crect x='9' y='5' width='6' height='10' rx='3' fill='white'/%3E%3Cpath d='M7 12a5 5 0 0 0 10 0M12 17v2.5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,10 +45,10 @@ a { color: inherit; }
 h1, h2, h3 { margin: 0; font-family: var(--display); }
 p { margin: 0; }
 
-/* ukazatel průběhu rolování */
+/* scroll progress bar */
 .progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 50; background: linear-gradient(90deg, var(--coral), var(--sun)); transform-origin: 0 50%; transform: scaleX(0); }
 
-/* ukazatel po pravé straně: jak hluboko na stránce jste */
+/* right-hand rail: how far down the page you are */
 .rail { position: fixed; right: 18px; top: 50%; translate: 0 -50%; z-index: 40; width: 44px; height: min(62vh, 520px); padding: 42px 0 14px; border-radius: 999px; background: rgb(26 20 70 / .72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgb(185 179 255 / .25); box-shadow: 0 12px 30px -12px rgb(0 0 0 / .5); }
 .pct { position: absolute; top: 12px; left: 0; right: 0; text-align: center; font: 700 11px var(--display); color: var(--sun); font-variant-numeric: tabular-nums; }
 .rail-track { position: absolute; left: 50%; top: 42px; bottom: 14px; width: 4px; translate: -50% 0; border-radius: 4px; background: rgb(185 179 255 / .22); overflow: hidden; }
@@ -62,7 +62,7 @@ p { margin: 0; }
 .rail li.on a span, .rail a:hover span, .rail a:focus-visible span { opacity: 1; }
 @media (max-width: 900px) { .rail { display: none; } .progress { height: 5px; } }
 
-/* ================= úvod ================= */
+/* ================= hero ================= */
 .hero { background: var(--night); color: #fff; position: relative; overflow: hidden; }
 .top { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
 .brand { display: flex; align-items: center; gap: 10px; font: 700 17px/1 var(--display); text-decoration: none; }
@@ -92,7 +92,7 @@ h1 .l:nth-child(2) span { animation-delay: .12s; color: var(--lilac); }
 .btn.line { border: 1.5px solid rgb(255 255 255 / .35); color: #fff; }
 .btn:hover { transform: translateY(-2px); }
 
-/* mikrofon s kruhy – po kliknutí promluví */
+/* microphone with rings, speaks on click */
 .mic-zone { position: relative; aspect-ratio: 1; display: grid; place-items: center; animation: fade 1s .3s both; }
 .ring { position: absolute; inset: 0; margin: auto; width: 34%; aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--lilac-2); opacity: 0; animation: ripple 3.6s cubic-bezier(.2,.6,.3,1) infinite; }
 .ring:nth-child(2) { animation-delay: .9s; }
@@ -106,13 +106,13 @@ h1 .l:nth-child(2) span { animation-delay: .12s; color: var(--lilac); }
 .mic-zone.speaking .mic { background: var(--coral); color: #fff; }
 .mic-tip { position: absolute; bottom: 4%; left: 0; right: 0; text-align: center; font-size: 14px; color: var(--lilac); }
 
-/* běžící pás aplikací */
+/* app marquee */
 .marquee { position: relative; z-index: 2; border-top: 1px solid rgb(255 255 255 / .12); padding: 22px 0; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
 .track { display: flex; gap: 48px; width: max-content; animation: slide 38s linear infinite; font: 500 18px var(--display); color: var(--lilac); white-space: nowrap; }
 .track span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); margin-right: 14px; vertical-align: middle; }
 @keyframes slide { to { transform: translateX(-50%); } }
 
-/* ================= scrollytelling: připnutá ukázka ================= */
+/* ================= scrollytelling: pinned demo ================= */
 .story { position: relative; height: 320vh; background: var(--night); color: #fff; }
 .pin { position: sticky; top: 0; height: 100vh; display: grid; align-items: center; overflow: hidden; }
 .pin-in { display: grid; grid-template-columns: .8fr 1.2fr; gap: 56px; align-items: center; }
@@ -147,17 +147,17 @@ h1 .l:nth-child(2) span { animation-delay: .12s; color: var(--lilac); }
 .composer.filled .send { background: #1A1446; color: var(--sun); }
 .story-hint { position: absolute; left: 50%; bottom: 28px; translate: -50% 0; font-size: 14px; color: var(--lilac); transition: opacity .3s; }
 
-/* ================= sekce ================= */
+/* ================= sections ================= */
 section.block { padding: 128px 0; }
 h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; letter-spacing: -0.04em; max-width: 16ch; }
 .intro { margin-top: 22px; max-width: 38em; font-size: 19px; color: var(--ink-2); }
 .intro a, .req a { color: var(--coral); }
 
-/* odhalení při rolování */
+/* reveal on scroll */
 .reveal { opacity: 0; transform: translateY(40px); transition: opacity .8s cubic-bezier(.2,.8,.2,1), transform .8s cubic-bezier(.2,.8,.2,1); transition-delay: var(--d, 0s); }
 .reveal.in { opacity: 1; transform: none; }
 
-/* úspora času */
+/* time saved */
 .race { margin-top: 64px; display: grid; gap: 26px; max-width: 1000px; }
 .lane { display: grid; grid-template-columns: 180px 1fr; gap: 22px; align-items: center; }
 .lane b { font-weight: 600; }
@@ -169,14 +169,14 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
 .race.in .fill span { opacity: 1; }
 .fill.type { background: #CFCBEA; color: #16133A; --w: .267; }
 .fill.talk { background: var(--coral); color: #fff; --w: 1; transition-delay: .2s; }
-.fill.type span { display: inline-block; transform: scaleX(3.75); transform-origin: 100% 50%; } /* kompenzace zmenšení */
+.fill.type span { display: inline-block; transform: scaleX(3.75); transform-origin: 100% 50%; } /* compensate for the scale */
 .calc { margin-top: 88px; font: 500 clamp(24px, 3vw, 40px)/1.4 var(--display); letter-spacing: -0.02em; max-width: 28ch; }
 .calc .num { font-weight: 900; color: var(--coral); font-variant-numeric: tabular-nums; }
 .slider { margin-top: 28px; display: flex; align-items: center; gap: 16px; max-width: 560px; font-size: 14px; color: var(--muted); }
 .slider input { flex: 1; accent-color: var(--coral); height: 30px; }
 .src { margin-top: 14px; font-size: 13.5px; color: var(--muted); max-width: 70ch; }
 
-/* historie – snímek se narovná při rolování */
+/* history: screenshot straightens on scroll */
 .hist { background: var(--card); overflow: hidden; }
 .hist-grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: 64px; align-items: center; }
 .hist ul { margin: 30px 0 0; padding: 0; list-style: none; display: grid; gap: 16px; }
@@ -189,13 +189,13 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
 .shot .dark { display: none; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .shot .light { display: none; } :root:not([data-theme="light"]) .shot .dark { display: block; } }
 
-/* funkce */
+/* features */
 .feats { margin-top: 64px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px 40px; }
 .feat svg { width: 34px; height: 34px; color: var(--coral); }
 .feat h3 { margin: 18px 0 8px; font: 700 20px/1.25 var(--display); letter-spacing: -0.02em; }
 .feat p { color: var(--ink-2); }
 
-/* instalace */
+/* installation */
 .inst { background: var(--night); color: #fff; }
 .inst h2 { color: #fff; }
 .inst .intro { color: var(--lilac); }
@@ -258,7 +258,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
 </head>
 <body>
 <div class="progress" id="progress" aria-hidden="true"></div>
-<nav class="rail" id="rail" aria-label="Kde na stránce jste">
+<nav class="rail" id="rail" aria-label="Wo Sie sich auf der Seite befinden">
   <span class="pct" id="pct">0 %</span>
   <div class="rail-track"><span class="rail-fill" id="rail-fill"></span></div>
   <ol id="rail-dots"></ol>
@@ -268,92 +268,92 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
   <div class="wrap">
     <div class="top">
       <a class="brand" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="8" y="2" width="8" height="13" rx="4" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></span>Diktovátko</a>
-      <nav aria-label="Hlavní">
-        <a href="#ukazka">Ukázka</a>
-        <a href="#uspora">Úspora času</a>
-        <a href="#historie">Historie</a>
-        <a href="#instalace">Instalace</a>
-        <a href="navod.html" class="keep">Návod</a>
-        <div class="lang" aria-label="Jazyk / Language"><a href="./" aria-current="page">CZ</a><a href="en/">EN</a><a href="de/">DE</a></div>
+      <nav aria-label="Hauptmenü">
+        <a href="#ukazka">Demo</a>
+        <a href="#uspora">Zeitersparnis</a>
+        <a href="#historie">Verlauf</a>
+        <a href="#instalace">Installation</a>
+        <a href="navod.html" class="keep">Anleitung</a>
+        <div class="lang" aria-label="Jazyk / Language"><a href="../">CZ</a><a href="../en/">EN</a><a href="./" aria-current="page">DE</a></div>
       </nav>
     </div>
     <div class="hero-in">
       <div>
-        <h1><span class="l"><span>Mluvte.</span></span><span class="l"><span>Píše se to samo.</span></span></h1>
-        <p class="lede">Podržíte klávesu, řeknete, co potřebujete, a pustíte. Text se objeví tam, kde máte kurzor: ve Slacku, e-mailu, Jiře i v chatu s AI. <b>Bezplatná alternativa k Wispr Flow, česky, pro Windows i Mac.</b></p>
+        <h1><span class="l"><span>Sprechen.</span></span><span class="l"><span>Der Rest schreibt sich.</span></span></h1>
+        <p class="lede">Sie halten eine Taste gedrückt, sagen, was Sie brauchen, und lassen los. Der Text erscheint dort, wo Ihr Cursor steht: in Slack, in der E-Mail, in Jira oder im KI-Chat. <b>Die kostenlose Alternative zu Wispr Flow für Windows und Mac. Auf Deutsch, Englisch und in 90+ Sprachen.</b></p>
         <div class="cta">
-          <a class="btn solid" id="dl-win" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.4 4.6v7H3zM11.4 4.4 21 3v8.6h-9.6zM3 12.4h7.4v7L3 18.4zM11.4 12.4H21V21l-9.6-1.4z"/></svg>Stáhnout pro Windows</a>
-          <a class="btn line" id="dl-mac" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>Stáhnout pro Mac</a>
+          <a class="btn solid" id="dl-win" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.4 4.6v7H3zM11.4 4.4 21 3v8.6h-9.6zM3 12.4h7.4v7L3 18.4zM11.4 12.4H21V21l-9.6-1.4z"/></svg>Für Windows herunterladen</a>
+          <a class="btn line" id="dl-mac" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>Für Mac herunterladen</a>
         </div>
       </div>
       <div class="mic-zone" id="mic-zone">
         <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
-        <button type="button" class="mic" id="mic" aria-label="Poslechnout si ukázku diktování"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
-        <span class="mic-tip" id="mic-tip">Klikněte a poslechněte si ukázku</span>
+        <button type="button" class="mic" id="mic" aria-label="Diktier-Beispiel anhören"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <span class="mic-tip" id="mic-tip">Klicken Sie, um ein Beispiel zu hören</span>
       </div>
     </div>
   </div>
-  <div class="marquee" aria-label="Funguje v aplikacích jako Slack, Outlook, Jira, Teams, Gmail, Notion, ChatGPT, Claude, Word a VS Code">
+  <div class="marquee" aria-label="Funktioniert in Apps wie Slack, Outlook, Jira, Teams, Gmail, Notion, ChatGPT, Claude, Word und VS Code">
     <div class="track" aria-hidden="true">
-      <span>Slack</span><span>Outlook</span><span>Jira</span><span>Teams</span><span>Gmail</span><span>Notion</span><span>ChatGPT</span><span>Claude</span><span>Word</span><span>VS Code</span><span>WhatsApp Web</span><span>Poznámky</span>
-      <span>Slack</span><span>Outlook</span><span>Jira</span><span>Teams</span><span>Gmail</span><span>Notion</span><span>ChatGPT</span><span>Claude</span><span>Word</span><span>VS Code</span><span>WhatsApp Web</span><span>Poznámky</span>
+      <span>Slack</span><span>Outlook</span><span>Jira</span><span>Teams</span><span>Gmail</span><span>Notion</span><span>ChatGPT</span><span>Claude</span><span>Word</span><span>VS Code</span><span>WhatsApp Web</span><span>Notizen</span>
+      <span>Slack</span><span>Outlook</span><span>Jira</span><span>Teams</span><span>Gmail</span><span>Notion</span><span>ChatGPT</span><span>Claude</span><span>Word</span><span>VS Code</span><span>WhatsApp Web</span><span>Notizen</span>
     </div>
   </div>
 </header>
 
-<!-- ukázka řízená rolováním -->
-<section class="story" id="ukazka" aria-label="Jak diktování probíhá">
+<!-- scroll-driven demo -->
+<section class="story" id="ukazka" aria-label="So funktioniert das Diktieren">
   <div class="pin">
     <div class="wrap pin-in">
       <ol class="beats">
-        <li class="beat on" data-b="0"><span class="n">1</span><div><h3>Klikněte do pole</h3><p>Kurzor bliká tam, kam chcete psát.</p></div></li>
-        <li class="beat" data-b="1"><span class="n">2</span><div><h3>Podržte <span class="hk">Ctrl + Win</span> a mluvte</h3><p>Hudba se ztiší, dole se objeví indikátor.</p></div></li>
-        <li class="beat" data-b="2"><span class="n">3</span><div><h3>Pusťte. Hotovo.</h3><p>Text je vložený i s interpunkcí.</p></div></li>
+        <li class="beat on" data-b="0"><span class="n">1</span><div><h3>Ins Textfeld klicken</h3><p>Der Cursor blinkt dort, wo Sie schreiben möchten.</p></div></li>
+        <li class="beat" data-b="1"><span class="n">2</span><div><h3><span class="hk">Ctrl + Win</span> halten und sprechen</h3><p>Die Musik wird leiser, unten erscheint eine Anzeige.</p></div></li>
+        <li class="beat" data-b="2"><span class="n">3</span><div><h3>Loslassen. Fertig.</h3><p>Der Text ist eingefügt, samt Satzzeichen.</p></div></li>
       </ol>
       <div class="device">
         <div class="keyrow"><span class="key hk" id="key">Ctrl + Win</span><div class="wave" id="wave" aria-hidden="true"></div></div>
         <div class="composer" id="composer">
           <div class="comp-head"><span class="dot"></span><b>Slack</b><span>#web-redesign</span></div>
-          <div class="comp-body"><span class="ph" id="ph">Napište zprávu do #web-redesign</span><span id="said"></span><span class="caret" aria-hidden="true"></span></div>
-          <div class="comp-foot"><span id="state">Kurzor je v poli</span><span class="send" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z"/></svg></span></div>
+          <div class="comp-body"><span class="ph" id="ph">Nachricht an #web-redesign</span><span id="said"></span><span class="caret" aria-hidden="true"></span></div>
+          <div class="comp-foot"><span id="state">Cursor steht im Feld</span><span class="send" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z"/></svg></span></div>
         </div>
       </div>
     </div>
-    <p class="story-hint" id="hint">Rolujte dál ↓</p>
+    <p class="story-hint" id="hint">Weiter scrollen ↓</p>
   </div>
 </section>
 
 <main>
   <section class="block" id="uspora">
     <div class="wrap">
-      <h2 class="reveal">Mluvíte skoro čtyřikrát rychleji, než píšete.</h2>
-      <p class="intro reveal" style="--d:.1s">Na klávesnici zvládne většina lidí kolem 40 slov za minutu, řečí kolem 150. Studie Stanfordovy univerzity zjistila, že diktování je zhruba třikrát rychlejší než psaní, a to i s opravami.</p>
-      <div class="race" id="race" role="img" aria-label="Psaní 40 slov za minutu, mluvení 150 slov za minutu">
-        <div class="lane"><span><b>Psaní</b><small>na klávesnici</small></span><div class="bar"><div class="fill type"><span><b data-count="40">0</b></span></div></div></div>
-        <div class="lane"><span><b>Mluvení</b><small>s Diktovátkem</small></span><div class="bar"><div class="fill talk"><span><b data-count="150">0</b> slov za minutu</span></div></div></div>
+      <h2 class="reveal">Sie sprechen fast viermal so schnell, wie Sie tippen.</h2>
+      <p class="intro reveal" style="--d:.1s">Die meisten Menschen tippen etwa 40 Wörter pro Minute und sprechen etwa 150. Eine Studie der Stanford University hat gezeigt, dass Diktieren etwa dreimal schneller ist als Tippen, selbst mit Korrekturen.</p>
+      <div class="race" id="race" role="img" aria-label="Tippen 40 Wörter pro Minute, Sprechen 150 Wörter pro Minute">
+        <div class="lane"><span><b>Tippen</b><small>auf der Tastatur</small></span><div class="bar"><div class="fill type"><span><b data-count="40">0</b></span></div></div></div>
+        <div class="lane"><span><b>Sprechen</b><small>mit Diktovátko</small></span><div class="bar"><div class="fill talk"><span><b data-count="150">0</b> Wörter pro Minute</span></div></div></div>
       </div>
-      <p class="calc reveal">Když denně napíšete <span class="num" id="words-out">2 000</span> slov, ušetříte <span class="num" id="per-day">34 minut</span> denně. To je <span class="num" id="per-month">12 hodin</span> měsíčně.</p>
-      <label class="slider reveal"><span>300 slov</span><input type="range" id="words" min="300" max="6000" step="100" value="2000" aria-label="Kolik slov denně napíšete"><span>6 000 slov</span></label>
-      <p class="src">Běžný pracovní e-mail má kolem 100 slov, odpověď ve Slacku 20 až 40. Výpočet počítá 20 % času navíc na kontrolu přepisu.</p>
+      <p class="calc reveal">Wenn Sie täglich <span class="num" id="words-out">2.000</span> Wörter schreiben, sparen Sie <span class="num" id="per-day">34 Minuten</span> am Tag. Das sind <span class="num" id="per-month">12 Stunden</span> im Monat.</p>
+      <label class="slider reveal"><span>300 Wörter</span><input type="range" id="words" min="300" max="6000" step="100" value="2000" aria-label="Wie viele Wörter Sie täglich schreiben"><span>6.000 Wörter</span></label>
+      <p class="src">Eine typische berufliche E-Mail hat etwa 100 Wörter, eine Antwort in Slack 20 bis 40. Die Berechnung rechnet 20 % zusätzliche Zeit für das Prüfen der Transkription ein.</p>
     </div>
   </section>
 
   <section class="block hist" id="historie">
     <div class="wrap hist-grid">
       <div>
-        <h2 class="reveal">Víte, co jste komu napsal.</h2>
-        <p class="intro reveal" style="--d:.1s">Každý přepis zůstane ve vašem počítači, i s časem a oknem, kam šel. Na konci měsíce máte podklad k tomu, na čem jste pracoval.</p>
+        <h2 class="reveal">Sie wissen, was Sie wem geschrieben haben.</h2>
+        <p class="intro reveal" style="--d:.1s">Jede Transkription bleibt auf Ihrem Computer, mit Uhrzeit und dem Fenster, in das sie ging. Am Monatsende haben Sie eine Übersicht, woran Sie gearbeitet haben.</p>
         <ul>
-          <li class="reveal" style="--d:.15s"><b>Časová osa po dnech</b> s aplikací a názvem konverzace</li>
-          <li class="reveal" style="--d:.25s"><b>Hledání a období</b>: dnes, týden, 10 až 90 dní, vlastní rozsah</li>
-          <li class="reveal" style="--d:.35s"><b>Statistiky</b>: slova, čas mluvení a ušetřený čas</li>
-          <li class="reveal" style="--d:.45s"><b>Export do Markdownu nebo CSV</b>, třeba pro AI</li>
+          <li class="reveal" style="--d:.15s"><b>Zeitleiste nach Tagen</b> mit App und Name der Unterhaltung</li>
+          <li class="reveal" style="--d:.25s"><b>Suche und Zeiträume</b>: heute, diese Woche, 10 bis 90 Tage oder eigener Zeitraum</li>
+          <li class="reveal" style="--d:.35s"><b>Statistiken</b>: Wörter, Sprechzeit und gesparte Zeit</li>
+          <li class="reveal" style="--d:.45s"><b>Export als Markdown oder CSV</b>, etwa für die Arbeit mit KI</li>
         </ul>
       </div>
       <div class="stage3d">
         <figure class="shot" id="shot">
-          <img class="light" src="img/history-light.png" alt="Okno historie: záznamy diktování po dnech, s aplikací a názvem okna" width="1380" height="826" loading="lazy">
-          <img class="dark" src="img/history-dark.png" alt="Okno historie v tmavém režimu" width="1380" height="826" loading="lazy">
+          <img class="light" src="../img/history-light.png" alt="Verlaufsfenster: Diktate nach Tagen, mit App und Fenstername" width="1380" height="826" loading="lazy">
+          <img class="dark" src="../img/history-dark.png" alt="Verlaufsfenster im dunklen Modus" width="1380" height="826" loading="lazy">
         </figure>
       </div>
     </div>
@@ -361,37 +361,37 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
 
   <section class="block" id="funkce">
     <div class="wrap">
-      <h2 class="reveal">Drobnosti, na kterých záleží.</h2>
+      <h2 class="reveal">Kleinigkeiten, die zählen.</h2>
       <div class="feats">
-        <div class="feat reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m23 9-6 6M17 9l6 6"/></svg><h3>Hudba se ztiší sama</h3><p>Spotify i videa se během diktování stáhnou na desetinu hlasitosti a pak se vrátí.</p></div>
-        <div class="feat reveal" style="--d:.1s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><h3>Soukromí podle vás</h3><p>Přepis offline v počítači, nebo za sekundu přes Groq s vlastním bezplatným klíčem.</p></div>
-        <div class="feat reveal" style="--d:.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><h3>Zkratka podle vás</h3><p>Výchozí Ctrl + Win, na Macu Ctrl + ⌘. Běžným zkratkám jako Ctrl+C nepřekáží.</p></div>
-        <div class="feat reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><h3>Nevymýšlí si</h3><p>Ticho se k přepisu neposílá, takže se nevloží vymyšlené věty typu „Titulky vytvořil…“.</p></div>
-        <div class="feat reveal" style="--d:.1s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-6"/></svg><h3>Statistiky, které motivují</h3><p>Kolik slov jste nadiktovali a kolik času jste tím ušetřili, po dnech i celkem.</p></div>
-        <div class="feat reveal" style="--d:.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg><h3>Bez předplatného</h3><p>Zdarma a open source. Žádný účet, limit slov ani měsíční tarif.</p></div>
+        <div class="feat reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m23 9-6 6M17 9l6 6"/></svg><h3>Musik wird von selbst leiser</h3><p>Spotify und Videos laufen beim Diktieren mit einem Zehntel der Lautstärke weiter und werden danach wieder lauter.</p></div>
+        <div class="feat reveal" style="--d:.1s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><h3>Datenschutz nach Ihrer Wahl</h3><p>Transkription offline auf Ihrem Computer oder in einer Sekunde über Groq mit Ihrem eigenen kostenlosen Schlüssel.</p></div>
+        <div class="feat reveal" style="--d:.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><h3>Tastenkürzel nach Wahl</h3><p>Standardmäßig Ctrl + Win, auf dem Mac Ctrl + ⌘. Gängige Kürzel wie Ctrl+C werden nicht gestört.</p></div>
+        <div class="feat reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><h3>Erfindet nichts dazu</h3><p>Stille wird nicht zur Transkription geschickt, deshalb landen keine erfundenen Sätze wie „Untertitel im Auftrag des ZDF“ im Text.</p></div>
+        <div class="feat reveal" style="--d:.1s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-6"/></svg><h3>Statistiken, die motivieren</h3><p>Wie viele Wörter Sie diktiert und wie viel Zeit Sie damit gespart haben, pro Tag und insgesamt.</p></div>
+        <div class="feat reveal" style="--d:.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg><h3>Kein Abo</h3><p>Kostenlos und Open Source. Kein Konto, kein Wortlimit, kein Monatstarif.</p></div>
       </div>
     </div>
   </section>
 
   <section class="block inst" id="instalace">
     <div class="wrap">
-      <h2 class="reveal">Za deset minut diktujete.</h2>
-      <p class="intro reveal" style="--d:.1s">Potřebujete jen <a href="https://www.python.org/downloads/">Python</a> a stažený ZIP. <a href="navod.html">Podrobný návod</a> vás provede krok za krokem.</p>
+      <h2 class="reveal">In zehn Minuten diktieren Sie.</h2>
+      <p class="intro reveal" style="--d:.1s">Sie brauchen nur <a href="https://www.python.org/downloads/">Python</a> und die heruntergeladene ZIP-Datei. Die <a href="navod.html">ausführliche Anleitung</a> führt Sie Schritt für Schritt durch.</p>
       <div class="oses">
         <div class="os reveal">
-          <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.4 4.6v7H3zM11.4 4.4 21 3v8.6h-9.6zM3 12.4h7.4v7L3 18.4zM11.4 12.4H21V21l-9.6-1.4z"/></svg>Windows 10 a 11</h3>
-          <ol><li>Stáhněte ZIP a rozbalte ho.</li><li>Spusťte <code>install.bat</code>.</li><li>Spusťte <code>start.bat</code>. Ikona je vedle hodin.</li></ol>
-          <a class="btn solid" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">Stáhnout pro Windows</a>
-          <p class="note">Při instalaci Pythonu zaškrtněte „Add python.exe to PATH“.</p>
+          <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.4 4.6v7H3zM11.4 4.4 21 3v8.6h-9.6zM3 12.4h7.4v7L3 18.4zM11.4 12.4H21V21l-9.6-1.4z"/></svg>Windows 10 und 11</h3>
+          <ol><li>Laden Sie die ZIP-Datei herunter und entpacken Sie sie.</li><li>Starten Sie <code>install.bat</code>.</li><li>Starten Sie <code>start.bat</code>. Das Symbol erscheint neben der Uhr.</li></ol>
+          <a class="btn solid" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">Für Windows herunterladen</a>
+          <p class="note">Setzen Sie bei der Python-Installation den Haken bei „Add python.exe to PATH“.</p>
         </div>
         <div class="os reveal" style="--d:.12s">
-          <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>macOS 12 a novější</h3>
-          <ol><li>Stáhněte ZIP a rozbalte ho.</li><li>Spusťte <code>install.command</code>.</li><li>Spusťte <code>start.command</code> a povolte mikrofon a klávesnici.</li></ol>
-          <a class="btn solid" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">Stáhnout pro Mac</a>
-          <p class="note">Mac verze je nová. <a href="navod.html?os=mac#spusteni">Oprávnění krok za krokem</a></p>
+          <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>macOS 12 und neuer</h3>
+          <ol><li>Laden Sie die ZIP-Datei herunter und entpacken Sie sie.</li><li>Starten Sie <code>install.command</code>.</li><li>Starten Sie <code>start.command</code> und erlauben Sie den Zugriff auf Mikrofon und Tastatur.</li></ol>
+          <a class="btn solid" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">Für Mac herunterladen</a>
+          <p class="note">Die Mac-Version ist neu. <a href="navod.html?os=mac#spusteni">Berechtigungen Schritt für Schritt</a></p>
         </div>
       </div>
-      <p class="req reveal">Pro nejrychlejší přepis si zdarma vytvořte <b>vlastní</b> klíč na <a href="https://console.groq.com/keys">console.groq.com</a> a vložte ho v aplikaci do Nastavení (<a href="navod.html#groq">jak na to</a>). Bez klíče se přepisuje offline.</p>
+      <p class="req reveal">Für die schnellste Transkription erstellen Sie kostenlos einen <b>eigenen</b> Schlüssel auf <a href="https://console.groq.com/keys">console.groq.com</a> und fügen ihn in der App unter Einstellungen ein (<a href="navod.html#groq">so geht es</a>). Ohne Schlüssel wird offline transkribiert.</p>
     </div>
   </section>
 </main>
@@ -399,7 +399,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
 <footer class="bigfoot">
   <div class="wrap">
     <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
-    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.8.0</a> vytvořil Michal Hudák. Licence MIT.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">Version 0.8.0</a> von Michal Hudák. MIT-Lizenz.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
   </div>
 </footer>
 
@@ -413,7 +413,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
     m.className = "btn solid"; w.className = "btn line"; w.before(m);
   }
 
-  /* ---------- odhalení prvků při rolování ---------- */
+  /* ---------- reveal elements on scroll ---------- */
   const io = new IntersectionObserver((entries) => entries.forEach((e) => {
     if (!e.isIntersecting) return;
     e.target.classList.add("in");
@@ -433,20 +433,20 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
     });
   }
 
-  /* ---------- kalkulačka ---------- */
+  /* ---------- calculator ---------- */
   const words = document.getElementById("words");
-  const plural = (n, a, b, c) => (n === 1 ? a : n >= 2 && n <= 4 ? b : c);
+  const plural = (n, one, many) => (n === 1 ? one : many);
   function calc() {
     const w = +words.value, saved = w / 40 - (w / 150) * 1.2;
     const min = Math.round(saved), h = Math.round((saved * 21) / 60);
-    document.getElementById("words-out").textContent = w.toLocaleString("cs-CZ");
-    document.getElementById("per-day").textContent = min >= 60 ? `${Math.floor(min / 60)} h ${min % 60} min` : `${min} ${plural(min, "minutu", "minuty", "minut")}`;
-    document.getElementById("per-month").textContent = `${h} ${plural(h, "hodinu", "hodiny", "hodin")}`;
+    document.getElementById("words-out").textContent = w.toLocaleString("de-DE");
+    document.getElementById("per-day").textContent = min >= 60 ? `${Math.floor(min / 60)} h ${min % 60} min` : `${min} ${plural(min, "Minute", "Minuten")}`;
+    document.getElementById("per-month").textContent = `${h} ${plural(h, "Stunde", "Stunden")}`;
   }
   words.addEventListener("input", calc); calc();
 
-  /* ---------- ukázka řízená rolováním ---------- */
-  const TEXT = "Úpravy košíku jsou hotové, zítra ráno je nahraju na testovací web. Klientovi můžeš napsat, že v pátek to spustíme naostro.";
+  /* ---------- scroll-driven demo ---------- */
+  const TEXT = "Die Änderungen am Warenkorb sind fertig, morgen früh lade ich sie auf die Testseite. Du kannst dem Kunden sagen, dass wir am Freitag live gehen.";
   const story = document.getElementById("ukazka"), key = document.getElementById("key"), wave = document.getElementById("wave");
   const composer = document.getElementById("composer"), said = document.getElementById("said"), ph = document.getElementById("ph");
   const state = document.getElementById("state"), hint = document.getElementById("hint");
@@ -458,7 +458,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
   let storyP = 0, lastShown = -1;
 
   function renderStory(p) {
-    // 0–0.15 kurzor v poli, 0.15–0.7 nahrávání (slova se "vyslovují"), 0.7–1 vloženo
+    // 0–0.15 cursor in field, 0.15–0.7 recording (words get "spoken"), 0.7–1 inserted
     const beat = p < 0.15 ? 0 : p < 0.72 ? 1 : 2;
     beats.forEach((b, i) => b.classList.toggle("on", i === beat));
     const rec = beat === 1;
@@ -472,7 +472,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
       ph.hidden = shown > 0 || beat === 2 ? true : false;
       lastShown = shown;
     }
-    state.textContent = beat === 0 ? "Kurzor je v poli" : beat === 1 ? "● Nahrávám…" : "✓ Vloženo diktováním";
+    state.textContent = beat === 0 ? "Cursor steht im Feld" : beat === 1 ? "● Aufnahme läuft…" : "✓ Per Diktat eingefügt";
     state.style.color = beat === 1 ? "#FF5A6E" : "";
     hint.style.opacity = p > 0.9 ? 0 : 1;
   }
@@ -485,7 +485,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
     requestAnimationFrame(animateWave);
   }
 
-  /* ---------- snímek historie se narovná ---------- */
+  /* ---------- history screenshot straightens ---------- */
   const shot = document.getElementById("shot");
   function renderShot() {
     const r = shot.getBoundingClientRect(), vh = innerHeight;
@@ -496,8 +496,8 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
     shot.style.setProperty("--sc", `${0.9 + 0.1 * e}`);
   }
 
-  /* ---------- ukazatel polohy na stránce ---------- */
-  const SECTIONS = [["top", "Úvod"], ["ukazka", "Ukázka"], ["uspora", "Úspora času"], ["historie", "Historie"], ["funkce", "Funkce"], ["instalace", "Instalace"]];
+  /* ---------- page position rail ---------- */
+  const SECTIONS = [["top", "Start"], ["ukazka", "Demo"], ["uspora", "Zeitersparnis"], ["historie", "Verlauf"], ["funkce", "Funktionen"], ["instalace", "Installation"]];
   document.querySelector(".hero").id = "top";
   const dotsEl = document.getElementById("rail-dots"), railFill = document.getElementById("rail-fill"), pct = document.getElementById("pct");
   dotsEl.innerHTML = SECTIONS.map(([id, label]) => `<li><a href="#${id}"><span>${label}</span></a></li>`).join("");
@@ -539,17 +539,17 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
   onScroll();
   if (!reduce) requestAnimationFrame(animateWave);
 
-  /* ---------- mikrofon v úvodu promluví ---------- */
+  /* ---------- hero microphone speaks ---------- */
   const zone = document.getElementById("mic-zone"), mic = document.getElementById("mic"), tip = document.getElementById("mic-tip");
   const synth = window.speechSynthesis;
-  const voiceCs = () => { const v = (synth?.getVoices() || []).filter((x) => x.lang.toLowerCase().startsWith("cs")); return v.find((x) => /natural|online|google/i.test(x.name)) || v[0] || null; };
+  const voiceFor = () => { const v = (synth?.getVoices() || []).filter((x) => x.lang.toLowerCase().startsWith("de")); return v.find((x) => /natural|online|google/i.test(x.name)) || v[0] || null; };
   mic.addEventListener("click", () => {
-    if (!synth) { tip.textContent = "Prohlížeč neumí přehrát ukázku"; return; }
+    if (!synth) { tip.textContent = "Ihr Browser kann das Beispiel nicht abspielen"; return; }
     if (synth.speaking) { synth.cancel(); return; }
     const u = new SpeechSynthesisUtterance(TEXT);
-    u.lang = "cs-CZ"; u.rate = 1.45; const v = voiceCs(); if (v) u.voice = v;
-    u.onstart = () => { zone.classList.add("speaking"); tip.textContent = "Takhle rychle diktujete…"; };
-    u.onend = u.onerror = () => { zone.classList.remove("speaking"); tip.textContent = "Pár vteřin mluvení. Na klávesnici by to trvalo půl minuty."; };
+    u.lang = "de-DE"; u.rate = 1.45; const v = voiceFor(); if (v) u.voice = v;
+    u.onstart = () => { zone.classList.add("speaking"); tip.textContent = "So schnell diktieren Sie…"; };
+    u.onend = u.onerror = () => { zone.classList.remove("speaking"); tip.textContent = "Ein paar Sekunden Sprechen. Getippt hätte es eine halbe Minute gedauert."; };
     synth.speak(u);
   });
 })();

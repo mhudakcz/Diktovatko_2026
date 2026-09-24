@@ -5,21 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Návod k Diktovátku</title>
 <meta name="description" content="Podrobný návod krok za krokem: instalace Diktovátka na Windows a Mac, vlastní Groq klíč, nastavení, historie a řešení problémů.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23F0405A'/%3E%3Crect x='9' y='5' width='6' height='10' rx='3' fill='white'/%3E%3Cpath d='M7 12a5 5 0 0 0 10 0M12 17v2.5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23FF5A6E'/%3E%3Crect x='9' y='5' width='6' height='10' rx='3' fill='white'/%3E%3Cpath d='M7 12a5 5 0 0 0 10 0M12 17v2.5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --fog: #EEF1F5; --paper: #FFFFFF; --ink: #1B2230; --ink-2: #4A5366; --muted: #6F788A;
-  --line: #DCE1E9; --ultra: #3847F5; --ultra-soft: #E6E8FE; --voice: #F0405A; --warn-bg: #FFF4E5; --warn: #8A4B00;
-  --display: "Bricolage Grotesque", "Segoe UI", sans-serif; --body: "Onest", "Segoe UI", system-ui, sans-serif;
+  --night: #1A1446; --night-2: #241C5C; --lilac: #B9B3FF; --lilac-2: #8F87E8; --sun: #FFD23F; --coral: #FF5A6E;
+  --fog: #F6F4FF; --paper: #FFFFFF; --ink: #16133A; --ink-2: #4C4870; --muted: #7A7699;
+  --line: #E2DEF7; --ultra: #D8304A; --ultra-soft: #EFEBFF; --voice: #FF5A6E; --warn-bg: #FFF3C4; --warn: #5E4600;
+  --display: "Unbounded", "Segoe UI", sans-serif; --body: "Onest", "Segoe UI", system-ui, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --fog: #12151C; --paper: #1A1F29; --ink: #E8EBF2; --ink-2: #B5BCCB; --muted: #8A93A6;
-    --line: #2A3140; --ultra: #8490FF; --ultra-soft: #262C4F; --warn-bg: #33260F; --warn: #F5C27A; color-scheme: dark;
+    --fog: #110D30; --paper: #1C1650; --ink: #EDEBFF; --ink-2: #BDB8E6; --muted: #8E89B8;
+    --line: #2E2770; --ultra: #FF8A98; --ultra-soft: #241C5C; --warn-bg: #3A2F0A; --warn: #FFE08A; color-scheme: dark;
   }
 }
 * { box-sizing: border-box; }
@@ -33,7 +34,10 @@ a { color: var(--ultra); text-underline-offset: 2px; }
 .brand { display: flex; align-items: center; gap: 9px; font: 800 17px/1 var(--display); color: var(--ink); text-decoration: none; }
 .mark { width: 24px; height: 24px; border-radius: 50%; background: var(--voice); display: grid; place-items: center; }
 .mark svg { width: 12px; height: 12px; }
-.os { margin-left: auto; display: inline-flex; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.lang { margin-left: auto; display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.lang a { padding: 5px 10px; border-radius: 8px; font: 600 13px var(--body); color: var(--ink-2); text-decoration: none; }
+.lang a[aria-current="page"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .1); }
+.os { margin-left: 10px; display: inline-flex; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
 .os button { border: 0; background: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; font: 500 14px var(--body); color: var(--ink-2); }
 .os button[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .1); }
 
@@ -106,14 +110,60 @@ body.is-mac .quick a.mac { display: flex; }
   .layout { grid-template-columns: 1fr; gap: 0; padding-top: 24px; }
   .toc { display: none; }
   .brand span:last-child { display: none; }
+  .top-in { gap: 10px; }
+  .lang a { padding: 5px 8px; }
+  .os { margin-left: 6px; }
+  .os button { padding: 6px 10px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ===== design varianty 2 (stejný jako hlavní stránka) ===== */
+.steps > li.mac, body.is-mac .steps > li.win { display: none; }
+body.is-mac .steps > li.mac { display: grid; }
+.progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 60; background: linear-gradient(90deg, var(--coral), var(--sun)); transform-origin: 0 50%; transform: scaleX(0); }
+.top { background: rgb(26 20 70 / .94); border-bottom: 1px solid rgb(185 179 255 / .18); }
+.top-in { height: 64px; }
+.brand { color: #fff; font: 700 16px/1 var(--display); }
+.mark { width: 28px; height: 28px; background: var(--coral); }
+.mark svg { width: 14px; height: 14px; }
+.lang, .os { background: rgb(255 255 255 / .08); border-radius: 999px; }
+.lang a, .os button { color: var(--lilac); border-radius: 999px; }
+.lang a[aria-current="page"], .os button[aria-pressed="true"] { background: var(--sun); color: var(--night); box-shadow: none; }
+h1 { font: 900 clamp(32px, 5.4vw, 58px)/1.02 var(--display); letter-spacing: -0.04em; }
+h2 { font: 900 clamp(22px, 2.6vw, 30px)/1.15 var(--display); letter-spacing: -0.035em; }
+h2 .n { color: var(--coral); }
+h3 { font: 700 18px/1.3 var(--display); letter-spacing: -0.02em; }
+.lede { font-size: 19px; }
+.toc a.on { background: var(--night); color: #fff; }
+.toc a.on::before { color: var(--sun); }
+.tldr { background: var(--night); border-color: var(--night); color: #EDEBFF; }
+.tldr-h { color: #fff; }
+.tldr b { color: #fff; }
+.tldr code { background: rgb(255 255 255 / .1); border-color: transparent; color: #fff; }
+.tldr li::marker { color: var(--sun); }
+.quick a { border-radius: 16px; transition: border-color .2s, transform .2s; }
+.quick a:hover { border-color: var(--coral); transform: translateY(-2px); }
+.quick a b { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+.steps > li::before { background: var(--sun); color: var(--night); font-family: var(--display); }
+.note { background: var(--ultra-soft); border-left: 4px solid var(--lilac-2); }
+.warn { border-left: 4px solid var(--sun); }
+.dl a { border-radius: 999px; background: var(--sun); color: var(--night); }
+.dl a.alt, body.is-mac .dl .win-btn { background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); }
+body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
+.shot { border-radius: 16px; box-shadow: 0 30px 60px -34px rgb(26 20 70 / .5); }
+.faq summary::after { color: var(--coral); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tldr { background: var(--paper); border-color: var(--line); } }
 </style>
 </head>
 <body>
 <div class="top">
   <div class="top-in">
     <a class="brand" href="./"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="8" y="2" width="8" height="13" rx="4" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></span><span>Diktovátko</span></a>
+    <div class="lang" aria-label="Jazyk / Language">
+      <a href="navod.html" hreflang="cs" lang="cs" aria-current="page">CZ</a>
+      <a href="en/navod.html" hreflang="en" lang="en">EN</a>
+      <a href="de/navod.html" hreflang="de" lang="de">DE</a>
+    </div>
     <div class="os" role="group" aria-label="Operační systém">
       <button type="button" data-os="win" aria-pressed="true">Windows</button>
       <button type="button" data-os="mac" aria-pressed="false">Mac</button>
@@ -141,7 +191,7 @@ body.is-mac .quick a.mac { display: flex; }
   <article>
     <h1>Návod krok za krokem</h1>
     <p class="lede">Od instalace po první nadiktovanou větu. Nepotřebujete žádné programátorské znalosti, stačí postupovat bod po bodu.</p>
-    <p class="meta">Návod platí pro <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.7.2</a>. Nahoře si přepněte, jestli máte <b>Windows</b> nebo <b>Mac</b>. Návod se podle toho upraví.</p>
+    <p class="meta">Návod platí pro <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.8.0</a>. Nahoře si přepněte, jestli máte <b>Windows</b> nebo <b>Mac</b>. Návod se podle toho upraví.</p>
 
     <div class="tldr">
       <h2 class="tldr-h">Ve zkratce</h2>
@@ -346,6 +396,7 @@ body.is-mac .quick a.mac { display: flex; }
           <span class="mac">Výchozí Ctrl + ⌘ Cmd, dále Fn / 🌐, pravý ⌘ Cmd, pravý ⌥ Option a další. Volba <i>Vlastní…</i> umožní zadat jakoukoli kombinaci.</span></td></tr>
         <tr><td><b>Způsob ovládání</b></td><td><i>Držet</i> nahrává, dokud klávesu držíte. <i>Přepínat</i>: první stisk spustí, druhý zastaví, hodí se na delší diktování.</td></tr>
         <tr><td><b>Jazyk</b></td><td>čeština, slovenština, angličtina a další, nebo automatické rozpoznání</td></tr>
+        <tr><td><b>Jazyk aplikace</b></td><td>čeština, angličtina nebo němčina; mění texty v okně, menu ikony a indikátoru</td></tr>
         <tr><td><b>Groq API klíč</b></td><td>viz <a href="#groq">krok 5</a>. Prázdné pole znamená přepis offline.</td></tr>
         <tr><td><b>Lokální model</b></td><td>přesnost a rychlost offline přepisu</td></tr>
         <tr><td><b>Slovník a styl</b></td><td>jména, firmy a výrazy, které má přepis znát</td></tr>
@@ -433,6 +484,16 @@ body.is-mac .quick a.mac { display: flex; }
     entries.forEach((en) => { if (en.isIntersecting) links.forEach((a) => a.classList.toggle("on", a.getAttribute("href") === "#" + en.target.id)); });
   }, { rootMargin: "-30% 0px -60% 0px" });
   document.querySelectorAll("article section[id]").forEach((s) => io.observe(s));
+})();
+</script>
+
+<script>
+(() => {
+  // pruh průběhu čtení nahoře
+  const bar = document.createElement("div"); bar.className = "progress"; bar.setAttribute("aria-hidden", "true");
+  document.body.prepend(bar);
+  const upd = () => { const d = document.documentElement; bar.style.transform = `scaleX(${d.scrollTop / Math.max(1, d.scrollHeight - innerHeight)})`; };
+  addEventListener("scroll", upd, { passive: true }); addEventListener("resize", upd); upd();
 })();
 </script>
 </body>

@@ -1,10 +1,12 @@
 # Diktovátko
 
-**Verze 0.7.2**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.8.0**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
-Bezplatná open-source alternativa k [Wispr Flow](https://wisprflow.ai) pro **Windows a Mac**. Funguje v jakékoli aplikaci, třeba ve Slacku, Outlooku, prohlížeči, Teams, Jiře nebo v chatu s AI. Umí česky i dalších 90+ jazyků.
+Bezplatná open-source alternativa k [Wispr Flow](https://wisprflow.ai) pro **Windows a Mac**. Funguje v jakékoli aplikaci, třeba ve Slacku, Outlooku, prohlížeči, Teams, Jiře nebo v chatu s AI. Přepisuje česky i v dalších 90+ jazycích. Aplikace a web jsou v češtině, angličtině a němčině.
+
+**Web:** [česky](https://mhudakcz.github.io/Diktovatko_2026/) · [English](https://mhudakcz.github.io/Diktovatko_2026/en/) · [Deutsch](https://mhudakcz.github.io/Diktovatko_2026/de/)
 
 **[Web projektu](https://mhudakcz.github.io/Diktovatko_2026/)** · **[Návod krok za krokem](https://mhudakcz.github.io/Diktovatko_2026/navod.html)** · **[Stáhnout ZIP](https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip)** (Windows i Mac)
 
@@ -74,6 +76,7 @@ Nejjednodušší je nastavovat v okně aplikace (sekce *Nastavení*). Soubor se 
 
 | Klíč | Výchozí | Popis |
 |---|---|---|
+| `ui_language` | `"cs"` | jazyk aplikace: `"cs"`, `"en"`, `"de"` |
 | `hotkeys` | `["ctrl+windows"]` (Mac `["ctrl+cmd"]`) | zkratka, např. `"right ctrl"`, `"ctrl+alt+space"`, na Macu `"fn"`, `"right cmd"` |
 | `mode` | `"hold"` | `"hold"` = drž a mluv, `"toggle"` = stisk start, další stisk stop |
 | `language` | `"cs"` | kód jazyka, nebo `null` pro automatickou detekci |
@@ -124,7 +127,8 @@ Na Macu použijte `.venv/bin/python`.
 | `history.py` | databáze historie, statistiky, export |
 | `app_window.py`, `ui/app.html` | okno s historií, statistikami a nastavením (pywebview) |
 | `config.py` | načítání a ukládání nastavení |
-| `docs/` | web projektu a návod (GitHub Pages) |
+| `i18n.py`, `ui/i18n.js` | překlady aplikace (cs, en, de) |
+| `docs/` | web projektu a návod (GitHub Pages), anglicky v `docs/en/`, německy v `docs/de/` |
 
 ## Licence
 

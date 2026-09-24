@@ -2,6 +2,13 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.8.0 – 2026-09-24
+
+- Jazykové verze: aplikace (okno, menu ikony, indikátor, export) v češtině, angličtině a němčině. Volba „Jazyk aplikace“ v nastavení, výchozí je čeština.
+- Web a návod v angličtině (`docs/en/`) a němčině (`docs/de/`) s přepínačem CZ/EN/DE. Ukázka na webu mluví anglicky, případně německy.
+- Návod má design hlavní stránky (varianta 2) a pruh průběhu čtení.
+- Oprava: v návodu se v režimu Windows zobrazoval i krok určený pro Mac.
+
 ## 0.7.2 – 2026-09-24
 
 - Web na telefonu: mikrofon v úvodu už se nesmrskne, nadpisy Windows/Mac se nelámou, nahoře zůstává tlačítko Návod.

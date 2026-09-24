@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anleitung zu Diktovátko</title>
+<meta name="description" content="Ausführliche Anleitung Schritt für Schritt: Diktovátko unter Windows und Mac installieren, eigener Groq-Schlüssel, Einstellungen, Verlauf und Problemlösung.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23FF5A6E'/%3E%3Crect x='9' y='5' width='6' height='10' rx='3' fill='white'/%3E%3Cpath d='M7 12a5 5 0 0 0 10 0M12 17v2.5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --night: #1A1446; --night-2: #241C5C; --lilac: #B9B3FF; --lilac-2: #8F87E8; --sun: #FFD23F; --coral: #FF5A6E;
+  --fog: #F6F4FF; --paper: #FFFFFF; --ink: #16133A; --ink-2: #4C4870; --muted: #7A7699;
+  --line: #E2DEF7; --ultra: #D8304A; --ultra-soft: #EFEBFF; --voice: #FF5A6E; --warn-bg: #FFF3C4; --warn: #5E4600;
+  --display: "Unbounded", "Segoe UI", sans-serif; --body: "Onest", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fog: #110D30; --paper: #1C1650; --ink: #EDEBFF; --ink-2: #BDB8E6; --muted: #8E89B8;
+    --line: #2E2770; --ultra: #FF8A98; --ultra-soft: #241C5C; --warn-bg: #3A2F0A; --warn: #FFE08A; color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body { margin: 0; background: var(--fog); color: var(--ink); font: 16.5px/1.65 var(--body); -webkit-font-smoothing: antialiased; }
+a { color: var(--ultra); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--ultra); outline-offset: 3px; border-radius: 4px; }
+
+.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--fog) 90%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top-in { width: min(1120px, 100% - 32px); margin: 0 auto; display: flex; align-items: center; gap: 20px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 9px; font: 800 17px/1 var(--display); color: var(--ink); text-decoration: none; }
+.mark { width: 24px; height: 24px; border-radius: 50%; background: var(--voice); display: grid; place-items: center; }
+.mark svg { width: 12px; height: 12px; }
+.lang { margin-left: auto; display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.lang a { padding: 5px 10px; border-radius: 8px; font: 600 13px var(--body); color: var(--ink-2); text-decoration: none; }
+.lang a[aria-current="page"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .1); }
+.os { margin-left: 10px; display: inline-flex; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.os button { border: 0; background: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; font: 500 14px var(--body); color: var(--ink-2); }
+.os button[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .1); }
+
+.layout { width: min(1120px, 100% - 32px); margin: 0 auto; display: grid; grid-template-columns: 230px 1fr; gap: 56px; padding: 40px 0 100px; }
+.toc { position: sticky; top: 90px; align-self: start; font-size: 14.5px; }
+.toc p { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+.toc ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; counter-reset: t; }
+.toc li { counter-increment: t; }
+.toc a { display: flex; gap: 10px; padding: 5px 8px; border-radius: 7px; color: var(--ink-2); text-decoration: none; }
+.toc a::before { content: counter(t); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 1.2em; }
+.toc a:hover, .toc a.on { background: var(--paper); color: var(--ink); }
+
+article { max-width: 720px; min-width: 0; }
+h1 { margin: 0; font: 800 clamp(34px, 5vw, 48px)/1.05 var(--display); letter-spacing: -0.03em; }
+.lede { margin: 14px 0 0; font-size: 19px; color: var(--ink-2); }
+.meta { margin: 18px 0 0; font-size: 14px; color: var(--muted); }
+section { margin-top: 56px; }
+h2 { margin: 0 0 12px; font: 800 28px/1.15 var(--display); letter-spacing: -0.02em; display: flex; gap: 12px; align-items: baseline; }
+h2 .n { color: var(--ultra); }
+h3 { margin: 28px 0 8px; font: 600 19px/1.3 var(--display); }
+p { margin: 0 0 14px; }
+ul { padding-left: 22px; margin: 0 0 14px; }
+li { margin-bottom: 6px; }
+
+.steps { list-style: none; padding: 0; margin: 18px 0; counter-reset: s; display: grid; gap: 14px; }
+.steps > li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 14px; margin: 0; }
+.steps > li::before { content: counter(s); width: 34px; height: 34px; border-radius: 50%; background: var(--ultra-soft); color: var(--ultra); display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+.steps > li > div { padding-top: 4px; }
+.steps b { font-weight: 600; }
+
+kbd { font: 600 0.82em var(--body); padding: 2px 7px; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; background: var(--paper); white-space: nowrap; }
+code { font: 500 0.88em "Cascadia Code", "SF Mono", Consolas, monospace; padding: 2px 6px; border-radius: 6px; background: var(--paper); border: 1px solid var(--line); }
+.path { font-weight: 600; }
+.note, .warn { padding: 14px 16px; border-radius: 12px; margin: 18px 0; font-size: 15.5px; }
+.note { background: var(--ultra-soft); }
+.warn { background: var(--warn-bg); color: var(--warn); }
+.note p:last-child, .warn p:last-child { margin: 0; }
+.shot { margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+.shot img { display: block; width: 100%; height: auto; }
+.faq details { border-top: 1px solid var(--line); padding: 12px 0; }
+.faq details:last-child { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+.faq summary::after { content: "+"; color: var(--muted); font-weight: 400; font-size: 20px; line-height: 1; }
+.faq details[open] summary::after { content: "–"; }
+.faq details > div { padding-top: 10px; color: var(--ink-2); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 14px 0; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 13.5px; }
+
+.tldr { margin-top: 28px; padding: 20px 22px; border-radius: 14px; background: var(--paper); border: 1px solid var(--line); }
+.tldr-h { font-size: 20px; margin-bottom: 8px; }
+.tldr ul { margin: 0; padding-left: 20px; }
+.tldr li { margin-bottom: 5px; }
+.quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; margin-top: 14px; }
+.quick a { display: flex; flex-direction: column; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); text-decoration: none; color: var(--ink); line-height: 1.3; }
+.quick a:hover { border-color: var(--ultra); }
+.quick a span { font-size: 13.5px; color: var(--muted); margin-top: 3px; }
+.dl { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 4px; }
+.dl a { display: inline-flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 11px; background: var(--ink); color: var(--fog); text-decoration: none; font-weight: 600; }
+.dl a.alt { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+.dl svg { width: 18px; height: 18px; }
+body.is-mac .dl .win-btn { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+body.is-mac .dl .mac-btn { background: var(--ink); color: var(--fog); border: 0; }
+.mac { display: none; }
+body.is-mac .mac { display: revert; }
+body.is-mac .win { display: none; }
+body.is-mac .quick a.mac { display: flex; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; gap: 0; padding-top: 24px; }
+  .toc { display: none; }
+  .brand span:last-child { display: none; }
+  .top-in { gap: 10px; }
+  .lang a { padding: 5px 8px; }
+  .os { margin-left: 6px; }
+  .os button { padding: 6px 10px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ===== design varianty 2 (stejný jako hlavní stránka) ===== */
+.steps > li.mac, body.is-mac .steps > li.win { display: none; }
+body.is-mac .steps > li.mac { display: grid; }
+.progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 60; background: linear-gradient(90deg, var(--coral), var(--sun)); transform-origin: 0 50%; transform: scaleX(0); }
+.top { background: rgb(26 20 70 / .94); border-bottom: 1px solid rgb(185 179 255 / .18); }
+.top-in { height: 64px; }
+.brand { color: #fff; font: 700 16px/1 var(--display); }
+.mark { width: 28px; height: 28px; background: var(--coral); }
+.mark svg { width: 14px; height: 14px; }
+.lang, .os { background: rgb(255 255 255 / .08); border-radius: 999px; }
+.lang a, .os button { color: var(--lilac); border-radius: 999px; }
+.lang a[aria-current="page"], .os button[aria-pressed="true"] { background: var(--sun); color: var(--night); box-shadow: none; }
+h1 { font: 900 clamp(32px, 5.4vw, 58px)/1.02 var(--display); letter-spacing: -0.04em; }
+h2 { font: 900 clamp(22px, 2.6vw, 30px)/1.15 var(--display); letter-spacing: -0.035em; }
+h2 .n { color: var(--coral); }
+h3 { font: 700 18px/1.3 var(--display); letter-spacing: -0.02em; }
+.lede { font-size: 19px; }
+.toc a.on { background: var(--night); color: #fff; }
+.toc a.on::before { color: var(--sun); }
+.tldr { background: var(--night); border-color: var(--night); color: #EDEBFF; }
+.tldr-h { color: #fff; }
+.tldr b { color: #fff; }
+.tldr code { background: rgb(255 255 255 / .1); border-color: transparent; color: #fff; }
+.tldr li::marker { color: var(--sun); }
+.quick a { border-radius: 16px; transition: border-color .2s, transform .2s; }
+.quick a:hover { border-color: var(--coral); transform: translateY(-2px); }
+.quick a b { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+.steps > li::before { background: var(--sun); color: var(--night); font-family: var(--display); }
+.note { background: var(--ultra-soft); border-left: 4px solid var(--lilac-2); }
+.warn { border-left: 4px solid var(--sun); }
+.dl a { border-radius: 999px; background: var(--sun); color: var(--night); }
+.dl a.alt, body.is-mac .dl .win-btn { background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); }
+body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
+.shot { border-radius: 16px; box-shadow: 0 30px 60px -34px rgb(26 20 70 / .5); }
+.faq summary::after { color: var(--coral); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tldr { background: var(--paper); border-color: var(--line); } }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="top-in">
+    <a class="brand" href="./"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="8" y="2" width="8" height="13" rx="4" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></span><span>Diktovátko</span></a>
+    <div class="lang" aria-label="Jazyk / Language">
+      <a href="../navod.html" hreflang="cs" lang="cs">CZ</a>
+      <a href="../en/navod.html" hreflang="en" lang="en">EN</a>
+      <a href="navod.html" hreflang="de" lang="de" aria-current="page">DE</a>
+    </div>
+    <div class="os" role="group" aria-label="Betriebssystem">
+      <button type="button" data-os="win" aria-pressed="true">Windows</button>
+      <button type="button" data-os="mac" aria-pressed="false">Mac</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="toc" aria-label="Inhalt">
+    <p>Inhalt</p>
+    <ol>
+      <li><a href="#potrebujete">Was Sie brauchen</a></li>
+      <li><a href="#python">Python installieren</a></li>
+      <li><a href="#stazeni">Herunterladen und installieren</a></li>
+      <li><a href="#spusteni">Erster Start</a></li>
+      <li><a href="#groq">Eigener Groq-Schlüssel</a></li>
+      <li><a href="#diktovani">So diktieren Sie</a></li>
+      <li><a href="#nastaveni">Einstellungen</a></li>
+      <li><a href="#historie">Verlauf und Statistik</a></li>
+      <li><a href="#problemy">Problemlösung</a></li>
+      <li><a href="#aktualizace">Aktualisieren und deinstallieren</a></li>
+    </ol>
+  </nav>
+
+  <article>
+    <h1>Anleitung Schritt für Schritt</h1>
+    <p class="lede">Von der Installation bis zum ersten diktierten Satz. Sie brauchen keine technischen Kenntnisse, folgen Sie einfach den Schritten der Reihe nach.</p>
+    <p class="meta">Diese Anleitung gilt für <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">Version 0.8.0</a>. Wählen Sie oben, ob Sie <b>Windows</b> oder einen <b>Mac</b> haben. Die Anleitung passt sich daran an.</p>
+
+    <div class="tldr">
+      <h2 class="tldr-h">Kurz gesagt</h2>
+      <ul>
+        <li><b>Was es ist:</b> Taste gedrückt halten, sprechen, loslassen, und der Text erscheint dort, wo Ihr Cursor steht. Kostenlos, in jeder App.</li>
+        <li><b>Installation:</b> Python von python.org, dann <span class="win"><code>install.bat</code> und <code>start.bat</code></span><span class="mac"><code>install.command</code> und <code>start.command</code></span>. Etwa 10 Minuten.</li>
+        <li class="mac"><b>Zusätzlich auf dem Mac:</b> dem Terminal Zugriff auf Mikrofon, Bedienungshilfen und Eingabeüberwachung erlauben.</li>
+        <li><b>Schnelle Transkription:</b> Jeder erstellt kostenlos einen <b>eigenen</b> Groq-Schlüssel und fügt ihn in den Einstellungen ein. Ohne Schlüssel funktioniert die Transkription offline, nur langsamer.</li>
+        <li><b>Tastenkürzel:</b> standardmäßig <span class="win">Ctrl + Win</span><span class="mac">Ctrl + ⌘ Cmd</span>, änderbar in den Einstellungen.</li>
+        <li><b>Verlauf und Statistik:</b> Alles bleibt nur auf Ihrem Computer. Sie können es durchsuchen, kopieren und exportieren.</li>
+      </ul>
+    </div>
+
+    <nav class="quick" aria-label="Schnellzugriff">
+      <a href="#stazeni"><b>Installation</b><span>herunterladen und starten</span></a>
+      <a href="#spusteni" class="mac"><b>Berechtigungen auf dem Mac</b><span>Mikrofon und Tastatur</span></a>
+      <a href="#spusteni" class="win"><b>Erster Start</b><span>wo das Symbol ist</span></a>
+      <a href="#groq"><b>Groq-Schlüssel</b><span>schnelle Transkription, kostenlos</span></a>
+      <a href="#diktovani"><b>So diktieren Sie</b><span>Ablauf und Tipps</span></a>
+      <a href="#nastaveni"><b>Einstellungen</b><span>Tastenkürzel, Sprache, Wortschatz</span></a>
+      <a href="#problemy"><b>Funktioniert nicht?</b><span>Problemlösung</span></a>
+    </nav>
+
+    <div class="warn mac">
+      <p><b>Die Mac-Version ist neu.</b> Wir verbessern sie noch. Wenn bei Ihnen etwas nicht funktioniert, melden Sie es über <a href="https://github.com/mhudakcz/Diktovatko_2026/issues">GitHub Issues</a>.</p>
+    </div>
+
+    <section id="potrebujete">
+      <h2><span class="n">1</span>Was Sie brauchen</h2>
+      <ul>
+        <li class="win">Einen Computer mit <b>Windows 10 oder 11</b>.</li>
+        <li class="mac">Einen Mac mit <b>macOS 12 Monterey</b> oder neuer (Apple Silicon oder Intel).</li>
+        <li>Ein <b>Mikrofon</b>: im Notebook eingebaut, im Headset oder separat.</li>
+        <li><b>Python</b>: ein kostenloses Programm, auf dem Diktovátko läuft. Wie Sie es installieren, steht im nächsten Schritt.</li>
+        <li><b>Internet</b> für die Installation. Zum Diktieren nur, wenn Sie die schnelle Transkription über Groq nutzen.</li>
+        <li>Etwa <b>10 Minuten</b> Zeit.</li>
+      </ul>
+    </section>
+
+    <section id="python">
+      <h2><span class="n">2</span>Python installieren</h2>
+      <p>Wenn Sie Python schon haben, überspringen Sie diesen Schritt.</p>
+      <ol class="steps win">
+        <li><div>Öffnen Sie <a href="https://www.python.org/downloads/">python.org/downloads</a> und klicken Sie auf die gelbe Schaltfläche <b>Download Python</b>.</div></li>
+        <li><div>Starten Sie die heruntergeladene Datei.</div></li>
+        <li><div><b>Wichtig:</b> Setzen Sie unten im ersten Fenster der Installation das Häkchen bei <b>Add python.exe to PATH</b>.</div></li>
+        <li><div>Klicken Sie auf <b>Install Now</b> und warten Sie, bis die Installation fertig ist. Schließen Sie dann das Fenster.</div></li>
+      </ol>
+      <ol class="steps mac">
+        <li><div>Öffnen Sie <a href="https://www.python.org/downloads/macos/">python.org/downloads/macos</a> und laden Sie den neuesten <b>macOS 64-bit universal2 installer</b> herunter.</div></li>
+        <li><div>Öffnen Sie die heruntergeladene <code>.pkg</code>-Datei und gehen Sie die Installation mit <b>Fortfahren</b> und <b>Installieren</b> durch.</div></li>
+        <li><div>Am Ende öffnet sich der Ordner Python. Doppelklicken Sie darin auf <b>Install Certificates.command</b>, damit Downloads aus dem Internet funktionieren.</div></li>
+      </ol>
+    </section>
+
+    <section id="stazeni">
+      <h2><span class="n">3</span>Diktovátko herunterladen und installieren</h2>
+      <ol class="steps">
+        <li><div>Laden Sie Diktovátko herunter. Für Windows und Mac ist es dieselbe ZIP-Datei:
+          <div class="dl">
+            <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip" class="win-btn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.4 4.6v7H3zM11.4 4.4 21 3v8.6h-9.6zM3 12.4h7.4v7L3 18.4zM11.4 12.4H21V21l-9.6-1.4z"/></svg>Für Windows herunterladen</a>
+            <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip" class="alt mac-btn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>Für Mac herunterladen</a>
+          </div></div></li>
+        <li><div>Entpacken Sie sie in einen Ordner, in dem sie dauerhaft bleiben kann, zum Beispiel <span class="path">Dokumente/Diktovatko</span>. Lassen Sie sie nicht im Ordner Downloads, wo sie später versehentlich gelöscht werden könnte.</div></li>
+        <li class="win"><div>Doppelklicken Sie im Ordner auf <code>install.bat</code>. Ein schwarzes Fenster öffnet sich und lädt die benötigten Komponenten herunter, das dauert 1–3 Minuten. Am Ende sehen Sie eine Meldung, dass alles fertig ist.</div></li>
+        <li class="mac"><div>Doppelklicken Sie im Ordner auf <code>install.command</code>. Das Terminal (ein Fenster mit Text) öffnet sich und die Installation beginnt, das dauert 1–3 Minuten. Am Ende sehen Sie eine Meldung, dass alles fertig ist, und können das Fenster schließen.</div></li>
+      </ol>
+      <div class="mac">
+        <h3>Wenn der Mac die Datei nicht öffnen will</h3>
+        <p>Der Mac meldet vielleicht, dass die Datei <i>nicht geöffnet werden kann, da sie von einem nicht verifizierten Entwickler stammt</i>, oder dass sie <i>nicht überprüft werden konnte</i>. Der Grund: Diktovátko stammt nicht aus dem App Store. Gehen Sie so vor:</p>
+        <ol class="steps">
+          <li><div>Klicken Sie im Dialog auf <b>Fertig</b> oder <b>OK</b>, nicht auf „In den Papierkorb legen“.</div></li>
+          <li><div>Öffnen Sie <span class="path">Systemeinstellungen → Datenschutz &amp; Sicherheit</span> und scrollen Sie ganz nach unten zum Bereich <b>Sicherheit</b>.</div></li>
+          <li><div>Klicken Sie bei der Meldung zu <code>install.command</code> auf <b>Dennoch öffnen</b> und bestätigen Sie mit Ihrem Passwort oder Touch ID.</div></li>
+          <li><div>Doppelklicken Sie erneut auf <code>install.command</code> und wählen Sie in der Nachfrage <b>Öffnen</b>.</div></li>
+        </ol>
+        <p>Unter älterem macOS (12–14) genügt es stattdessen, die Datei mit der <b>rechten Maustaste</b> (oder mit gedrückter Ctrl-Taste) anzuklicken, <b>Öffnen</b> zu wählen und in der Nachfrage erneut <b>Öffnen</b>. Genauso gehen Sie bei <code>start.command</code> vor, falls der Mac nachfragt.</p>
+        <div class="note">
+          <p><b>Notlösung über das Terminal</b>, wenn nichts davon hilft:</p>
+          <ol>
+            <li>Öffnen Sie die App <b>Terminal</b> (<kbd>⌘</kbd>+<kbd>Leertaste</kbd>, „Terminal“ eingeben, Enter).</li>
+            <li>Tippen Sie <code>bash</code> und ein Leerzeichen, drücken Sie aber noch nicht Enter.</li>
+            <li>Ziehen Sie die Datei <code>install.command</code> mit der Maus ins Terminal-Fenster, dann wird ihr Pfad eingefügt.</li>
+            <li>Drücken Sie <kbd>Enter</kbd>. Genauso können Sie <code>start.command</code> starten.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="note win"><p>Wenn Windows das blaue Fenster <b>Der Computer wurde durch Windows geschützt</b> anzeigt, klicken Sie auf <b>Weitere Informationen</b> und dann auf <b>Trotzdem ausführen</b>.</p></div>
+    </section>
+
+    <section id="spusteni">
+      <h2><span class="n">4</span>Erster Start</h2>
+      <ol class="steps win">
+        <li><div>Doppelklicken Sie auf <code>start.bat</code>.</div></li>
+        <li><div>Unten rechts neben der Uhr erscheint ein Mikrofonsymbol. Wenn Sie es nicht sehen, klicken Sie auf den Pfeil <kbd>^</kbd> neben der Uhr, dort ist das Symbol. Sie können es direkt in die Taskleiste ziehen, damit es immer sichtbar ist.</div></li>
+        <li><div>Ein kurzer Piepton bedeutet, dass Diktovátko bereit ist.</div></li>
+      </ol>
+      <ol class="steps mac">
+        <li><div>Doppelklicken Sie auf <code>start.command</code>. Kurz öffnet sich das Terminal mit einer Meldung, dass Diktovátko läuft. Dieses Fenster können Sie schließen, Diktovátko läuft weiter.</div></li>
+        <li><div>Oben rechts in der Menüleiste (bei Uhr, WLAN und Batterie) erscheint ein Mikrofonsymbol.</div></li>
+        <li><div>Der Mac fragt nach Zugriff auf das <b>Mikrofon</b> und die <b>Bedienungshilfen</b>. Erlauben Sie beides. Schalten Sie dann wie unten beschrieben alle Berechtigungen ein und starten Sie Diktovátko einmal neu.</div></li>
+      </ol>
+
+      <div class="mac">
+        <h3>Sie sehen das Symbol in der Menüleiste nicht?</h3>
+        <p>Auf MacBooks mit Notch verschwinden Symbole, die nicht mehr in die Menüleiste passen, hinter der Notch. Beenden Sie einige andere Apps in der Menüleiste, oder halten Sie <kbd>⌘</kbd> gedrückt und ziehen Sie weniger wichtige Symbole aus der Menüleiste. Diktovátko funktioniert aber auch, wenn Sie das Symbol nicht sehen: Tastenkürzel und Anzeige funktionieren weiter.</p>
+
+        <h3>Berechtigungen auf dem Mac</h3>
+        <p>macOS schützt Mikrofon und Tastatur, deshalb müssen Sie Diktovátko den Zugriff von Hand erlauben. Die Berechtigungen bekommt die App, über die Sie Diktovátko starten, also das <b>Terminal</b>.</p>
+        <table>
+          <tr><th>Eintrag</th><th>Wofür er nötig ist</th><th>Erforderlich?</th></tr>
+          <tr><td><b>Mikrofon</b></td><td>Aufnahme Ihrer Stimme</td><td>ja</td></tr>
+          <tr><td><b>Bedienungshilfen</b></td><td>Einfügen des Textes an der Cursorposition</td><td>ja</td></tr>
+          <tr><td><b>Eingabeüberwachung</b></td><td>Erkennen, dass Sie das Tastenkürzel gedrückt halten</td><td>ja</td></tr>
+          <tr><td><b>Bildschirmaufnahme</b></td><td>Fenstertitel im Verlauf (ohne sie wird nur der App-Name gespeichert)</td><td>nein</td></tr>
+        </table>
+        <ol class="steps">
+          <li><div>Öffnen Sie <span class="path"> → Systemeinstellungen → Datenschutz &amp; Sicherheit</span>. Unter macOS 12 Monterey ist es <span class="path"> → Systemeinstellungen → Sicherheit &amp; Datenschutz → Datenschutz</span>.</div></li>
+          <li><div>Klicken Sie rechts auf <b>Mikrofon</b> und schalten Sie den Schalter bei <b>Terminal</b> ein.</div></li>
+          <li><div>Gehen Sie zurück, klicken Sie auf <b>Bedienungshilfen</b> und schalten Sie <b>Terminal</b> ein. Wenn es nicht in der Liste steht, klicken Sie unten auf <b>+</b>, wählen im Fenster <span class="path">Programme → Dienstprogramme → Terminal</span> und klicken auf <b>Öffnen</b>.</div></li>
+          <li><div>Schalten Sie <b>Terminal</b> genauso unter <b>Eingabeüberwachung</b> ein.</div></li>
+          <li><div>Wenn Sie im Verlauf Fenstertitel sehen möchten, schalten Sie <b>Terminal</b> auch unter <b>Bildschirmaufnahme</b> ein. Optional.</div></li>
+          <li><div>Wenn der Mac fragt, ob das Terminal beendet und neu geöffnet werden soll, wählen Sie <b>Beenden &amp; erneut öffnen</b>.</div></li>
+          <li><div>Starten Sie Diktovátko neu: Symbol in der Menüleiste → <b>Beenden</b>, dann erneut auf <code>start.command</code> doppelklicken.</div></li>
+        </ol>
+        <div class="note"><p><b>Bei Anmeldung starten</b> (eine Option in den Einstellungen) startet Diktovátko ohne Terminal, direkt über Python. Nach der ersten Anmeldung fragt der Mac deshalb erneut nach den Berechtigungen, diesmal für <b>Python</b>. Erlauben Sie sie genauso wie für das Terminal. Wenn Python in der Liste fehlt, fügen Sie es über <b>+</b> hinzu: Drücken Sie <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>, fügen Sie den Pfad <code>/Library/Frameworks/Python.framework/Versions</code> ein, öffnen Sie den Ordner mit der höchsten Versionsnummer, dann <code>bin</code>, und wählen Sie die Datei <code>python3</code>.</p></div>
+
+        <h3>Tastenkürzel auf dem Mac</h3>
+        <p>Das Standard-Tastenkürzel ist <kbd>Ctrl</kbd> + <kbd>⌘ Cmd</kbd>: Halten Sie beide Tasten unten links gleichzeitig gedrückt. In den Einstellungen von Diktovátko können Sie auch die rechte ⌘-Taste, die rechte ⌥-Taste oder <kbd>Fn</kbd> (🌐) wählen.</p>
+        <h3>Wenn Sie die Fn-Taste (🌐) nutzen möchten</h3>
+        <p>macOS nutzt die Fn-Taste (auf neueren Tastaturen mit dem Symbol 🌐 unten links) auch selbst. Wenn Sie sie wählen, stellen Sie einmalig Folgendes ein:</p>
+        <ol class="steps">
+          <li><div>Öffnen Sie <span class="path"> → Systemeinstellungen → Tastatur</span>.</div></li>
+          <li><div>Wählen Sie bei <b>„🌐-Taste drücken für“</b> die Option <b>Nichts tun</b>.</div></li>
+          <li><div>Wenn Sie das Diktieren von Apple nicht nutzen, schalten Sie es weiter unten im Bereich <b>Diktat</b> aus, damit es sich nicht mit dem Tastenkürzel in die Quere kommt.</div></li>
+        </ol>
+
+
+        <h3>Welches Mikrofon verwendet wird</h3>
+        <p>Diktovátko nimmt über das Mikrofon auf, das unter <span class="path"> → Systemeinstellungen → Ton → Eingang</span> ausgewählt ist. Wenn Sie ein Headset mit Mikrofon oder ein externes Mikrofon angeschlossen haben, wählen Sie es dort aus.</p>
+
+        <h3>Prüfen, ob alles funktioniert</h3>
+        <ol class="steps">
+          <li><div>Öffnen Sie zum Beispiel die App <b>Notizen</b> und klicken Sie in eine neue Notiz.</div></li>
+          <li><div>Halten Sie <kbd>Ctrl</kbd> + <kbd>⌘</kbd> (oder Ihr gewähltes Tastenkürzel) gedrückt. Es sollte kurz klicken, und unten auf dem Bildschirm erscheint eine dunkle Pille mit Balken.</div></li>
+          <li><div>Sagen Sie „Hallo, das ist ein Diktiertest.“ und lassen Sie die Tasten los. Nach ein bis zwei Sekunden erscheint der Text in der Notiz.</div></li>
+        </ol>
+        <p>Wenn die Pille nicht erscheint, fehlt die Berechtigung Eingabeüberwachung. Wenn sie erscheint, der Text aber nicht eingefügt wird, fehlen die Bedienungshilfen. Mehr dazu unter <a href="#problemy">Problemlösung</a>.</p>
+      </div>
+    </section>
+
+    <section id="groq">
+      <h2><span class="n">5</span>Eigener Groq-Schlüssel (empfohlen)</h2>
+      <p>Diktovátko kann auf zwei Arten transkribieren:</p>
+      <ul>
+        <li><b>Offline auf Ihrem Computer</b> funktioniert sofort und ohne Registrierung. Bei der ersten Nutzung werden aber etwa 1,6 GB heruntergeladen, und die Transkription dauert ungefähr so lange wie die Aufnahme selbst.</li>
+        <li><b>Über den Dienst Groq</b> ist sie in einer Sekunde fertig. Dafür brauchen Sie einen <b>eigenen kostenlosen Schlüssel</b>.</li>
+      </ul>
+      <div class="note"><p><b>Jeder Nutzer braucht seinen eigenen Schlüssel.</b> Der Schlüssel ist wie ein Passwort für Ihr Groq-Konto. Diktovátko speichert ihn nur auf Ihrem Computer (in der Datei <code>config.json</code>) und gibt ihn nie weiter. Schicken Sie den Schlüssel niemandem und fügen Sie ihn nirgends öffentlich ein.</p></div>
+      <h3>So bekommen Sie einen Schlüssel</h3>
+      <ol class="steps">
+        <li><div>Öffnen Sie <a href="https://console.groq.com/keys">console.groq.com/keys</a>.</div></li>
+        <li><div>Melden Sie sich an: am einfachsten mit der Schaltfläche <b>Continue with Google</b> oder per E-Mail. Eine Kreditkarte geben Sie nicht an.</div></li>
+        <li><div>Klicken Sie auf <b>Create API Key</b>, geben Sie als Namen zum Beispiel <i>Diktovátko</i> ein und bestätigen Sie.</div></li>
+        <li><div>Es erscheint ein Schlüssel, der mit <code>gsk_</code> beginnt. Klicken Sie auf <b>Copy</b>. Der Schlüssel wird nur einmal angezeigt. Wenn Sie ihn verlieren, erstellen Sie einfach einen neuen.</div></li>
+        <li><div>Klicken Sie auf das Diktovátko-Symbol und wählen Sie oben <b>Einstellungen</b>.</div></li>
+        <li><div>Fügen Sie den Schlüssel in das Feld <b>Groq-API-Schlüssel</b> ein (<kbd class="win">Ctrl</kbd><kbd class="mac">⌘</kbd> + <kbd>V</kbd>) und klicken Sie unten auf <b>Einstellungen speichern</b>. Fertig, das nächste Diktat läuft über Groq.</div></li>
+      </ol>
+      <h3>Gut zu wissen</h3>
+      <ul>
+        <li><b>Kostenlos:</b> Der kostenlose Tarif von Groq reicht für mehrere Stunden Diktat pro Tag. Ohne hinterlegte Karte wird Ihnen nie etwas berechnet. Wenn Sie das Limit überschreiten, warten Sie nur kurz.</li>
+        <li><b>Datenschutz:</b> Mit Schlüssel wird die Aufnahme an die Server von Groq in den USA geschickt. Vertrauliches können Sie offline diktieren, löschen Sie dazu einfach den Schlüssel in den Einstellungen.</li>
+        <li><b>Wenn Ihr Schlüssel in falsche Hände gerät</b>, löschen Sie ihn auf <a href="https://console.groq.com/keys">console.groq.com/keys</a> mit dem Papierkorbsymbol und erstellen Sie einen neuen.</li>
+      </ul>
+    </section>
+
+    <section id="diktovani">
+      <h2><span class="n">6</span>So diktieren Sie</h2>
+      <ol class="steps">
+        <li><div>Klicken Sie dorthin, wo Sie schreiben möchten: in eine E-Mail, einen Chat, ein Dokument, eine Suche…</div></li>
+        <li><div>Halten Sie <span class="win"><kbd>Ctrl</kbd> + <kbd>Win</kbd></span><span class="mac"><kbd>Ctrl</kbd> + <kbd>⌘</kbd></span> gedrückt. Ein Piepton ertönt, und unten auf dem Bildschirm erscheint eine dunkle Pille mit Balken, die sich mit Ihrer Stimme bewegen. Musik und Videos werden leiser.</div></li>
+        <li><div>Sprechen Sie ganz normal, in ganzen Sätzen. Kommas und Punkte setzt die Transkription selbst.</div></li>
+        <li><div>Lassen Sie die Tasten los. Die Pille zeigt eine Welle, und kurz darauf erscheint der Text an der Cursorposition.</div></li>
+      </ol>
+      <h3>Tipps</h3>
+      <ul>
+        <li>Warten Sie nach dem Drücken einen Moment, bevor Sie sprechen (der Piepton genügt), damit das erste Wort nicht abgeschnitten wird.</li>
+        <li>Sie können auch mehrere Minuten am Stück diktieren. Längere Aufnahmen werden automatisch aufgeteilt.</li>
+        <li>Wenn Sie zum Tastenkürzel versehentlich eine andere Taste drücken (zum Beispiel <kbd class="win">Ctrl</kbd><kbd class="mac">⌘</kbd>+<kbd>C</kbd>), wird die Aufnahme abgebrochen und nichts eingefügt.</li>
+        <li>Namen und Fachbegriffe, die falsch transkribiert werden, tragen Sie in den Einstellungen im Feld <b>Wortschatz und Stil</b> ein.</li>
+      </ul>
+    </section>
+
+    <section id="nastaveni">
+      <h2><span class="n">7</span>Einstellungen</h2>
+      <p>Klicken Sie auf das Diktovátko-Symbol und wählen Sie oben <b>Einstellungen</b>. Änderungen gelten sofort, wenn Sie auf <b>Einstellungen speichern</b> klicken.</p>
+      <figure class="shot win"><img src="../img/settings-light.png" alt="Einstellungen von Diktovátko" loading="lazy"></figure>
+      <table>
+        <tr><th>Option</th><th>Was sie bewirkt</th></tr>
+        <tr><td><b>Tastenkürzel zum Diktieren</b></td><td>
+          <span class="win">Standardmäßig Ctrl + Win, außerdem rechte Ctrl-Taste, Ctrl + Alt + Leertaste und weitere. Mit <i>Eigene…</i> können Sie jede beliebige Kombination eingeben, zum Beispiel <code>ctrl+alt+d</code>.</span>
+          <span class="mac">Standardmäßig Ctrl + ⌘ Cmd, außerdem Fn / 🌐, rechte ⌘ Cmd, rechte ⌥ Option und weitere. Mit <i>Eigene…</i> können Sie jede beliebige Kombination eingeben.</span></td></tr>
+        <tr><td><b>Bedienung</b></td><td><i>Halten</i> nimmt auf, solange Sie die Tasten gedrückt halten. <i>Umschalten</i>: Der erste Druck startet, der zweite stoppt. Praktisch für längeres Diktieren.</td></tr>
+        <tr><td><b>Sprache (Transkription)</b></td><td>Tschechisch, Slowakisch, Englisch und weitere, oder automatische Erkennung</td></tr>
+        <tr><td><b>App-Sprache</b></td><td>Tschechisch, Englisch oder Deutsch; ändert die Texte im Fenster, im Menü des Symbols und in der Anzeige</td></tr>
+        <tr><td><b>Groq-API-Schlüssel</b></td><td>siehe <a href="#groq">Schritt 5</a>. Ein leeres Feld bedeutet Offline-Transkription.</td></tr>
+        <tr><td><b>Lokales Modell</b></td><td>Genauigkeit und Geschwindigkeit der Offline-Transkription</td></tr>
+        <tr><td><b>Wortschatz und Stil</b></td><td>Namen, Firmen und Begriffe, die die Transkription kennen soll</td></tr>
+        <tr><td><b>Andere Töne beim Diktieren leiser stellen</b></td><td>wie stark Musik und Videos beim Diktieren leiser werden <span class="mac">(auf dem Mac wird der gesamte Ton des Computers leiser)</span></td></tr>
+        <tr><td><b>Aufnahmeanzeige, Signalton, Leerzeichen</b></td><td>Aussehen und Details beim Diktieren</td></tr>
+        <tr><td><b>Verlauf speichern</b></td><td>ausgeschaltet wird nicht mehr gespeichert, was Sie diktieren</td></tr>
+        <tr><td><b>Bei Anmeldung starten</b></td><td>Diktovátko startet von selbst, wenn Sie den Computer einschalten</td></tr>
+      </table>
+    </section>
+
+    <section id="historie">
+      <h2><span class="n">8</span>Verlauf und Statistik</h2>
+      <p>Jede Transkription wird <b>nur auf Ihrem Computer</b> gespeichert, zusammen mit der Uhrzeit und dem Titel des Fensters, in das sie ging (eine Slack-Unterhaltung, ein E-Mail-Betreff, ein Ticketname…). Das hilft, wenn Sie später nachsehen möchten, woran Sie gearbeitet haben.</p>
+      <ul>
+        <li><b>Verlauf:</b> Klicken Sie auf das Symbol. Links wählen Sie einen Zeitraum (heute, 7, 10, 14, 20 oder 30 Tage, diesen oder letzten Monat oder einen eigenen Datumsbereich) oder eine App, oder Sie suchen nach einem Wort.</li>
+        <li><b>Kopieren:</b> Markieren Sie Einträge per Klick und wählen Sie unten <i>Text kopieren</i> oder <i>Mit Zeit und Fenster kopieren</i>.</li>
+        <li><b>Export:</b> Die Schaltfläche <i>Exportieren</i> speichert die angezeigten Einträge als Markdown oder CSV (öffnet sich in Excel). Praktisch als Grundlage für eine KI, zum Beispiel mit der Anweisung „Fasse zusammen, woran ich letzten Monat gearbeitet habe“.</li>
+        <li><b>Statistik:</b> Anzahl der Wörter und Einträge, Sprechzeit und gesparte Zeit für heute, diese Woche, diesen Monat und insgesamt, ein Diagramm nach Tagen und eine Übersicht der Apps.</li>
+      </ul>
+      <figure class="shot"><img src="../img/stats-light.png" alt="Diktierstatistik" loading="lazy"></figure>
+    </section>
+
+    <section id="problemy" class="faq">
+      <h2><span class="n">9</span>Problemlösung</h2>
+      <details><summary>Nach dem Drücken des Tastenkürzels passiert nichts</summary><div>
+        <p class="win">Prüfen Sie, ob das Diktovátko-Symbol neben der Uhr ist und dunkel aussieht (nicht grau und nicht schwarz-rot). Grau bedeutet, dass es noch lädt. Wenn das Symbol fehlt, starten Sie <code>start.bat</code> erneut.</p>
+        <p class="mac">Fast immer liegt es an den Berechtigungen. Prüfen Sie <b>Bedienungshilfen</b> und <b>Eingabeüberwachung</b> unter <span class="path">Systemeinstellungen → Datenschutz &amp; Sicherheit</span>, beenden Sie dann Diktovátko und starten Sie es neu.</p>
+        <p>Probieren Sie in den Einstellungen ein anderes Tastenkürzel. Manche Notebooks haben keine rechte Ctrl-Taste oder keine Menütaste.</p></div></details>
+      <details><summary>Es wird aufgenommen, aber der Text wird nicht eingefügt</summary><div>
+        <p>Klicken Sie vor dem Diktieren wirklich in ein Textfeld, sodass der Cursor darin blinkt.</p>
+        <p class="win">In Fenster, die „als Administrator“ laufen (etwa manche Installationsprogramme), lässt Windows kein Einfügen zu.</p>
+        <p class="mac">Die Berechtigung <b>Bedienungshilfen</b> fehlt.</p>
+        <p>Den Text finden Sie auch im Verlauf und können ihn von dort kopieren.</p></div></details>
+      <details><summary>Ein tiefer Piepton ertönt und „Transkription fehlgeschlagen“ erscheint</summary><div>
+        <p>Meistens ist der Groq-Schlüssel falsch kopiert. Erstellen Sie einen neuen und fügen Sie ihn erneut ein (<a href="#groq">Schritt 5</a>). Andere mögliche Ursachen sind ein Internetausfall oder ein vorübergehend aufgebrauchtes kostenloses Limit. Details finden Sie im Log: Symbol → <b>Log öffnen</b>.</p></div></details>
+      <details><summary>Die Transkription schreibt Namen oder Fachbegriffe falsch</summary><div>
+        <p>Tragen Sie sie in den Einstellungen im Feld <b>Wortschatz und Stil</b> ein, zum Beispiel: „Hallo, hier schreibt Michal von MageXo. Wir arbeiten mit Shopify, Jira und Slack.“ Die Transkription richtet sich danach.</p></div></details>
+      <details><summary>Es wurde ein unsinniger Satz eingefügt, den ich nicht gesagt habe</summary><div>
+        <p>Whisper erfindet manchmal aus Stille einen Satz wie „Untertitel von…“. Diktovátko erkennt die häufigsten davon und verwirft sie. Wenn Sie auf einen neuen stoßen, sagen Sie uns Bescheid, dann ergänzen wir ihn.</p></div></details>
+      <details class="mac"><summary>Nach dem Drücken von Fn öffnet sich die Emoji-Auswahl oder das Apple-Diktat</summary><div>
+        <p>Stellen Sie unter <span class="path">Systemeinstellungen → Tastatur</span> die Option <b>„🌐-Taste drücken für“</b> auf <b>Nichts tun</b>. Oder wählen Sie in Diktovátko ein anderes Tastenkürzel, zum Beispiel die rechte ⌘-Taste.</p></div></details>
+      <details class="mac"><summary>Die Pille erscheint nicht, obwohl alles erlaubt ist</summary><div>
+        <p>macOS übernimmt Berechtigungen manchmal erst nach einem vollständigen Neustart der App. Beenden Sie Diktovátko (Symbol → <b>Beenden</b>), beenden Sie auch das Terminal (<kbd>⌘</kbd>+<kbd>Q</kbd>) und starten Sie <code>start.command</code> erneut.</p>
+        <p>Es hilft auch, das Terminal in der Liste der Berechtigungen <b>aus- und wieder einzuschalten</b> oder es mit <b>−</b> zu entfernen und über <b>+</b> erneut hinzuzufügen.</p></div></details>
+      <details class="mac"><summary>Nach dem Diktieren ist der Ton des Computers leise geblieben</summary><div>
+        <p>Auf dem Mac stellt Diktovátko während der Aufnahme den gesamten Ton leiser und danach wieder zurück. Wenn die App mitten in der Aufnahme abgestürzt ist, wurde die Lautstärke nicht zurückgesetzt. Stellen Sie sie mit der Lautstärketaste oder im Kontrollzentrum wieder hoch. Wenn Sie das Leiserstellen nicht möchten, schalten Sie in den Einstellungen <b>Andere Töne beim Diktieren leiser stellen</b> aus.</p></div></details>
+      <details class="mac"><summary>Im Verlauf steht nur der App-Name, nicht das Fenster oder die Unterhaltung</summary><div>
+        <p>macOS zeigt Fenstertitel nur mit der Berechtigung <b>Bildschirmaufnahme</b> an (siehe <a href="#spusteni">Schritt 4</a>). Diktovátko nimmt Ihren Bildschirm nicht auf, es braucht die Berechtigung nur, um Fenstertitel zu lesen.</p></div></details>
+      <details class="mac"><summary>Die Installation endet mit einem Fehler zu „pip“ oder „certificate“</summary><div>
+        <p>Starten Sie im Ordner <span class="path">Programme → Python 3.x</span> die Datei <b>Install Certificates.command</b> und danach erneut <code>install.command</code>. Auch die Installation des neuesten Python von python.org hilft.</p></div></details>
+      <details class="win"><summary>Nach Ctrl + Win öffnet sich das Startmenü</summary><div>
+        <p>Diktovátko blockiert das, auf manchen Computern passiert es trotzdem. Verwenden Sie lieber die rechte Ctrl-Taste oder Ctrl + Alt + Leertaste.</p></div></details>
+    </section>
+
+    <section id="aktualizace">
+      <h2><span class="n">10</span>Aktualisieren und deinstallieren</h2>
+      <h3>Auf eine neue Version aktualisieren</h3>
+      <ol class="steps">
+        <li><div>Beenden Sie Diktovátko: Symbol → <b>Beenden</b>.</div></li>
+        <li><div>Laden Sie die neue <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">ZIP-Datei</a> herunter und kopieren Sie ihren Inhalt über den alten Ordner. Die Dateien <code>config.json</code> (Einstellungen und Schlüssel) und <code>history.db</code> (Verlauf) werden nicht überschrieben, weil sie nicht in der ZIP-Datei sind.</div></li>
+        <li><div>Starten Sie erneut <code class="win">install.bat</code><code class="mac">install.command</code> und danach <code class="win">start.bat</code><code class="mac">start.command</code>.</div></li>
+      </ol>
+      <h3>Deinstallieren</h3>
+      <p>Schalten Sie in den Einstellungen <b>Bei Anmeldung starten</b> aus, beenden Sie Diktovátko und löschen Sie seinen gesamten Ordner. Damit verschwinden auch Verlauf und Schlüssel. Python können Sie behalten oder wie gewohnt deinstallieren.</p>
+      <p class="mac">Auf dem Mac können Sie danach unter <span class="path">Datenschutz &amp; Sicherheit</span> die Berechtigungen ausschalten, die Sie dem Terminal (und Python) für Diktovátko gegeben haben. Die Datei für den automatischen Start ist <code>~/Library/LaunchAgents/cz.diktovatko.plist</code> und wird automatisch gelöscht, wenn Sie die Option in den Einstellungen ausschalten.</p>
+    </section>
+  </article>
+</div>
+
+<script>
+(() => {
+  const setOs = (os) => {
+    document.body.classList.toggle("is-mac", os === "mac");
+    document.querySelectorAll(".os button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.os === os));
+    try { localStorage.setItem("diktovatko-os", os); } catch (e) {}
+  };
+  let saved = null;
+  try { saved = localStorage.getItem("diktovatko-os"); } catch (e) {}
+  const fromHash = location.search.includes("os=mac") ? "mac" : null;
+  setOs(fromHash || saved || (/Mac/.test(navigator.platform) ? "mac" : "win"));
+  document.querySelector(".os").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) setOs(b.dataset.os); });
+
+  const links = [...document.querySelectorAll(".toc a")];
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) links.forEach((a) => a.classList.toggle("on", a.getAttribute("href") === "#" + en.target.id)); });
+  }, { rootMargin: "-30% 0px -60% 0px" });
+  document.querySelectorAll("article section[id]").forEach((s) => io.observe(s));
+})();
+</script>
+
+<script>
+(() => {
+  // pruh průběhu čtení nahoře
+  const bar = document.createElement("div"); bar.className = "progress"; bar.setAttribute("aria-hidden", "true");
+  document.body.prepend(bar);
+  const upd = () => { const d = document.documentElement; bar.style.transform = `scaleX(${d.scrollTop / Math.max(1, d.scrollHeight - innerHeight)})`; };
+  addEventListener("scroll", upd, { passive: true }); addEventListener("resize", upd); upd();
+})();
+</script>
+</body>
+</html>

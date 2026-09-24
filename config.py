@@ -9,6 +9,8 @@ APP_DIR = Path(__file__).resolve().parent
 CONFIG_PATH = APP_DIR / "config.json"
 
 DEFAULT_CONFIG = {
+    # Jazyk aplikace (okno, menu ikony, indikátor): "cs", "en" nebo "de"
+    "ui_language": "cs",
     # Zapnuté klávesové zkratky (viz PRESETS v hotkeys.py a platform_mac.py),
     # např. "ctrl+windows", "right ctrl", "f9", na Macu "ctrl+cmd", "fn", "right cmd"
     "hotkeys": ["ctrl+cmd"] if sys.platform == "darwin" else ["ctrl+windows"],

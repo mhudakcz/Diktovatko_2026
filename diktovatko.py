@@ -24,7 +24,9 @@ from PIL import Image, ImageDraw
 
 import config
 import history
+import i18n
 import plat
+from i18n import t
 from version import VERSION
 
 APP_DIR = config.APP_DIR
@@ -60,14 +62,11 @@ ICONS = {
     "transcribing": make_icon("#3847F5"),
     "error": make_icon("#B42318"),
 }
-STATUS_TEXT = {
-    "loading": "Načítám model…",
-    "idle": "Připraveno",
-    "recording": "Nahrávám…",
-    "transcribing": "Přepisuji…",
-    "error": "Chyba – viz diktovatko.log",
-}
 HOTKEY_LABELS = dict(plat.presets())
+
+
+def status_text(state):
+    return t("status." + state)
 
 
 class Transcriber:
@@ -183,12 +182,13 @@ def paste_text(text):
 
 
 def hotkey_label(hk):
-    return HOTKEY_LABELS.get(hk, hk)
+    return i18n.hotkey_label(hk, HOTKEY_LABELS.get(hk, hk))
 
 
 class App:
     def __init__(self):
         self.cfg = config.load_config()
+        i18n.set_lang(self.cfg["ui_language"])
         self.config_mtime = config.CONFIG_PATH.stat().st_mtime
         self.transcriber = Transcriber(self.cfg)
         self.state = "loading"
@@ -202,32 +202,34 @@ class App:
         self.lock = threading.Lock()
         self.hotkeys = plat.hotkey_manager(self.on_hotkey_press, self.on_hotkey_release, self.on_hotkey_interrupt)
 
+        # Texty položek jsou funkce, aby se po změně jazyka v nastavení přeložily bez restartu.
+        tr = lambda key: (lambda _: t(key))  # noqa: E731
         export_items = [
-            pystray.MenuItem(label, (lambda k: lambda: self.export_history(k))(key))
-            for key, label in history.PERIODS
+            pystray.MenuItem(tr("period." + key), (lambda k: lambda: self.export_history(k))(key))
+            for key, _ in history.PERIODS
             if key != "today"
         ]
-        export_items += [pystray.Menu.SEPARATOR, pystray.MenuItem("Otevřít složku exportů", self.open_exports)]
+        export_items += [pystray.Menu.SEPARATOR, pystray.MenuItem(tr("menu.exports_folder"), self.open_exports)]
         self.icon = pystray.Icon(
             "diktovatko",
             ICONS["loading"],
             "Diktovátko",
             menu=pystray.Menu(
                 pystray.MenuItem(f"Diktovátko {VERSION}", None, enabled=False),
-                pystray.MenuItem(lambda _: STATUS_TEXT[self.state], None, enabled=False),
+                pystray.MenuItem(lambda _: status_text(self.state), None, enabled=False),
                 pystray.MenuItem(
-                    lambda _: "Zkratka: " + ", ".join(hotkey_label(h) for h in self.cfg["hotkeys"]),
+                    lambda _: t("menu.hotkey", keys=", ".join(hotkey_label(h) for h in self.cfg["hotkeys"])),
                     None,
                     enabled=False,
                 ),
                 pystray.Menu.SEPARATOR,
-                pystray.MenuItem("Historie", lambda: self.open_window("history"), default=True),
-                pystray.MenuItem("Statistiky", lambda: self.open_window("stats")),
-                pystray.MenuItem("Nastavení", lambda: self.open_window("settings")),
-                pystray.MenuItem("Exportovat historii", pystray.Menu(*export_items)),
+                pystray.MenuItem(tr("menu.history"), lambda: self.open_window("history"), default=True),
+                pystray.MenuItem(tr("menu.stats"), lambda: self.open_window("stats")),
+                pystray.MenuItem(tr("menu.settings"), lambda: self.open_window("settings")),
+                pystray.MenuItem(tr("menu.export"), pystray.Menu(*export_items)),
                 pystray.Menu.SEPARATOR,
-                pystray.MenuItem("Otevřít log", lambda: plat.open_path(LOG_PATH)),
-                pystray.MenuItem("Ukončit", self.quit),
+                pystray.MenuItem(tr("menu.log"), lambda: plat.open_path(LOG_PATH)),
+                pystray.MenuItem(tr("menu.quit"), self.quit),
             ),
         )
 
@@ -247,7 +249,7 @@ class App:
     def set_state(self, state):
         self.state = state
         self.icon.icon = ICONS[state]
-        self.icon.title = f"Diktovátko – {STATUS_TEXT[state]}"
+        self.icon.title = f"Diktovátko – {status_text(state)}"
         self.icon.update_menu()
         if self.overlay:
             if state in ("recording", "transcribing"):
@@ -343,7 +345,7 @@ class App:
         finally:
             self.set_state("idle")
             if failed and self.overlay:
-                self.overlay.show("error", "Přepis se nepovedl")
+                self.overlay.show("error", t("overlay.failed"))
 
     # --- zkratky -------------------------------------------------------------
     def on_hotkey_press(self, hk):
@@ -378,6 +380,7 @@ class App:
             )
             self.cfg.clear()
             self.cfg.update(new)
+            i18n.set_lang(self.cfg["ui_language"])
             self._apply_extras()
             self.hotkeys.set_hotkeys(self.cfg["hotkeys"])
             self.icon.update_menu()
@@ -418,7 +421,7 @@ class App:
     def export_history(self, period):
         try:
             start, end = history.period_range(period)
-            out, n = history.export(start, end)
+            out, n = history.export(start, end, lang=i18n.lang())
             log.info("Export %s–%s: %d záznamů -> %s", start, end, n, out)
             plat.open_path(out)
         except Exception:

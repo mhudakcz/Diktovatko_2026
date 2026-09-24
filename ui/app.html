@@ -136,12 +136,12 @@ mark { background: color-mix(in srgb, var(--ultra) 22%, transparent); color: inh
 .tip.on { opacity: 1; }
 .two { display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; }
 .apps-bars { display: grid; gap: 7px; }
-.ab { display: grid; grid-template-columns: 110px 1fr 70px; align-items: center; gap: 10px; font-size: 13px; }
+.ab { display: grid; grid-template-columns: 110px 1fr auto; align-items: center; gap: 10px; font-size: 13px; }
 .ab .lbl { display: flex; align-items: center; min-width: 0; }
 .ab .lbl span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ab .track { display: block; height: 10px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
 .ab .fill { display: block; height: 100%; border-radius: 3px; background: var(--ultra); min-width: 3px; }
-.ab .v { text-align: right; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.ab .v { white-space: nowrap; min-width: 70px; text-align: right; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .facts { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 7px 12px; font-size: 13px; color: var(--ink-2); }
 .facts dd { margin: 0; text-align: right; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
 .note { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
@@ -200,6 +200,7 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
 @media (max-width: 900px) { body { grid-template-columns: 200px 1fr; } .wrap { padding: 16px 18px 110px; } .bar { left: calc(200px + (100vw - 200px) / 2); } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<script src="i18n.js"></script>
 </head>
 <body>
 <aside>
@@ -208,30 +209,30 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
     Diktovátko <span class="ver" id="ver"></span>
   </div>
   <nav class="views" aria-label="Sekce">
-    <button data-view="history" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Historie</button>
-    <button data-view="stats" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>Statistiky</button>
-    <button data-view="settings" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Nastavení</button>
+    <button data-view="history" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg><span data-i18n="nav.history">Historie</span></button>
+    <button data-view="stats" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg><span data-i18n="nav.stats">Statistiky</span></button>
+    <button data-view="settings" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span data-i18n="nav.settings">Nastavení</span></button>
   </nav>
 
   <div id="side-history">
     <label class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" type="search" placeholder="Hledat" aria-label="Hledat">
+      <input id="q" type="search" placeholder="Hledat" aria-label="Hledat" data-i18n-ph="search.ph" data-i18n-aria="search.aria">
     </label>
     <div class="group" style="margin-top:14px">
-      <h2>Období</h2>
+      <h2 data-i18n="side.period">Období</h2>
       <div class="nav" id="periods"></div>
       <div class="range" id="range" hidden>
-        <input type="date" id="from" aria-label="Od">
-        <input type="date" id="to" aria-label="Do">
+        <input type="date" id="from" aria-label="Od" data-i18n-aria="side.from">
+        <input type="date" id="to" aria-label="Do" data-i18n-aria="side.to">
       </div>
     </div>
     <div class="group" id="apps-group" style="margin-top:14px">
-      <h2>Aplikace</h2>
+      <h2 data-i18n="side.apps">Aplikace</h2>
       <div class="nav" id="apps"></div>
     </div>
   </div>
-  <div class="foot" id="foot-history">Klikem vyberete záznam, <kbd>Ctrl</kbd>+<kbd>A</kbd> vybere vše zobrazené, <kbd>Ctrl</kbd>+<kbd>C</kbd> zkopíruje text.</div>
+  <div class="foot" id="foot-history" data-i18n-html="side.foot">Klikem vyberete záznam, <kbd>Ctrl</kbd>+<kbd>A</kbd> vybere vše zobrazené, <kbd>Ctrl</kbd>+<kbd>C</kbd> zkopíruje text.</div>
 </aside>
 
 <main id="main">
@@ -245,9 +246,9 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
       <div class="split">
         <button class="btn" id="export">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>
-          Exportovat
+          <span data-i18n="hist.export">Exportovat</span>
         </button>
-        <select id="fmt" aria-label="Formát exportu"><option value="md">Markdown</option><option value="csv">CSV</option></select>
+        <select id="fmt" aria-label="Formát exportu" data-i18n-aria="hist.fmt"><option value="md">Markdown</option><option value="csv">CSV</option></select>
       </div>
     </header>
     <div id="list"></div>
@@ -255,72 +256,80 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
 
   <!-- STATISTIKY -->
   <div class="wrap" id="view-stats" hidden>
-    <header><div><h1>Statistiky</h1><p class="summary" id="stats-sub"></p></div></header>
+    <header><div><h1 data-i18n="stats.title">Statistiky</h1><p class="summary" id="stats-sub"></p></div></header>
     <div class="tiles" id="tiles"></div>
     <div class="panel">
-      <h3>Slova za den<small>posledních 30 dní</small></h3>
+      <h3><span data-i18n="stats.wordsPerDay">Slova za den</span><small data-i18n="stats.last30">posledních 30 dní</small></h3>
       <div class="chart" id="chart"><div class="tip" id="tip"></div></div>
     </div>
     <div class="two">
-      <div class="panel"><h3>Kam nejvíc diktujete<small>všechna data, podle počtu slov</small></h3><div class="apps-bars" id="appbars"></div></div>
-      <div class="panel"><h3>Zajímavosti</h3><dl class="facts" id="facts"></dl><p class="note" id="note"></p></div>
+      <div class="panel"><h3><span data-i18n="stats.whereMost">Kam nejvíc diktujete</span><small data-i18n="stats.allData">všechna data, podle počtu slov</small></h3><div class="apps-bars" id="appbars"></div></div>
+      <div class="panel"><h3 data-i18n="stats.facts">Zajímavosti</h3><dl class="facts" id="facts"></dl><p class="note" id="note"></p></div>
     </div>
   </div>
 
   <!-- NASTAVENÍ -->
   <div class="wrap" id="view-settings" hidden>
-    <header><div><h1>Nastavení</h1><p class="summary">Změny platí hned po uložení, aplikaci není potřeba restartovat.</p></div></header>
+    <header><div><h1 data-i18n="set.title">Nastavení</h1><p class="summary" data-i18n="set.sub">Změny platí hned po uložení, aplikaci není potřeba restartovat.</p></div></header>
     <form class="settings" id="settings" onsubmit="return false">
       <section class="card">
-        <h2>Klávesová zkratka</h2>
-        <p>Když během držení zkratky stisknete jinou klávesu (třeba <span class="copy-key">Ctrl</span>+C), nahrávání se zruší, takže běžné zkratky dál fungují.</p>
-        <p class="mac-only" hidden>Když zvolíte klávesu Fn, nastavte v <b>Nastavení systému → Klávesnice</b> u klávesy 🌐 volbu <b>Nedělat nic</b>, jinak se místo diktování otevře výběr emoji.</p>
+        <h2 data-i18n="set.hotkey.h">Klávesová zkratka</h2>
+        <p id="hotkey-p"></p>
+        <p class="mac-only" hidden data-i18n-html="set.mac.fn">Když zvolíte klávesu Fn, nastavte v <b>Nastavení systému → Klávesnice</b> u klávesy 🌐 volbu <b>Nedělat nic</b>, jinak se místo diktování otevře výběr emoji.</p>
         <div class="row">
-          <div><div class="t">Zkratka pro diktování</div><div class="d" id="hotkey-caps"></div></div>
+          <div><div class="t" data-i18n="set.hotkey.t">Zkratka pro diktování</div><div class="d" id="hotkey-caps"></div></div>
           <select class="field" id="hotkey"></select>
         </div>
         <div class="row" id="custom-row" hidden>
-          <div><div class="t">Vlastní zkratka</div><div class="d">Názvy kláves spojte znakem +, např. <kbd>f10</kbd>, <kbd>ctrl+alt+d</kbd>, <kbd>right shift</kbd>.</div></div>
-          <input class="field" id="custom" placeholder="např. ctrl+alt+d">
+          <div><div class="t" data-i18n="set.custom.t">Vlastní zkratka</div><div class="d" data-i18n-html="set.custom.d">Názvy kláves spojte znakem +, např. <kbd>f10</kbd>, <kbd>ctrl+alt+d</kbd>, <kbd>right shift</kbd>.</div></div>
+          <input class="field" id="custom" placeholder="např. ctrl+alt+d" data-i18n-ph="set.custom.ph">
         </div>
         <div class="row">
-          <div><div class="t">Způsob ovládání</div><div class="d">Držet: nahrává, dokud klávesu držíte. Přepínat: první stisk spustí, druhý zastaví.</div></div>
-          <div class="seg" id="mode"><button type="button" data-v="hold">Držet</button><button type="button" data-v="toggle">Přepínat</button></div>
+          <div><div class="t" data-i18n="set.mode.t">Způsob ovládání</div><div class="d" data-i18n="set.mode.d">Držet: nahrává, dokud klávesu držíte. Přepínat: první stisk spustí, druhý zastaví.</div></div>
+          <div class="seg" id="mode"><button type="button" data-v="hold" data-i18n="set.mode.hold">Držet</button><button type="button" data-v="toggle" data-i18n="set.mode.toggle">Přepínat</button></div>
         </div>
       </section>
 
       <section class="card">
-        <h2>Přepis</h2>
+        <h2 data-i18n="set.tr.h">Přepis</h2>
         <div class="row">
-          <div><div class="t">Jazyk</div></div>
+          <div><div class="t" data-i18n="set.lang.t">Jazyk přepisu</div></div>
           <select class="field" id="language"></select>
         </div>
         <div class="row">
-          <div><div class="t">Groq API klíč</div><div class="d">S klíčem trvá přepis kolem sekundy, nahrávka ale jde na servery Groq. Bez klíče se přepisuje offline. <button type="button" class="link" id="groq-link">Získat klíč zdarma</button></div></div>
-          <div class="inline"><input class="field" id="groq" type="password" autocomplete="off" placeholder="gsk_…"><button type="button" class="btn" id="groq-show">Zobrazit</button></div>
+          <div><div class="t" data-i18n="set.groq.t">Groq API klíč</div><div class="d"><span data-i18n="set.groq.d"></span> <button type="button" class="link" id="groq-link" data-i18n="set.groq.link">Získat klíč zdarma</button></div></div>
+          <div class="inline"><input class="field" id="groq" type="password" autocomplete="off" placeholder="gsk_…"><button type="button" class="btn" id="groq-show" data-i18n="set.groq.show">Zobrazit</button></div>
         </div>
         <div class="row">
-          <div><div class="t">Lokální model</div><div class="d">Používá se, když není vyplněný Groq klíč. Při první změně se model stáhne.</div></div>
+          <div><div class="t" data-i18n="set.model.t">Lokální model</div><div class="d" data-i18n="set.model.d">Používá se, když není vyplněný Groq klíč. Při první změně se model stáhne.</div></div>
           <select class="field" id="model"></select>
         </div>
         <div class="row" style="display:block">
-          <div class="t">Slovník a styl</div>
-          <div class="d">Jména, firmy a odborné výrazy, které má přepis znát. Model podle této ukázky převezme i styl a interpunkci.</div>
+          <div class="t" data-i18n="set.prompt.t">Slovník a styl</div>
+          <div class="d" data-i18n="set.prompt.d">Jména, firmy a odborné výrazy, které má přepis znát. Model podle této ukázky převezme i styl a interpunkci.</div>
           <textarea class="field" id="prompt"></textarea>
         </div>
       </section>
 
       <section class="card">
-        <h2>Chování</h2>
+        <h2 data-i18n="set.beh.h">Chování</h2>
         <div class="row">
-          <div><div class="t">Ztlumit ostatní zvuky při diktování</div><div class="d">Spotify, videa a další aplikace se během nahrávání ztiší.</div></div>
-          <div class="inline"><input type="range" id="duck-level" min="0" max="50" step="5" aria-label="Hlasitost při ztlumení"><span id="duck-val" class="d" style="width:36px"></span><label class="switch"><input type="checkbox" id="duck"><span></span></label></div>
+          <div><div class="t" data-i18n="set.duck.t">Ztlumit ostatní zvuky při diktování</div><div class="d" data-i18n="set.duck.d">Spotify, videa a další aplikace se během nahrávání ztiší.</div></div>
+          <div class="inline"><input type="range" id="duck-level" min="0" max="50" step="5" aria-label="Hlasitost při ztlumení" data-i18n-aria="set.duck.aria"><span id="duck-val" class="d" style="width:36px"></span><label class="switch"><input type="checkbox" id="duck"><span></span></label></div>
         </div>
-        <div class="row"><div><div class="t">Indikátor nahrávání na obrazovce</div></div><label class="switch"><input type="checkbox" id="overlay"><span></span></label></div>
-        <div class="row"><div><div class="t">Pípnutí při startu a konci nahrávání</div></div><label class="switch"><input type="checkbox" id="sounds"><span></span></label></div>
-        <div class="row"><div><div class="t">Mezera za vloženým textem</div><div class="d">Hodí se, když diktujete po kouscích.</div></div><label class="switch"><input type="checkbox" id="trailing"><span></span></label></div>
-        <div class="row"><div><div class="t">Ukládat historii</div><div class="d">Text, čas a okno se ukládají jen do vašeho počítače.</div></div><label class="switch"><input type="checkbox" id="hist"><span></span></label></div>
-        <div class="row"><div><div class="t">Spouštět po přihlášení do Windows</div></div><label class="switch"><input type="checkbox" id="autostart"><span></span></label></div>
+        <div class="row"><div><div class="t" data-i18n="set.overlay.t">Indikátor nahrávání na obrazovce</div></div><label class="switch"><input type="checkbox" id="overlay"><span></span></label></div>
+        <div class="row"><div><div class="t" data-i18n="set.sounds.t">Pípnutí při startu a konci nahrávání</div></div><label class="switch"><input type="checkbox" id="sounds"><span></span></label></div>
+        <div class="row"><div><div class="t" data-i18n="set.trailing.t">Mezera za vloženým textem</div><div class="d" data-i18n="set.trailing.d">Hodí se, když diktujete po kouscích.</div></div><label class="switch"><input type="checkbox" id="trailing"><span></span></label></div>
+        <div class="row"><div><div class="t" data-i18n="set.hist.t">Ukládat historii</div><div class="d" data-i18n="set.hist.d">Text, čas a okno se ukládají jen do vašeho počítače.</div></div><label class="switch"><input type="checkbox" id="hist"><span></span></label></div>
+        <div class="row"><div><div class="t" id="autostart-t">Spouštět po přihlášení</div></div><label class="switch"><input type="checkbox" id="autostart"><span></span></label></div>
+      </section>
+
+      <section class="card">
+        <h2 data-i18n="set.ui.h">Jazyk aplikace</h2>
+        <div class="row">
+          <div><div class="t" data-i18n="set.ui.t">Jazyk okna, menu a indikátoru</div><div class="d" data-i18n="set.ui.d"></div></div>
+          <select class="field" id="ui-language"></select>
+        </div>
       </section>
 
       <div class="savebar"><button type="button" class="btn primary" id="save">Uložit nastavení</button><span class="msg" id="save-msg"></span></div>
@@ -328,11 +337,11 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
   </div>
 </main>
 
-<div class="bar" id="bar" role="toolbar" aria-label="Vybrané záznamy">
+<div class="bar" id="bar" role="toolbar" aria-label="Vybrané záznamy" data-i18n-aria="bar.aria">
   <span class="count" id="selcount"></span>
-  <button class="go" id="copy-text">Kopírovat text</button>
-  <button id="copy-meta">Kopírovat s časem a oknem</button>
-  <button id="clear">Zrušit výběr</button>
+  <button class="go" id="copy-text" data-i18n="bar.copyText">Kopírovat text</button>
+  <button id="copy-meta" data-i18n="bar.copyMeta">Kopírovat s časem a oknem</button>
+  <button id="clear" data-i18n="bar.clear">Zrušit výběr</button>
 </div>
 <div class="toast" id="toast" role="status"></div>
 
@@ -356,7 +365,7 @@ const state = { view: "history", period: "7d", q: "", app: null, rows: [], shown
 const $ = (id) => document.getElementById(id);
 const api = () => window.pywebview.api;
 
-function appLabel(exe) { return APP_NAMES[(exe || "").toLowerCase()] || (exe || "Neznámá aplikace").replace(/\.exe$/i, ""); }
+function appLabel(exe) { return APP_NAMES[(exe || "").toLowerCase()] || (exe || t("app.unknown")).replace(/\.exe$/i, ""); }
 function appColor(exe) { let h = 0; for (const ch of (exe || "").toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return PALETTE[h % PALETTE.length]; }
 function cleanTitle(t) { t = t || ""; for (const re of TITLE_SUFFIXES) t = t.replace(re, ""); return t; }
 function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
@@ -369,13 +378,12 @@ function highlight(s) {
 function dayLabel(iso) {
   const d = new Date(iso + "T00:00:00"), today = new Date(); today.setHours(0, 0, 0, 0);
   const diff = Math.round((today - d) / 864e5);
-  const full = d.toLocaleDateString("cs-CZ", { weekday: "long", day: "numeric", month: "long" });
-  if (diff === 0) return ["Dnes", full];
-  if (diff === 1) return ["Včera", full];
+  const full = d.toLocaleDateString(locale(), { weekday: "long", day: "numeric", month: "long" });
+  if (diff === 0) return [t("day.today"), full];
+  if (diff === 1) return [t("day.yesterday"), full];
   return [full.charAt(0).toUpperCase() + full.slice(1), d.getFullYear() !== today.getFullYear() ? d.getFullYear() : ""];
 }
-function plural(n, one, few, many) { return n === 1 ? one : n >= 2 && n <= 4 ? few : many; }
-function num(n) { return Math.round(n).toLocaleString("cs-CZ"); }
+function num(n) { return Math.round(n).toLocaleString(locale()); }
 function fmtDur(s) {
   s = Math.round(s || 0);
   if (s < 60) return `${s} s`;
@@ -404,11 +412,11 @@ document.querySelector(".views").addEventListener("click", (e) => { const b = e.
 function periodKey() { return state.period === "custom" ? `${$("from").value}|${$("to").value}` : state.period; }
 function periodTitle() {
   if (state.period !== "custom") return state.periods.find(([k]) => k === state.period)[1];
-  const f = (s) => new Date(s + "T00:00:00").toLocaleDateString("cs-CZ", { day: "numeric", month: "numeric", year: "numeric" });
+  const f = (s) => new Date(s + "T00:00:00").toLocaleDateString(locale(), { day: "numeric", month: "numeric", year: "numeric" });
   return `${f($("from").value)} – ${f($("to").value)}`;
 }
 function renderPeriods() {
-  $("periods").innerHTML = [...state.periods, ["custom", "Vlastní rozsah"]]
+  $("periods").innerHTML = [...state.periods, ["custom", t("side.custom")]]
     .map(([k, l]) => `<button aria-pressed="${k === state.period}" data-p="${k}">${l}</button>`).join("");
   $("range").hidden = state.period !== "custom";
 }
@@ -418,7 +426,7 @@ function renderApps() {
   const apps = Object.entries(counts).sort((a, b) => b[1] - a[1]);
   $("apps-group").hidden = apps.length === 0;
   $("apps").innerHTML =
-    `<button aria-pressed="${state.app === null}" data-a=""><span class="app-name"><span>Všechny aplikace</span></span><span class="n">${state.rows.length}</span></button>` +
+    `<button aria-pressed="${state.app === null}" data-a=""><span class="app-name"><span>${t("side.allApps")}</span></span><span class="n">${state.rows.length}</span></button>` +
     apps.map(([a, n]) => `<button aria-pressed="${state.app === a}" data-a="${esc(a || "")}"><span class="app-name"><span class="app-dot" style="background:${appColor(a)}"></span><span>${esc(appLabel(a))}</span></span><span class="n">${n}</span></button>`).join("");
 }
 function renderList() {
@@ -427,12 +435,12 @@ function renderList() {
   const words = state.shown.reduce((s, r) => s + r.text.split(/\s+/).filter(Boolean).length, 0);
   const n = state.shown.length;
   $("title").textContent = periodTitle();
-  $("summary").textContent = n ? `${n} ${plural(n, "záznam", "záznamy", "záznamů")}, ${num(words)} ${plural(words, "slovo", "slova", "slov")}, nadiktováno za ${fmtDur(secs)}` : "";
+  $("summary").textContent = n ? t("hist.summary", { records: tp("record", n), words: tp("word", words), dur: fmtDur(secs) }) : "";
   if (!n) {
-    const keys = (state.settings?.config.hotkeys || ["ctrl+windows"]).map(keyText).join(" nebo ");
+    const keys = (state.settings?.config.hotkeys || ["ctrl+windows"]).map(keyText).join(t("hist.or"));
     $("list").innerHTML = state.q || state.app
-      ? `<div class="empty"><h2>Nic neodpovídá hledání</h2><p>Zkuste jiné slovo nebo delší období v levém panelu.</p></div>`
-      : `<div class="empty"><h2>V tomhle období nic není</h2><p>Klikněte do libovolného textového pole, podržte <b>${esc(keys)}</b>, řekněte, co potřebujete, a klávesu pusťte. Přepis se vloží na místo kurzoru a objeví se tady.</p></div>`;
+      ? `<div class="empty"><h2>${t("hist.noMatch.h")}</h2><p>${t("hist.noMatch.p")}</p></div>`
+      : `<div class="empty"><h2>${t("hist.empty.h")}</h2><p>${t("hist.empty.p", { keys: esc(keys) })}</p></div>`;
     return;
   }
   const byDay = new Map();
@@ -447,14 +455,14 @@ function renderList() {
         <div class="body"><p class="text">${highlight(r.text)}</p>
           <div class="meta"><span class="chip">${esc(appLabel(r.app))}</span><span class="where" title="${esc(r.window_title)}">${highlight(cleanTitle(r.window_title))}</span></div>
         </div>
-        <button class="copy1" title="Kopírovat tento text" aria-label="Kopírovat tento text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
+        <button class="copy1" title="${t("copy.one")}" aria-label="${t("copy.one")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
       </li>`;
     }
     html += `</ol></section>`;
   }
   $("list").innerHTML = html;
 }
-function renderBar() { const n = state.selected.size; $("bar").classList.toggle("on", n > 0); if (n) $("selcount").textContent = `Vybráno ${n}`; }
+function renderBar() { const n = state.selected.size; $("bar").classList.toggle("on", n > 0); if (n) $("selcount").textContent = t("bar.selected", { n }); }
 async function loadHistory() {
   if (state.period === "custom" && (!$("from").value || !$("to").value)) return;
   state.rows = await api().entries(periodKey(), state.q);
@@ -470,7 +478,7 @@ async function copyRows(rows, withMeta) {
     ? rows.map((r) => `[${r.ts.replace("T", " ").slice(0, 16)}] ${appLabel(r.app)}: ${cleanTitle(r.window_title)}\n${r.text}`).join("\n\n")
     : rows.map((r) => r.text).join("\n");
   await api().copy(out);
-  toast(rows.length === 1 ? "Zkopírováno" : `Zkopírováno ${rows.length} ${plural(rows.length, "záznam", "záznamy", "záznamů")}`);
+  toast(rows.length === 1 ? t("toast.copied") : t("toast.copiedN", { records: tp("record", rows.length) }));
 }
 $("periods").addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
@@ -498,32 +506,32 @@ $("list").addEventListener("click", (e) => {
 $("copy-text").onclick = () => copyRows(selectedRows(), false);
 $("copy-meta").onclick = () => copyRows(selectedRows(), true);
 $("clear").onclick = () => { state.selected.clear(); renderList(); renderBar(); };
-$("export").onclick = async () => { const n = await api().export(periodKey(), state.q, $("fmt").value); toast(`Exportováno ${n} ${plural(n, "záznam", "záznamy", "záznamů")}`); };
+$("export").onclick = async () => { const n = await api().export(periodKey(), state.q, $("fmt").value); toast(t("toast.exported", { records: tp("record", n) })); };
 
 /* ---------------- statistiky ---------------- */
 async function loadStats() {
   const s = await api().stats();
   const P = s.periods;
   const tile = (title, p, cls = "") => `<div class="tile ${cls}"><h3>${title}</h3>
-    <div class="big">${num(p.words)}<small>${plural(p.words, "slovo", "slova", "slov")}</small></div>
-    <dl><dt>Záznamy</dt><dd>${num(p.count)}</dd><dt>Mluvení</dt><dd>${fmtDur(p.audio_seconds)}</dd><dt>Ušetřeno</dt><dd>~${fmtMin(p.saved_minutes)}</dd></dl></div>`;
-  $("tiles").innerHTML = tile("Dnes", P.today) + tile("Posledních 7 dní", P["7d"]) + tile("Posledních 30 dní", P["30d"]) + tile("Od začátku", P.all, "total");
+    <div class="big">${num(p.words)}<small>${tp("word", p.words).replace(/^[\d\s.,\u00a0\u202f]+/, "")}</small></div>
+    <dl><dt>${t("tile.records")}</dt><dd>${num(p.count)}</dd><dt>${t("tile.speaking")}</dt><dd>${fmtDur(p.audio_seconds)}</dd><dt>${t("tile.saved")}</dt><dd>~${fmtMin(p.saved_minutes)}</dd></dl></div>`;
+  $("tiles").innerHTML = tile(t("tile.today"), P.today) + tile(t("tile.7d"), P["7d"]) + tile(t("tile.30d"), P["30d"]) + tile(t("tile.all"), P.all, "total");
   $("stats-sub").textContent = s.first_use
-    ? `Diktovátko používáte od ${new Date(s.first_use + "T00:00:00").toLocaleDateString("cs-CZ", { day: "numeric", month: "long", year: "numeric" })}`
-    : "Statistiky se začnou plnit po prvním nadiktování.";
+    ? t("stats.since", { date: new Date(s.first_use + "T00:00:00").toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" }) })
+    : t("stats.empty");
   renderChart(s.daily);
   const max = Math.max(1, ...s.apps.map((a) => a.words));
   $("appbars").innerHTML = s.apps.length
-    ? s.apps.map((a) => `<div class="ab"><span class="lbl"><span class="app-dot" style="background:${appColor(a.app)}"></span><span>${esc(appLabel(a.app))}</span></span><span class="track"><span class="fill" style="width:${(a.words / max) * 100}%"></span></span><span class="v">${num(a.words)} slov</span></div>`).join("")
-    : `<p class="note">Zatím žádná data.</p>`;
+    ? s.apps.map((a) => `<div class="ab"><span class="lbl"><span class="app-dot" style="background:${appColor(a.app)}"></span><span>${esc(appLabel(a.app))}</span></span><span class="track"><span class="fill" style="width:${(a.words / max) * 100}%"></span></span><span class="v">${tp("word", a.words)}</span></div>`).join("")
+    : `<p class="note">${t("stats.noData")}</p>`;
   const avgPerDay = s.active_days ? P.all.words / s.active_days : 0;
   $("facts").innerHTML = `
-    <dt>Dny, kdy jste diktoval</dt><dd>${num(s.active_days)}</dd>
-    <dt>Série dní v řadě</dt><dd>${num(s.streak)}</dd>
-    <dt>Průměrně za aktivní den</dt><dd>${num(avgPerDay)} slov</dd>
-    <dt>Rychlost mluvení</dt><dd>${s.wpm ? s.wpm + " slov/min" : "–"}</dd>
-    <dt>Znaků celkem</dt><dd>${num(P.all.chars)}</dd>`;
-  $("note").textContent = `Ušetřený čas počítá rozdíl proti psaní na klávesnici rychlostí ${s.typing_wpm} slov za minutu.`;
+    <dt>${t("fact.days")}</dt><dd>${num(s.active_days)}</dd>
+    <dt>${t("fact.streak")}</dt><dd>${num(s.streak)}</dd>
+    <dt>${t("fact.avg")}</dt><dd>${tp("word", avgPerDay)}</dd>
+    <dt>${t("fact.wpm")}</dt><dd>${s.wpm ? s.wpm + " " + t("fact.wpmUnit") : "–"}</dd>
+    <dt>${t("fact.chars")}</dt><dd>${num(P.all.chars)}</dd>`;
+  $("note").textContent = t("stats.note", { wpm: s.typing_wpm });
 }
 function renderChart(daily) {
   const el = $("chart"), tip = $("tip");
@@ -532,7 +540,7 @@ function renderChart(daily) {
   const top = max <= 0 ? 10 : niceCeil(max);
   const n = daily.length, slot = (W - padL) / n, bw = Math.max(4, Math.min(22, slot - 4));
   const y = (v) => padT + (H - padT - padB) * (1 - v / top);
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Počet nadiktovaných slov za posledních 30 dní">`;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t("chart.aria")}">`;
   for (const g of [0, top / 2, top]) svg += `<line class="grid" x1="${padL}" x2="${W}" y1="${y(g)}" y2="${y(g)}"/><text class="axis" x="${padL - 6}" y="${y(g) + 4}" text-anchor="end">${num(g)}</text>`;
   daily.forEach((d, i) => {
     const x = padL + i * slot + (slot - bw) / 2, h = Math.max(0, y(0) - y(d.words));
@@ -541,7 +549,7 @@ function renderChart(daily) {
     svg += `<rect class="hit" data-i="${i}" x="${padL + i * slot}" y="${padT}" width="${slot}" height="${H - padT - padB}"/>`;
     if (i % 5 === 4 || today) {
       const dt = new Date(d.date + "T00:00:00");
-      svg += `<text class="axis" x="${x + bw / 2}" y="${H - 4}" text-anchor="middle">${today ? "dnes" : dt.getDate() + ". " + (dt.getMonth() + 1) + "."}</text>`;
+      svg += `<text class="axis" x="${x + bw / 2}" y="${H - 4}" text-anchor="middle">${today ? t("chart.today") : dt.toLocaleDateString(locale(), { day: "numeric", month: "numeric" })}</text>`;
     }
   });
   svg += `</svg>`;
@@ -551,7 +559,7 @@ function renderChart(daily) {
     r.addEventListener("mouseenter", () => {
       const d = daily[+r.dataset.i], dt = new Date(d.date + "T00:00:00");
       el.querySelectorAll(".col").forEach((b) => b.classList.toggle("hover", b.dataset.i === r.dataset.i));
-      tip.innerHTML = `<b>${num(d.words)}</b> ${plural(d.words, "slovo", "slova", "slov")} · ${dt.toLocaleDateString("cs-CZ", { weekday: "short", day: "numeric", month: "numeric" })}`;
+      tip.innerHTML = `<b>${tp("word", d.words)}</b>, ${dt.toLocaleDateString(locale(), { weekday: "short", day: "numeric", month: "numeric" })}`;
       const rect = r.getBoundingClientRect(), host = el.getBoundingClientRect();
       tip.style.left = rect.left - host.left + rect.width / 2 + "px";
       tip.style.top = y(d.words) + "px";
@@ -567,18 +575,21 @@ window.addEventListener("resize", () => { if (state.view === "stats") loadStats(
 /* ---------------- nastavení ---------------- */
 function keyText(hk) {
   const preset = state.settings?.presets.find(([k]) => k === hk);
-  return preset ? preset[1].replace(/\s*\(.*\)$/, "") : hk.split("+").map((p) => KEY_NAMES[p] || p.toUpperCase()).join(" + ");
+  return preset ? preset[1].replace(/\s*\(.*\)$/, "") : hk.split("+").map(keyName).join(" + ");
 }
-function caps(hk) { return hk.split("+").map((p) => `<kbd>${esc(KEY_NAMES[p] || p.toUpperCase())}</kbd>`).join(""); }
+function keyName(p) { return I18N[LANG].keys?.[p] || KEY_NAMES[p] || p.toUpperCase(); }
+function caps(hk) { return hk.split("+").map((p) => `<kbd>${esc(keyName(p))}</kbd>`).join(""); }
 async function loadSettings() {
   state.settings = await api().get_settings();
-  const { config: c, presets, languages, models, autostart, platform } = state.settings;
+  const { config: c, presets, languages, models, autostart, platform, ui_languages } = state.settings;
   document.querySelectorAll(".mac-only").forEach((el) => (el.hidden = platform !== "macos"));
-  document.querySelectorAll(".copy-key").forEach((el) => (el.textContent = platform === "macos" ? "⌘" : "Ctrl"));
+  $("hotkey-p").textContent = t("set.hotkey.p", { copy: platform === "macos" ? "⌘" : "Ctrl" });
+  $("autostart-t").textContent = t("set.autostart." + platform);
+  $("ui-language").innerHTML = ui_languages.map(([v, l]) => `<option value="${v}" ${c.ui_language === v ? "selected" : ""}>${l}</option>`).join("");
   const current = c.hotkeys[0] || presets[0][0];
   const isPreset = presets.some(([k]) => k === current);
   $("hotkey").innerHTML = presets.map(([k, label]) => `<option value="${esc(k)}" ${k === current ? "selected" : ""}>${esc(label)}</option>`).join("")
-    + `<option value="__custom" ${isPreset ? "" : "selected"}>Vlastní…</option>`;
+    + `<option value="__custom" ${isPreset ? "" : "selected"}>${t("set.custom.opt")}</option>`;
   $("custom").value = isPreset ? "" : current;
   hotkeyChanged();
   setSeg(c.mode);
@@ -594,9 +605,9 @@ async function loadSettings() {
 function setDirty(dirty, savedAt) {
   const b = $("save"), m = $("save-msg");
   b.classList.toggle("saved", !dirty);
-  b.textContent = dirty ? "Uložit nastavení" : "✓ Uloženo";
+  b.textContent = dirty ? t("set.save") : t("set.saved");
   m.className = "msg" + (dirty ? " dirty" : "");
-  m.textContent = dirty ? "Máte neuložené změny." : savedAt ? `Uloženo v ${savedAt}. Změny už platí.` : "Vše je uložené.";
+  m.textContent = dirty ? t("set.dirty") : savedAt ? t("set.savedAt", { time: savedAt }) : t("set.allSaved");
 }
 $("settings").addEventListener("input", () => setDirty(true));
 $("settings").addEventListener("change", () => setDirty(true));
@@ -604,36 +615,39 @@ function chosenHotkey() { return $("hotkey").value === "__custom" ? $("custom").
 function hotkeyChanged() {
   $("custom-row").hidden = $("hotkey").value !== "__custom";
   const hk = chosenHotkey();
-  $("hotkey-caps").innerHTML = hk ? "Stiskněte " + caps(hk) : "Zadejte vlastní zkratku níže.";
+  $("hotkey-caps").innerHTML = hk ? t("set.press", { keys: caps(hk) }) : t("set.enterCustom");
 }
 $("hotkey").addEventListener("change", () => { hotkeyChanged(); if ($("hotkey").value === "__custom") $("custom").focus(); });
 $("custom").addEventListener("input", hotkeyChanged);
 function setSeg(v) { $("mode").dataset.v = v; $("mode").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === v)); }
-function duckLabel() { const v = +$("duck-level").value; $("duck-val").textContent = v === 0 ? "ticho" : v + " %"; }
+function duckLabel() { const v = +$("duck-level").value; $("duck-val").textContent = v === 0 ? t("set.duck.silent") : v + " %"; }
 $("mode").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && b.dataset.v !== $("mode").dataset.v) { setSeg(b.dataset.v); setDirty(true); } });
 $("duck-level").addEventListener("input", duckLabel);
-$("groq-show").onclick = () => { const i = $("groq"); const show = i.type === "password"; i.type = show ? "text" : "password"; $("groq-show").textContent = show ? "Skrýt" : "Zobrazit"; };
+$("groq-show").onclick = () => { const i = $("groq"); const show = i.type === "password"; i.type = show ? "text" : "password"; $("groq-show").textContent = show ? t("set.groq.hide") : t("set.groq.show"); };
 $("groq-link").onclick = () => api().open_url("https://console.groq.com/keys");
 $("save").onclick = async () => {
   if ($("save").classList.contains("saved")) return;
-  $("save").disabled = true; $("save").textContent = "Ukládám…";
+  $("save").disabled = true; $("save").textContent = t("set.saving");
   const hotkeys = chosenHotkey() ? [chosenHotkey()] : [];
   const cfg = {
     hotkeys, mode: $("mode").dataset.v, language: $("language").value || null, model: $("model").value,
     groq_api_key: $("groq").value.trim(), initial_prompt: $("prompt").value.trim(),
     duck_audio: $("duck").checked, duck_level: +$("duck-level").value / 100,
     overlay: $("overlay").checked, sounds: $("sounds").checked, trailing_space: $("trailing").checked, history: $("hist").checked,
+    ui_language: $("ui-language").value,
   };
+  const langChanged = cfg.ui_language !== state.settings.config.ui_language;
   let res;
   try { res = await api().save_settings(cfg, $("autostart").checked); }
-  catch (e) { res = { ok: false, error: "Uložení se nepovedlo: " + e }; }
+  catch (e) { res = { ok: false, error: t("set.saveFail", { e }) }; }
   $("save").disabled = false;
   if (res.ok) {
     state.settings.config = { ...state.settings.config, ...cfg };
-    setDirty(false, new Date().toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" }));
-    toast("✓ Nastavení uloženo");
+    if (langChanged) { await initLang(); loadSettings(); }
+    setDirty(false, new Date().toLocaleTimeString(locale(), { hour: "2-digit", minute: "2-digit" }));
+    toast(t("toast.saved"));
   } else {
-    $("save").textContent = "Uložit nastavení";
+    $("save").textContent = t("set.save");
     $("save-msg").className = "msg err";
     $("save-msg").textContent = res.error;
   }
@@ -656,9 +670,14 @@ async function checkPending() {
   else if (state.view === "stats") loadStats();
 }
 window.addEventListener("focus", () => window.pywebview && checkPending());
-window.addEventListener("pywebviewready", async () => {
-  state.periods = await api().periods();
+async function initLang() {
   state.settings = await api().get_settings();
+  setLang(state.settings.lang);
+  state.periods = await api().periods();
+  applyI18n();
+}
+window.addEventListener("pywebviewready", async () => {
+  await initLang();
   $("ver").textContent = state.settings.version ? "v" + state.settings.version : "";
   const v = await api().pending_view();
   showView(v || "history");

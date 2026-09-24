@@ -161,17 +161,24 @@ def fetch_dicts(date_from, date_to, search=None):
         return [dict(r) for r in con.execute(sql + " ORDER BY ts DESC", params)]
 
 
-def export(date_from, date_to, fmt="md", search=None):
+def export(date_from, date_to, fmt="md", search=None, lang=None):
+    from i18n import t
+
     rows = fetch(date_from, date_to, search)
     EXPORT_DIR.mkdir(exist_ok=True)
     out = EXPORT_DIR / f"diktovani_{date_from}_{date_to}.{fmt}"
     if fmt == "csv":
         with out.open("w", newline="", encoding="utf-8-sig") as f:  # BOM kvůli Excelu
             w = csv.writer(f, delimiter=";")
-            w.writerow(["čas", "aplikace", "okno", "text"])
+            w.writerow(t("export.csv", lang))
             w.writerows(rows)
     else:
-        lines = [f"# Diktování {date_from} – {date_to}", "", f"Záznamů: {len(rows)}", ""]
+        lines = [
+            "# " + t("export.title", lang, start=date_from, end=date_to),
+            "",
+            t("export.count", lang, n=len(rows)),
+            "",
+        ]
         current_day = None
         for ts, app, title, text in rows:
             day, clock = ts[:10], ts[11:16]
