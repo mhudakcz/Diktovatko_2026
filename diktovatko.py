@@ -39,7 +39,7 @@ SAMPLE_RATE = 16000
 MAX_RECORDING_SECONDS = 15 * 60  # zapomenuté nahrávání v režimu Přepínat se samo ukončí
 PRUNE_EVERY_SECONDS = 6 * 3600
 SUPPORT_URL = "https://ko-fi.com/michalhudak"
-UPDATE_EVERY_SECONDS = 6 * 3600
+UPDATE_EVERY_SECONDS = 2 * 3600
 UPDATE_FIRST_DELAY = 30  # první kontrola chvíli po startu, ať nezdržuje načítání
 
 # Log se rotuje (max. 3 × 1 MB) a nikdy neobsahuje nadiktovaný text, jen délky a časy.

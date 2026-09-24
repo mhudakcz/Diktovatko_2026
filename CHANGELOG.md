@@ -2,6 +2,11 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.10.1 – 2026-09-24
+
+- Kontrola aktualizací běží jednou za 2 hodiny (dřív 6).
+- Web (CZ, EN, DE): mezi funkcemi karta „Aktualizuje se samo“.
+
 ## 0.10.0 – 2026-09-24
 
 - Automatické aktualizace: aplikace jednou za 6 hodin zkontroluje GitHub Releases, při nové verzi zobrazí upozornění a v menu ikony i v Nastavení → Aktualizace nabídne „Aktualizovat“. Aktualizace stáhne novou verzi, ponechá nastavení, klíč i historii, doinstaluje nové knihovny a aplikaci restartuje.
