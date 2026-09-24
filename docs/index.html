@@ -3,486 +3,532 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Diktovátko – mluvte, text se napíše sám</title>
+<title>Diktovátko – mluvte, píše se to samo</title>
 <meta name="description" content="Podržte klávesu, mluvte a pusťte. Diktovátko přepíše, co řeknete, a vloží text tam, kde máte kurzor. Zdarma a open source pro Windows i Mac.">
-<meta property="og:title" content="Diktovátko – mluvte, text se napíše sám">
-<meta property="og:description" content="Bezplatná open-source alternativa k Wispr Flow pro Windows i Mac. Česky, offline nebo přes Groq, s historií toho, co jste nadiktovali.">
+<meta property="og:title" content="Diktovátko – mluvte, píše se to samo">
+<meta property="og:description" content="Bezplatná open-source alternativa k Wispr Flow pro Windows i Mac. Česky, offline nebo přes Groq, s historií a statistikami.">
 <meta property="og:image" content="https://mhudakcz.github.io/Diktovatko_2026/img/history-light.png">
-<meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23F0405A'/%3E%3Crect x='9' y='5' width='6' height='10' rx='3' fill='white'/%3E%3Cpath d='M7 12a5 5 0 0 0 10 0M12 17v2.5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23FF5A6E'/%3E%3Crect x='9' y='5' width='6' height='10' rx='3' fill='white'/%3E%3Cpath d='M7 12a5 5 0 0 0 10 0M12 17v2.5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ultra: #2B36E0;
-  --ultra-deep: #1F28B8;
-  --voice: #F0405A;
-  --ink: #1B2230;
-  --ink-2: #4A5366;
-  --muted: #6F788A;
-  --paper: #F3F4F8;
+  --night: #1A1446;
+  --night-2: #241C5C;
+  --lilac: #B9B3FF;
+  --lilac-2: #8F87E8;
+  --coral: #FF5A6E;
+  --sun: #FFD23F;
+  --ink: #16133A;
+  --ink-2: #4C4870;
+  --muted: #7A7699;
+  --paper: #F6F4FF;
   --card: #FFFFFF;
-  --line: #DDE1EA;
-  --link: #2B36E0;
-  --on-ultra-2: #C9CEFF;
-  --display: "Bricolage Grotesque", "Segoe UI", sans-serif;
+  --line: #E2DEF7;
+  --display: "Unbounded", "Segoe UI", sans-serif;
   --body: "Onest", "Segoe UI", system-ui, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ink: #E8EBF2; --ink-2: #B5BCCB; --muted: #8A93A6; --paper: #12151C; --card: #1A1F29; --line: #2A3140;
-    --ultra: #2A33C9; --ultra-deep: #1D2596; --link: #9AA2FF; color-scheme: dark;
+    --ink: #EDEBFF; --ink-2: #BDB8E6; --muted: #8E89B8; --paper: #110D30; --card: #1C1650; --line: #2E2770; color-scheme: dark;
   }
 }
-:root[data-theme="dark"] {
-  --ink: #E8EBF2; --ink-2: #B5BCCB; --muted: #8A93A6; --paper: #12151C; --card: #1A1F29; --line: #2A3140;
-  --ultra: #2A33C9; --ultra-deep: #1D2596; --link: #9AA2FF; color-scheme: dark;
-}
+:root[data-theme="dark"] { --ink: #EDEBFF; --ink-2: #BDB8E6; --muted: #8E89B8; --paper: #110D30; --card: #1C1650; --line: #2E2770; color-scheme: dark; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.6 var(--body); -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.6 var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 a { color: inherit; }
-:focus-visible { outline: 3px solid var(--voice); outline-offset: 3px; border-radius: 4px; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; border-radius: 6px; }
 .wrap { width: min(1180px, 100% - 32px); margin: 0 auto; }
-h1, h2, h3 { font-family: var(--display); margin: 0; }
+h1, h2, h3 { margin: 0; font-family: var(--display); }
 p { margin: 0; }
 
-/* ================= ÚVOD: nahrávací scéna ================= */
-.stage { background: var(--ultra); color: #fff; position: relative; overflow: hidden; }
-.top { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
-.brand { display: flex; align-items: center; gap: 10px; font: 800 20px/1 var(--display); text-decoration: none; }
-.mark { width: 30px; height: 30px; border-radius: 50%; background: var(--voice); display: grid; place-items: center; }
+/* ukazatel průběhu rolování */
+.progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 50; background: linear-gradient(90deg, var(--coral), var(--sun)); transform-origin: 0 50%; transform: scaleX(0); }
+
+/* ukazatel po pravé straně: jak hluboko na stránce jste */
+.rail { position: fixed; right: 18px; top: 50%; translate: 0 -50%; z-index: 40; width: 44px; height: min(62vh, 520px); padding: 42px 0 14px; border-radius: 999px; background: rgb(26 20 70 / .72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgb(185 179 255 / .25); box-shadow: 0 12px 30px -12px rgb(0 0 0 / .5); }
+.pct { position: absolute; top: 12px; left: 0; right: 0; text-align: center; font: 700 11px var(--display); color: var(--sun); font-variant-numeric: tabular-nums; }
+.rail-track { position: absolute; left: 50%; top: 42px; bottom: 14px; width: 4px; translate: -50% 0; border-radius: 4px; background: rgb(185 179 255 / .22); overflow: hidden; }
+.rail-fill { position: absolute; inset: 0; background: linear-gradient(var(--coral), var(--sun)); transform-origin: 50% 0; transform: scaleY(0); border-radius: 4px; }
+.rail ol { position: absolute; left: 0; right: 0; top: 42px; bottom: 14px; margin: 0; padding: 0; list-style: none; }
+.rail li { position: absolute; left: 50%; translate: -50% -50%; }
+.rail a { display: block; width: 14px; height: 14px; border-radius: 50%; background: var(--night); border: 2px solid var(--lilac-2); transition: transform .2s, background .2s, border-color .2s; }
+.rail a:hover, .rail li.done a { background: var(--lilac); border-color: var(--lilac); }
+.rail li.on a { background: var(--sun); border-color: var(--sun); transform: scale(1.35); }
+.rail a span { position: absolute; right: 30px; top: 50%; translate: 0 -50%; padding: 5px 10px; border-radius: 8px; background: var(--night); color: #fff; font: 500 13px var(--body); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; border: 1px solid rgb(185 179 255 / .25); }
+.rail li.on a span, .rail a:hover span, .rail a:focus-visible span { opacity: 1; }
+@media (max-width: 900px) { .rail { display: none; } .progress { height: 5px; } }
+
+/* ================= úvod ================= */
+.hero { background: var(--night); color: #fff; position: relative; overflow: hidden; }
+.top { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 17px/1 var(--display); text-decoration: none; }
+.mark { width: 30px; height: 30px; border-radius: 50%; background: var(--coral); display: grid; place-items: center; }
 .mark svg { width: 15px; height: 15px; }
 .top nav { display: flex; gap: 26px; font-size: 15px; }
-.top nav a { text-decoration: none; color: var(--on-ultra-2); }
+.top nav a { text-decoration: none; color: var(--lilac); }
 .top nav a:hover { color: #fff; }
 
-.hero { padding: 36px 0 0; }
-h1 { font-weight: 800; font-stretch: 84%; font-size: clamp(46px, 7.6vw, 116px); line-height: .92; letter-spacing: -0.03em; }
-h1 span { display: block; }
-.lede { margin-top: 22px; max-width: 34em; font-size: clamp(18px, 1.6vw, 21px); line-height: 1.5; color: var(--on-ultra-2); }
+.hero-in { position: relative; z-index: 2; display: grid; grid-template-columns: 1.25fr .75fr; gap: 40px; align-items: center; padding: 64px 0 120px; }
+h1 { font-weight: 900; font-size: clamp(44px, 7vw, 104px); line-height: .98; letter-spacing: -0.04em; }
+h1 .l { display: block; overflow: hidden; }
+h1 .l span { display: inline-block; animation: rise .9s cubic-bezier(.2,.8,.2,1) both; }
+h1 .l:nth-child(2) span { animation-delay: .12s; color: var(--lilac); }
+@keyframes rise { from { transform: translateY(105%); } to { transform: none; } }
+.lede { margin-top: 28px; max-width: 32em; font-size: 19px; line-height: 1.55; color: var(--lilac); animation: fade .8s .35s both; }
 .lede b { color: #fff; font-weight: 600; }
-
-.scene { margin-top: 40px; display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center; }
-.key { font: 600 15px var(--body); padding: 12px 18px; border-radius: 12px; background: rgb(255 255 255 / .1); border: 1px solid rgb(255 255 255 / .28); border-bottom-width: 5px; white-space: nowrap; transition: transform .08s, border-bottom-width .08s, background .15s; }
-.key.down { transform: translateY(4px); border-bottom-width: 1px; background: var(--voice); border-color: var(--voice); }
-.wave { height: 84px; display: flex; align-items: center; gap: 3px; overflow: hidden; }
-.wave i { flex: 1 0 4px; max-width: 7px; height: 4px; border-radius: 3px; background: rgb(255 255 255 / .35); transition: height .1s, background .2s; }
-.wave.live i { background: #fff; }
-.wave.think i { background: #FFC2CB; }
-.scene { grid-template-columns: auto 1fr auto; }
-.sound { position: relative; width: 60px; height: 60px; border-radius: 50%; border: 0; background: #FFD23F; color: #1B2230; display: grid; place-items: center; cursor: pointer; box-shadow: 0 10px 24px -8px rgb(0 0 0 / .45); transition: transform .15s; }
-.sound:hover { transform: scale(1.06); }
-.sound svg { width: 26px; height: 26px; }
-.sound .on, .sound[aria-pressed="true"] .off { display: none; }
-.sound[aria-pressed="true"] .on { display: block; }
-/* dokud je zvuk vypnutý, kolečko jemně pulzuje, aby bylo vidět, že jde zapnout */
-.sound[aria-pressed="false"]::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid #FFD23F; animation: ring 1.8s ease-out infinite; }
-@keyframes ring { from { transform: scale(.9); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
-.sound-tip { position: absolute; right: 0; top: calc(100% + 10px); font: 500 13px var(--body); color: #FFE58A; white-space: nowrap; }
-.sound-wrap { position: relative; }
-/* vstupní pole zprávy, do kterého se přepis vloží */
-.composer { margin-top: 24px; max-width: 860px; border-radius: 18px; background: #fff; color: #1B2230; box-shadow: 0 30px 60px -28px rgb(10 14 60 / .6); overflow: hidden; }
-.comp-head { display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-bottom: 1px solid #E6E9F0; font-size: 14px; color: #6F788A; }
-.comp-head b { color: #1B2230; font-weight: 600; }
-.app-dot { width: 10px; height: 10px; border-radius: 50%; background: #7A4BE0; }
-.comp-body { padding: 14px 16px 6px; min-height: 5.4em; font: 400 clamp(19px, 1.9vw, 24px)/1.45 var(--body); border: 2px solid transparent; margin: 8px; border-radius: 12px; transition: border-color .2s, background .2s; }
-.composer.focus .comp-body { border-color: var(--voice); background: #FFF7F8; }
-.comp-body .ph { color: #9AA1B0; }
-.comp-body .w { opacity: 0; display: inline-block; transition: opacity .2s; }
-.comp-body .w.in { opacity: 1; }
-.caret { display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; vertical-align: -.15em; background: var(--voice); animation: blink 1s steps(1) infinite; }
-@keyframes blink { 50% { opacity: 0; } }
-.comp-foot { display: flex; align-items: center; justify-content: space-between; padding: 4px 20px 14px; }
-.where { font: 500 14px var(--body); color: #6F788A; min-height: 1.4em; }
-.where.live { color: var(--voice); }
-.send { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: #E6E9F0; color: #9AA1B0; transition: background .2s, color .2s; }
-.send svg { width: 18px; height: 18px; }
-.composer.filled .send { background: var(--ultra); color: #fff; }
-.status { font-size: 14px; color: var(--on-ultra-2); margin-top: 10px; min-height: 1.5em; }
-
-.cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 40px; }
-.btn { display: inline-flex; align-items: center; gap: 10px; padding: 15px 22px; border-radius: 14px; font-weight: 600; text-decoration: none; }
+@keyframes fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; animation: fade .8s .5s both; }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 15px 22px; border-radius: 999px; font-weight: 600; text-decoration: none; transition: transform .2s, background .2s; }
 .btn svg { width: 19px; height: 19px; }
-.btn.solid { background: #fff; color: var(--ultra-deep); }
-.btn.line { border: 1.5px solid rgb(255 255 255 / .45); color: #fff; }
-.btn:hover { transform: translateY(-1px); }
-.btn.link { padding: 15px 8px; color: var(--on-ultra-2); }
-.btn.link:hover { color: #fff; }
+.btn.solid { background: var(--sun); color: var(--ink); }
+.btn.line { border: 1.5px solid rgb(255 255 255 / .35); color: #fff; }
+.btn:hover { transform: translateY(-2px); }
 
-.brief { margin-top: 64px; padding: 22px 0 26px; border-top: 1px solid rgb(255 255 255 / .22); display: grid; grid-template-columns: 1fr auto; gap: 18px 40px; align-items: center; }
-.brief p { color: var(--on-ultra-2); font-size: 15.5px; max-width: 62ch; }
-.brief p b { color: #fff; font-weight: 600; }
-.jump { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
-.jump a { font-size: 14px; padding: 6px 12px; border-radius: 999px; text-decoration: none; background: rgb(255 255 255 / .1); }
-.jump a:hover { background: rgb(255 255 255 / .22); }
+/* mikrofon s kruhy – po kliknutí promluví */
+.mic-zone { position: relative; aspect-ratio: 1; display: grid; place-items: center; animation: fade 1s .3s both; }
+.ring { position: absolute; inset: 0; margin: auto; width: 34%; aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--lilac-2); opacity: 0; animation: ripple 3.6s cubic-bezier(.2,.6,.3,1) infinite; }
+.ring:nth-child(2) { animation-delay: .9s; }
+.ring:nth-child(3) { animation-delay: 1.8s; }
+.ring:nth-child(4) { animation-delay: 2.7s; }
+@keyframes ripple { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(2.9); opacity: 0; } }
+.mic-zone.speaking .ring { border-color: var(--coral); animation-duration: 1.6s; }
+.mic { position: relative; z-index: 1; width: 34%; aspect-ratio: 1; border-radius: 50%; border: 0; background: var(--sun); color: var(--ink); display: grid; place-items: center; cursor: pointer; box-shadow: 0 24px 60px -20px rgb(255 210 63 / .55); transition: transform .2s, background .2s; }
+.mic:hover { transform: scale(1.05); }
+.mic svg { width: 38%; height: 38%; }
+.mic-zone.speaking .mic { background: var(--coral); color: #fff; }
+.mic-tip { position: absolute; bottom: 4%; left: 0; right: 0; text-align: center; font-size: 14px; color: var(--lilac); }
+
+/* běžící pás aplikací */
+.marquee { position: relative; z-index: 2; border-top: 1px solid rgb(255 255 255 / .12); padding: 22px 0; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+.track { display: flex; gap: 48px; width: max-content; animation: slide 38s linear infinite; font: 500 18px var(--display); color: var(--lilac); white-space: nowrap; }
+.track span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); margin-right: 14px; vertical-align: middle; }
+@keyframes slide { to { transform: translateX(-50%); } }
+
+/* ================= scrollytelling: připnutá ukázka ================= */
+.story { position: relative; height: 320vh; background: var(--night); color: #fff; }
+.pin { position: sticky; top: 0; height: 100vh; display: grid; align-items: center; overflow: hidden; }
+.pin-in { display: grid; grid-template-columns: .8fr 1.2fr; gap: 56px; align-items: center; }
+.beats { list-style: none; margin: 0; padding: 0; display: grid; gap: 26px; }
+.beat { display: grid; grid-template-columns: 56px 1fr; gap: 18px; opacity: .3; transition: opacity .35s; }
+.beat.on { opacity: 1; }
+.beat .n { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font: 700 20px var(--display); border: 2px solid var(--lilac-2); transition: background .3s, border-color .3s, color .3s; }
+.beat.on .n { background: var(--sun); border-color: var(--sun); color: var(--ink); }
+.beat h3 { font: 700 clamp(20px, 2vw, 26px)/1.2 var(--display); letter-spacing: -0.02em; }
+.beat p { margin-top: 6px; color: var(--lilac); }
+.device { position: relative; }
+.keyrow { display: flex; align-items: center; gap: 18px; margin-bottom: 22px; }
+.key { font: 600 16px var(--body); padding: 14px 20px; border-radius: 14px; background: rgb(255 255 255 / .08); border: 1px solid rgb(255 255 255 / .25); border-bottom-width: 6px; transition: transform .1s, border-bottom-width .1s, background .2s; }
+.key.down { transform: translateY(5px); border-bottom-width: 1px; background: var(--coral); border-color: var(--coral); }
+.wave { flex: 1; height: 70px; display: flex; align-items: center; gap: 3px; }
+.wave i { flex: 1; max-width: 6px; height: 4px; border-radius: 3px; background: rgb(255 255 255 / .3); }
+.wave.live i { background: #fff; }
+.composer { border-radius: 22px; background: #fff; color: #16133A; box-shadow: 0 40px 80px -30px rgb(0 0 0 / .6); overflow: hidden; }
+.comp-head { display: flex; align-items: center; gap: 10px; padding: 14px 22px; border-bottom: 1px solid #ECE9FA; font-size: 14px; color: #7A7699; }
+.comp-head b { color: #16133A; font-weight: 600; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #7A4BE0; }
+.comp-body { margin: 10px; padding: 16px 18px; min-height: 7.5em; border-radius: 14px; border: 2px solid #ECE9FA; font-size: clamp(18px, 1.7vw, 22px); line-height: 1.5; transition: border-color .3s, background .3s; }
+.composer.focus .comp-body { border-color: var(--coral); background: #FFF6F7; }
+.ph { color: #A5A1C2; }
+.w { opacity: .12; transition: opacity .15s; }
+.w.in { opacity: 1; }
+.caret { display: inline-block; width: 2px; height: 1.1em; vertical-align: -.15em; margin-left: 2px; background: var(--coral); animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.comp-foot { display: flex; align-items: center; justify-content: space-between; padding: 4px 22px 16px; font-size: 14px; color: #7A7699; }
+.send { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: #ECE9FA; color: #A5A1C2; transition: background .3s, color .3s; }
+.send svg { width: 19px; height: 19px; }
+.composer.filled .send { background: #1A1446; color: var(--sun); }
+.story-hint { position: absolute; left: 50%; bottom: 28px; translate: -50% 0; font-size: 14px; color: var(--lilac); transition: opacity .3s; }
 
 /* ================= sekce ================= */
-section { padding: 112px 0; }
-h2 { font-weight: 800; font-stretch: 82%; font-size: clamp(38px, 5.2vw, 68px); line-height: .95; letter-spacing: -0.03em; max-width: 14ch; }
-.intro { margin-top: 20px; max-width: 38em; font-size: 19px; color: var(--ink-2); }
-.intro a, .req a, .os .note a { color: var(--link); }
+section.block { padding: 128px 0; }
+h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; letter-spacing: -0.04em; max-width: 16ch; }
+.intro { margin-top: 22px; max-width: 38em; font-size: 19px; color: var(--ink-2); }
+.intro a, .req a { color: var(--coral); }
+
+/* odhalení při rolování */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity .8s cubic-bezier(.2,.8,.2,1), transform .8s cubic-bezier(.2,.8,.2,1); transition-delay: var(--d, 0s); }
+.reveal.in { opacity: 1; transform: none; }
 
 /* úspora času */
-.race { margin-top: 56px; display: grid; gap: 22px; max-width: 980px; }
-.lane { display: grid; grid-template-columns: 170px 1fr; gap: 20px; align-items: center; }
-.lane .who { font-weight: 600; }
-.lane .who small { display: block; font-weight: 400; color: var(--muted); font-size: 14px; }
-.bar { height: 44px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); overflow: hidden; }
-.bar span { display: flex; align-items: center; justify-content: flex-end; padding-right: 14px; height: 100%; border-radius: 9px; font: 800 18px var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.bar.type span { width: 26.7%; background: #C3C8D4; color: #1B2230; }
-.bar.talk span { width: 100%; background: var(--voice); color: #fff; }
-.src { margin-top: 12px; font-size: 13.5px; color: var(--muted); max-width: 70ch; }
+.race { margin-top: 64px; display: grid; gap: 26px; max-width: 1000px; }
+.lane { display: grid; grid-template-columns: 180px 1fr; gap: 22px; align-items: center; }
+.lane b { font-weight: 600; }
+.lane small { display: block; color: var(--muted); font-size: 14px; }
+.bar { height: 56px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); overflow: hidden; }
+.fill { height: 100%; border-radius: 999px; display: flex; align-items: center; justify-content: flex-end; padding-right: 20px; font: 700 18px var(--display); white-space: nowrap; transform-origin: 0 50%; transform: scaleX(0); transition: transform 1.6s cubic-bezier(.2,.8,.2,1); }
+.fill span { transition: opacity .4s 1.2s; opacity: 0; }
+.race.in .fill { transform: scaleX(var(--w)); }
+.race.in .fill span { opacity: 1; }
+.fill.type { background: #CFCBEA; color: #16133A; --w: .267; }
+.fill.talk { background: var(--coral); color: #fff; --w: 1; transition-delay: .2s; }
+.fill.type span { display: inline-block; transform: scaleX(3.75); transform-origin: 100% 50%; } /* kompenzace zmenšení */
+.calc { margin-top: 88px; font: 500 clamp(24px, 3vw, 40px)/1.4 var(--display); letter-spacing: -0.02em; max-width: 28ch; }
+.calc .num { font-weight: 900; color: var(--coral); font-variant-numeric: tabular-nums; }
+.slider { margin-top: 28px; display: flex; align-items: center; gap: 16px; max-width: 560px; font-size: 14px; color: var(--muted); }
+.slider input { flex: 1; accent-color: var(--coral); height: 30px; }
+.src { margin-top: 14px; font-size: 13.5px; color: var(--muted); max-width: 70ch; }
 
-.calc { margin-top: 72px; font: 400 clamp(26px, 3.4vw, 44px)/1.35 var(--display); font-stretch: 90%; letter-spacing: -0.015em; max-width: 26ch; }
-.calc output { font-weight: 800; color: var(--voice); font-variant-numeric: tabular-nums; }
-.calc .num { font-weight: 800; color: var(--link); font-variant-numeric: tabular-nums; }
-.slider { margin-top: 26px; display: flex; align-items: center; gap: 16px; max-width: 560px; font-size: 14px; color: var(--muted); }
-.slider input { flex: 1; accent-color: var(--voice); height: 30px; }
-
-/* jak to funguje – skutečná posloupnost */
-.alt { background: var(--card); }
-.steps { margin: 56px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; counter-reset: s; }
-.steps li { counter-increment: s; }
-.steps li::before { content: counter(s); display: block; font: 800 88px/1 var(--display); font-stretch: 75%; color: var(--link); margin-bottom: 10px; }
-.steps h3 { font: 600 23px/1.25 var(--display); margin-bottom: 8px; }
-.steps p { color: var(--ink-2); }
-
-/* historie */
-.hist { display: grid; grid-template-columns: .75fr 1.25fr; gap: 64px; align-items: center; }
+/* historie – snímek se narovná při rolování */
+.hist { background: var(--card); overflow: hidden; }
+.hist-grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: 64px; align-items: center; }
 .hist ul { margin: 30px 0 0; padding: 0; list-style: none; display: grid; gap: 16px; }
-.hist li { padding-left: 26px; position: relative; color: var(--ink-2); }
-.hist li::before { content: ""; position: absolute; left: 0; top: .55em; width: 10px; height: 10px; border-radius: 50%; border: 2.5px solid var(--voice); }
+.hist li { padding-left: 28px; position: relative; color: var(--ink-2); }
+.hist li::before { content: ""; position: absolute; left: 0; top: .5em; width: 12px; height: 12px; border-radius: 50%; background: var(--coral); }
 .hist li b { color: var(--ink); font-weight: 600; }
-.shot { margin: 0; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 40px 80px -40px rgb(27 34 48 / .45); }
+.stage3d { perspective: 1400px; }
+.shot { margin: 0; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 50px 100px -40px rgb(26 20 70 / .55); transform: rotateX(var(--rx, 22deg)) rotateY(var(--ry, -14deg)) scale(var(--sc, .9)); transform-origin: 50% 60%; will-change: transform; }
 .shot img { display: block; width: 100%; height: auto; }
 .shot .dark { display: none; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .shot .light { display: none; } :root:not([data-theme="light"]) .shot .dark { display: block; } }
 
-/* funkce – prostý seznam */
-.feats { margin-top: 56px; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; }
-.feat { padding: 26px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 40px 1fr; gap: 18px; }
-.feat svg { width: 26px; height: 26px; color: var(--voice); margin-top: 3px; }
-.feat h3 { font: 600 21px/1.3 var(--display); margin-bottom: 6px; }
+/* funkce */
+.feats { margin-top: 64px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px 40px; }
+.feat svg { width: 34px; height: 34px; color: var(--coral); }
+.feat h3 { margin: 18px 0 8px; font: 700 20px/1.25 var(--display); letter-spacing: -0.02em; }
 .feat p { color: var(--ink-2); }
 
 /* instalace */
+.inst { background: var(--night); color: #fff; }
+.inst h2 { color: #fff; }
+.inst .intro { color: var(--lilac); }
+.inst .intro a, .inst .req a { color: var(--sun); }
 .oses { margin-top: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.os { padding: 32px; border-radius: 20px; border: 1px solid var(--line); background: var(--card); }
-.os h3 { display: flex; align-items: center; gap: 12px; font: 700 26px var(--display); }
+.os { padding: 34px; border-radius: 26px; background: var(--night-2); border: 1px solid rgb(255 255 255 / .1); transition: transform .3s, border-color .3s; }
+.os:hover { transform: translateY(-4px); border-color: var(--lilac-2); }
+.os h3 { display: flex; align-items: center; gap: 12px; font: 700 24px var(--display); }
 .os h3 svg { width: 26px; height: 26px; }
-.os ol { margin: 20px 0 24px; padding-left: 22px; color: var(--ink-2); display: grid; gap: 8px; }
-.os code { font: 500 .88em "Cascadia Code", "SF Mono", Consolas, monospace; padding: 2px 6px; border-radius: 6px; background: var(--paper); border: 1px solid var(--line); color: var(--ink); }
-.os .btn { background: var(--ink); color: var(--paper); }
-.os .note { margin-top: 16px; font-size: 14.5px; color: var(--muted); }
-.req { margin-top: 28px; color: var(--ink-2); max-width: 70ch; }
+.os ol { margin: 20px 0 26px; padding-left: 22px; color: var(--lilac); display: grid; gap: 8px; }
+.os code { font: 500 .88em "Cascadia Code", "SF Mono", Consolas, monospace; padding: 2px 7px; border-radius: 6px; background: rgb(255 255 255 / .1); color: #fff; }
+.os .note { margin-top: 16px; font-size: 14.5px; color: var(--lilac); }
+.os .note a { color: var(--sun); }
+.req { margin-top: 30px; max-width: 70ch; color: var(--lilac); }
 
-footer { padding: 40px 0 56px; color: var(--muted); font-size: 15px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); }
-footer a { color: var(--ink-2); }
+.bigfoot { background: var(--night); color: var(--lilac); padding: 40px 0 44px; overflow: hidden; }
+.wordmark { display: block; width: 100%; height: auto; user-select: none; }
+.wordmark text { font: 900 170px var(--display); fill: var(--night-2); }
+.foot-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 24px; font-size: 15px; }
+.foot-row a { color: #fff; }
 
 @media (max-width: 900px) {
   .top nav { display: none; }
-  .scene { grid-template-columns: 1fr; gap: 16px; }
-  .scene .key { justify-self: start; }
-  .brief { grid-template-columns: 1fr; }
-  .jump { justify-content: flex-start; }
-  section { padding: 80px 0; }
+  .hero-in, .pin-in, .hist-grid, .oses { grid-template-columns: 1fr; }
+  .mic-zone { max-width: 320px; margin: 0 auto; }
+  .story { height: 280vh; }
+  .pin-in { gap: 28px; }
+  .beats { gap: 12px; }
+  .beat p { display: none; }
+  .feats { grid-template-columns: 1fr; }
   .lane { grid-template-columns: 1fr; gap: 8px; }
-  .steps, .hist, .feats, .oses { grid-template-columns: 1fr; }
-  .hist { gap: 40px; }
-  .os { padding: 24px; }
+  section.block { padding: 88px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before { transition: none !important; animation: none !important; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+  .fill { transform: scaleX(var(--w)); } .fill span { opacity: 1; }
+  .shot { transform: none; }
   html { scroll-behavior: auto; }
 }
 </style>
 </head>
 <body>
+<div class="progress" id="progress" aria-hidden="true"></div>
+<nav class="rail" id="rail" aria-label="Kde na stránce jste">
+  <span class="pct" id="pct">0 %</span>
+  <div class="rail-track"><span class="rail-fill" id="rail-fill"></span></div>
+  <ol id="rail-dots"></ol>
+</nav>
 
-<header class="stage">
+<header class="hero">
   <div class="wrap">
     <div class="top">
       <a class="brand" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="8" y="2" width="8" height="13" rx="4" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></span>Diktovátko</a>
       <nav aria-label="Hlavní">
+        <a href="#ukazka">Ukázka</a>
         <a href="#uspora">Úspora času</a>
-        <a href="#jak">Jak to funguje</a>
         <a href="#historie">Historie</a>
         <a href="#instalace">Instalace</a>
         <a href="navod.html">Návod</a>
-        <a href="https://github.com/mhudakcz/Diktovatko_2026">GitHub</a>
       </nav>
     </div>
-
-    <div class="hero">
-      <h1><span>Řekněte to.</span><span>Napíše se to samo.</span></h1>
-      <p class="lede">Podržíte klávesu, mluvíte a pustíte. Diktovátko přepíše, co jste řekli, a vloží to tam, kde máte kurzor: do Slacku, e-mailu, Jiry nebo chatu s AI. <b>Zdarma, česky, pro Windows i Mac.</b></p>
-
-      <div class="scene">
-        <span class="key" id="key" aria-hidden="true">Ctrl + Win</span>
-        <div class="wave" id="wave" aria-hidden="true"></div>
-        <div class="sound-wrap">
-        <button type="button" class="sound" id="sound" aria-pressed="false" aria-label="Pustit ukázku se zvukem" title="Pustit ukázku se zvukem">
-          <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m23 9-6 6M17 9l6 6"/></svg>
-          <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
-        </button>
-        <span class="sound-tip" id="sound-label">Pusťte si to se zvukem</span>
+    <div class="hero-in">
+      <div>
+        <h1><span class="l"><span>Mluvte.</span></span><span class="l"><span>Píše se to samo.</span></span></h1>
+        <p class="lede">Podržíte klávesu, řeknete, co potřebujete, a pustíte. Text se objeví tam, kde máte kurzor: ve Slacku, e-mailu, Jiře i v chatu s AI. <b>Zdarma, česky, pro Windows i Mac.</b></p>
+        <div class="cta">
+          <a class="btn solid" id="dl-win" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.4 4.6v7H3zM11.4 4.4 21 3v8.6h-9.6zM3 12.4h7.4v7L3 18.4zM11.4 12.4H21V21l-9.6-1.4z"/></svg>Stáhnout pro Windows</a>
+          <a class="btn line" id="dl-mac" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>Stáhnout pro Mac</a>
         </div>
       </div>
-      <div class="composer" id="composer">
-        <div class="comp-head"><span class="app-dot" id="app-dot"></span><b id="app">Slack</b><span id="chan">#web-redesign</span></div>
-        <div class="comp-body" aria-live="polite"><span class="ph" id="ph">Napište zprávu…</span><span id="said"></span><span class="caret" aria-hidden="true"></span></div>
-        <div class="comp-foot"><span class="where" id="where"></span><span class="send" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z"/></svg></span></div>
+      <div class="mic-zone" id="mic-zone">
+        <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
+        <button type="button" class="mic" id="mic" aria-label="Poslechnout si ukázku diktování"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <span class="mic-tip" id="mic-tip">Klikněte a poslechněte si ukázku</span>
       </div>
-
-      <div class="cta">
-        <a class="btn solid" id="dl-win" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.4 4.6v7H3zM11.4 4.4 21 3v8.6h-9.6zM3 12.4h7.4v7L3 18.4zM11.4 12.4H21V21l-9.6-1.4z"/></svg>
-          Stáhnout pro Windows
-        </a>
-        <a class="btn line" id="dl-mac" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.940 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.280 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>
-          Stáhnout pro Mac
-        </a>
-        <a class="btn link" href="navod.html">Návod k instalaci</a>
-      </div>
-
-      <div class="brief">
-        <p><b>Ve zkratce:</b> bezplatná alternativa k Wispr Flow. Přepisuje offline, nebo za sekundu přes vlastní bezplatný Groq klíč. Hudbu během diktování ztiší, všechno nadiktované si pamatuje v historii a ukáže, kolik času jste ušetřili.</p>
-        <nav class="jump" aria-label="Rozcestník">
-          <a href="#uspora">Kolik ušetříte</a>
-          <a href="#jak">Jak to funguje</a>
-          <a href="#historie">Historie</a>
-          <a href="#funkce">Funkce</a>
-          <a href="#instalace">Instalace</a>
-        </nav>
-      </div>
+    </div>
+  </div>
+  <div class="marquee" aria-label="Funguje v aplikacích jako Slack, Outlook, Jira, Teams, Gmail, Notion, ChatGPT, Claude, Word a VS Code">
+    <div class="track" aria-hidden="true">
+      <span>Slack</span><span>Outlook</span><span>Jira</span><span>Teams</span><span>Gmail</span><span>Notion</span><span>ChatGPT</span><span>Claude</span><span>Word</span><span>VS Code</span><span>WhatsApp Web</span><span>Poznámky</span>
+      <span>Slack</span><span>Outlook</span><span>Jira</span><span>Teams</span><span>Gmail</span><span>Notion</span><span>ChatGPT</span><span>Claude</span><span>Word</span><span>VS Code</span><span>WhatsApp Web</span><span>Poznámky</span>
     </div>
   </div>
 </header>
 
-<main>
-  <section id="uspora">
-    <div class="wrap">
-      <h2>Mluvíte skoro čtyřikrát rychleji, než píšete.</h2>
-      <p class="intro">Na klávesnici zvládne většina lidí kolem 40 slov za minutu, řečí kolem 150. Studie Stanfordovy univerzity zjistila, že diktování je zhruba třikrát rychlejší než psaní, a to i s opravami.</p>
-
-      <div class="race" role="img" aria-label="Psaní 40 slov za minutu, mluvení 150 slov za minutu">
-        <div class="lane"><span class="who">Psaní<small>na klávesnici</small></span><div class="bar type"><span>40</span></div></div>
-        <div class="lane"><span class="who">Mluvení<small>s Diktovátkem</small></span><div class="bar talk"><span>150 slov za minutu</span></div></div>
+<!-- ukázka řízená rolováním -->
+<section class="story" id="ukazka" aria-label="Jak diktování probíhá">
+  <div class="pin">
+    <div class="wrap pin-in">
+      <ol class="beats">
+        <li class="beat on" data-b="0"><span class="n">1</span><div><h3>Klikněte do pole</h3><p>Kurzor bliká tam, kam chcete psát.</p></div></li>
+        <li class="beat" data-b="1"><span class="n">2</span><div><h3>Podržte <span class="hk">Ctrl + Win</span> a mluvte</h3><p>Hudba se ztiší, dole se objeví indikátor.</p></div></li>
+        <li class="beat" data-b="2"><span class="n">3</span><div><h3>Pusťte. Hotovo.</h3><p>Text je vložený i s interpunkcí.</p></div></li>
+      </ol>
+      <div class="device">
+        <div class="keyrow"><span class="key hk" id="key">Ctrl + Win</span><div class="wave" id="wave" aria-hidden="true"></div></div>
+        <div class="composer" id="composer">
+          <div class="comp-head"><span class="dot"></span><b>Slack</b><span>#web-redesign</span></div>
+          <div class="comp-body"><span class="ph" id="ph">Napište zprávu do #web-redesign</span><span id="said"></span><span class="caret" aria-hidden="true"></span></div>
+          <div class="comp-foot"><span id="state">Kurzor je v poli</span><span class="send" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z"/></svg></span></div>
+        </div>
       </div>
+    </div>
+    <p class="story-hint" id="hint">Rolujte dál ↓</p>
+  </div>
+</section>
 
-      <p class="calc">Když denně napíšete <span class="num" id="words-out">2 000</span> slov, ušetříte <output id="per-day">34 minut</output> denně. To je <span class="num" id="per-month">12 hodin</span> měsíčně a <span class="num" id="per-year">16 pracovních dní</span> za rok.</p>
-      <label class="slider"><span>300 slov</span><input type="range" id="words" min="300" max="6000" step="100" value="2000" aria-label="Kolik slov denně napíšete"><span>6 000 slov</span></label>
+<main>
+  <section class="block" id="uspora">
+    <div class="wrap">
+      <h2 class="reveal">Mluvíte skoro čtyřikrát rychleji, než píšete.</h2>
+      <p class="intro reveal" style="--d:.1s">Na klávesnici zvládne většina lidí kolem 40 slov za minutu, řečí kolem 150. Studie Stanfordovy univerzity zjistila, že diktování je zhruba třikrát rychlejší než psaní, a to i s opravami.</p>
+      <div class="race" id="race" role="img" aria-label="Psaní 40 slov za minutu, mluvení 150 slov za minutu">
+        <div class="lane"><span><b>Psaní</b><small>na klávesnici</small></span><div class="bar"><div class="fill type"><span><b data-count="40">0</b></span></div></div></div>
+        <div class="lane"><span><b>Mluvení</b><small>s Diktovátkem</small></span><div class="bar"><div class="fill talk"><span><b data-count="150">0</b> slov za minutu</span></div></div></div>
+      </div>
+      <p class="calc reveal">Když denně napíšete <span class="num" id="words-out">2 000</span> slov, ušetříte <span class="num" id="per-day">34 minut</span> denně. To je <span class="num" id="per-month">12 hodin</span> měsíčně.</p>
+      <label class="slider reveal"><span>300 slov</span><input type="range" id="words" min="300" max="6000" step="100" value="2000" aria-label="Kolik slov denně napíšete"><span>6 000 slov</span></label>
       <p class="src">Běžný pracovní e-mail má kolem 100 slov, odpověď ve Slacku 20 až 40. Výpočet počítá 20 % času navíc na kontrolu přepisu.</p>
     </div>
   </section>
 
-  <section id="jak" class="alt">
-    <div class="wrap">
-      <h2>Tři kroky. Žádné okno navíc.</h2>
-      <ol class="steps">
-        <li><h3>Klikněte do pole a podržte klávesu</h3><p>Ctrl + Win, na Macu Ctrl + ⌘, nebo jiná zkratka podle vás. Hudba a videa se samy ztiší.</p></li>
-        <li><h3>Mluvte přirozeně</h3><p>Dole na obrazovce se objeví malá pilulka, která ukazuje, že vás slyší. Čárky a tečky doplní přepis sám.</p></li>
-        <li><h3>Pusťte klávesu</h3><p>Za chvilku je text na místě kurzoru. Schránka zůstane, jak byla, a přepis se uloží do historie.</p></li>
-      </ol>
-    </div>
-  </section>
-
-  <section id="historie">
-    <div class="wrap hist">
+  <section class="block hist" id="historie">
+    <div class="wrap hist-grid">
       <div>
-        <h2>Víte, co jste komu napsal.</h2>
-        <p class="intro">Každý přepis se uloží do vašeho počítače, i s časem a oknem, kam šel. Na konci měsíce tak máte podklad k tomu, na čem jste pracoval.</p>
+        <h2 class="reveal">Víte, co jste komu napsal.</h2>
+        <p class="intro reveal" style="--d:.1s">Každý přepis zůstane ve vašem počítači, i s časem a oknem, kam šel. Na konci měsíce máte podklad k tomu, na čem jste pracoval.</p>
         <ul>
-          <li><b>Časová osa po dnech</b> s aplikací a názvem konverzace, e-mailu nebo tiketu</li>
-          <li><b>Hledání a období</b>: dnes, týden, 10 až 90 dní, měsíc nebo vlastní rozsah</li>
-          <li><b>Statistiky</b>: slova, čas mluvení a ušetřený čas, graf po dnech</li>
-          <li><b>Export do Markdownu nebo CSV</b>, třeba jako podklad pro AI</li>
+          <li class="reveal" style="--d:.15s"><b>Časová osa po dnech</b> s aplikací a názvem konverzace</li>
+          <li class="reveal" style="--d:.25s"><b>Hledání a období</b>: dnes, týden, 10 až 90 dní, vlastní rozsah</li>
+          <li class="reveal" style="--d:.35s"><b>Statistiky</b>: slova, čas mluvení a ušetřený čas</li>
+          <li class="reveal" style="--d:.45s"><b>Export do Markdownu nebo CSV</b>, třeba pro AI</li>
         </ul>
       </div>
-      <figure class="shot">
-        <img class="light" src="img/history-light.png" alt="Okno historie: záznamy diktování po dnech, s aplikací a názvem okna" width="1380" height="826" loading="lazy">
-        <img class="dark" src="img/history-dark.png" alt="Okno historie v tmavém režimu" width="1380" height="826" loading="lazy">
-      </figure>
-    </div>
-  </section>
-
-  <section id="funkce" class="alt">
-    <div class="wrap">
-      <h2>Drobnosti, na kterých záleží.</h2>
-      <div class="feats">
-        <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m23 9-6 6M17 9l6 6"/></svg><div><h3>Hudba se ztiší sama</h3><p>Spotify, YouTube i další aplikace se během diktování stáhnou na desetinu hlasitosti a pak se vrátí.</p></div></div>
-        <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><div><h3>Soukromí podle vás</h3><p>Přepis offline přímo v počítači, nebo za sekundu přes Groq s vlastním bezplatným klíčem. Historie nikam neodchází.</p></div></div>
-        <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><div><h3>Zkratka podle vás</h3><p>Výchozí je Ctrl + Win, na Macu Ctrl + ⌘. Vybrat jde i pravý Ctrl, Fn nebo vlastní kombinaci. Běžným zkratkám jako Ctrl+C nepřekáží.</p></div></div>
-        <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><div><h3>Nevymýšlí si</h3><p>Ticho se k přepisu vůbec neposílá, takže se nevloží vymyšlené věty typu „Titulky vytvořil…“.</p></div></div>
-        <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><div><h3>I dlouhé diktování</h3><p>Klidně několik minut v kuse. Delší nahrávky se automaticky rozdělí a přepis se spojí.</p></div></div>
-        <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg><div><h3>Bez předplatného</h3><p>Zdarma a open source. Žádný účet, limit slov ani měsíční tarif.</p></div></div>
+      <div class="stage3d">
+        <figure class="shot" id="shot">
+          <img class="light" src="img/history-light.png" alt="Okno historie: záznamy diktování po dnech, s aplikací a názvem okna" width="1380" height="826" loading="lazy">
+          <img class="dark" src="img/history-dark.png" alt="Okno historie v tmavém režimu" width="1380" height="826" loading="lazy">
+        </figure>
       </div>
     </div>
   </section>
 
-  <section id="instalace">
+  <section class="block" id="funkce">
     <div class="wrap">
-      <h2>Za deset minut diktujete.</h2>
-      <p class="intro">Potřebujete jen <a href="https://www.python.org/downloads/">Python</a> a stažený ZIP. <a href="navod.html">Podrobný návod</a> vás provede krok za krokem.</p>
+      <h2 class="reveal">Drobnosti, na kterých záleží.</h2>
+      <div class="feats">
+        <div class="feat reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m23 9-6 6M17 9l6 6"/></svg><h3>Hudba se ztiší sama</h3><p>Spotify i videa se během diktování stáhnou na desetinu hlasitosti a pak se vrátí.</p></div>
+        <div class="feat reveal" style="--d:.1s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><h3>Soukromí podle vás</h3><p>Přepis offline v počítači, nebo za sekundu přes Groq s vlastním bezplatným klíčem.</p></div>
+        <div class="feat reveal" style="--d:.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><h3>Zkratka podle vás</h3><p>Výchozí Ctrl + Win, na Macu Ctrl + ⌘. Běžným zkratkám jako Ctrl+C nepřekáží.</p></div>
+        <div class="feat reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><h3>Nevymýšlí si</h3><p>Ticho se k přepisu neposílá, takže se nevloží vymyšlené věty typu „Titulky vytvořil…“.</p></div>
+        <div class="feat reveal" style="--d:.1s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-6"/></svg><h3>Statistiky, které motivují</h3><p>Kolik slov jste nadiktovali a kolik času jste tím ušetřili, po dnech i celkem.</p></div>
+        <div class="feat reveal" style="--d:.2s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg><h3>Bez předplatného</h3><p>Zdarma a open source. Žádný účet, limit slov ani měsíční tarif.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block inst" id="instalace">
+    <div class="wrap">
+      <h2 class="reveal">Za deset minut diktujete.</h2>
+      <p class="intro reveal" style="--d:.1s">Potřebujete jen <a href="https://www.python.org/downloads/">Python</a> a stažený ZIP. <a href="navod.html">Podrobný návod</a> vás provede krok za krokem.</p>
       <div class="oses">
-        <div class="os">
+        <div class="os reveal">
           <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.4 4.6v7H3zM11.4 4.4 21 3v8.6h-9.6zM3 12.4h7.4v7L3 18.4zM11.4 12.4H21V21l-9.6-1.4z"/></svg>Windows 10 a 11</h3>
-          <ol>
-            <li>Stáhněte ZIP a rozbalte ho třeba do Dokumentů.</li>
-            <li>Spusťte <code>install.bat</code>.</li>
-            <li>Spusťte <code>start.bat</code>. Ikona se objeví vedle hodin.</li>
-          </ol>
-          <a class="btn" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">Stáhnout pro Windows</a>
+          <ol><li>Stáhněte ZIP a rozbalte ho.</li><li>Spusťte <code>install.bat</code>.</li><li>Spusťte <code>start.bat</code>. Ikona je vedle hodin.</li></ol>
+          <a class="btn solid" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">Stáhnout pro Windows</a>
           <p class="note">Při instalaci Pythonu zaškrtněte „Add python.exe to PATH“.</p>
         </div>
-        <div class="os">
+        <div class="os reveal" style="--d:.12s">
           <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>macOS 12 a novější</h3>
-          <ol>
-            <li>Stáhněte ZIP a rozbalte ho.</li>
-            <li>Spusťte <code>install.command</code>.</li>
-            <li>Spusťte <code>start.command</code> a povolte mikrofon a klávesnici.</li>
-          </ol>
-          <a class="btn" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">Stáhnout pro Mac</a>
+          <ol><li>Stáhněte ZIP a rozbalte ho.</li><li>Spusťte <code>install.command</code>.</li><li>Spusťte <code>start.command</code> a povolte mikrofon a klávesnici.</li></ol>
+          <a class="btn solid" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">Stáhnout pro Mac</a>
           <p class="note">Mac verze je nová. <a href="navod.html?os=mac#spusteni">Oprávnění krok za krokem</a></p>
         </div>
       </div>
-      <p class="req">Pro nejrychlejší přepis si zdarma vytvořte <b>vlastní</b> klíč na <a href="https://console.groq.com/keys">console.groq.com</a> a vložte ho v aplikaci do Nastavení (<a href="navod.html#groq">jak na to</a>). Bez klíče se přepisuje offline.</p>
+      <p class="req reveal">Pro nejrychlejší přepis si zdarma vytvořte <b>vlastní</b> klíč na <a href="https://console.groq.com/keys">console.groq.com</a> a vložte ho v aplikaci do Nastavení (<a href="navod.html#groq">jak na to</a>). Bez klíče se přepisuje offline.</p>
     </div>
   </section>
 </main>
 
-<div class="wrap">
-  <footer>
-    <span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.7.0</a> vytvořil Michal Hudák. Licence MIT.</span>
-    <a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a>
-  </footer>
-</div>
+<footer class="bigfoot">
+  <div class="wrap">
+    <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
+    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.7.1</a> vytvořil Michal Hudák. Licence MIT.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+  </div>
+</footer>
 
 <script>
 (() => {
-  // Návštěvníkům z Macu nabídneme jako hlavní tlačítko Mac verzi.
-  if (/Mac/.test(navigator.platform)) {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isMac = /Mac/.test(navigator.platform);
+  if (isMac) {
+    document.querySelectorAll(".hk").forEach((el) => (el.textContent = el.textContent.replace("Ctrl + Win", "Ctrl + ⌘")));
     const m = document.getElementById("dl-mac"), w = document.getElementById("dl-win");
     m.className = "btn solid"; w.className = "btn line"; w.before(m);
-    document.getElementById("key").textContent = "Ctrl + ⌘";
   }
-})();
-(() => {
-  // Kalkulačka úspory času: psaní 40 slov/min, diktování 150 slov/min + 20 % na kontrolu a opravy.
+
+  /* ---------- odhalení prvků při rolování ---------- */
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add("in");
+    if (e.target.id === "race") countUp(e.target);
+    io.unobserve(e.target);
+  }), { threshold: 0.2 });
+  document.querySelectorAll(".reveal, #race").forEach((el) => io.observe(el));
+  function countUp(root) {
+    root.querySelectorAll("[data-count]").forEach((el) => {
+      const to = +el.dataset.count, t0 = performance.now(), dur = reduce ? 0 : 1600;
+      const step = (now) => {
+        const p = dur ? Math.min(1, (now - t0) / dur) : 1;
+        el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
+  /* ---------- kalkulačka ---------- */
   const words = document.getElementById("words");
   const plural = (n, a, b, c) => (n === 1 ? a : n >= 2 && n <= 4 ? b : c);
   function calc() {
-    const w = +words.value;
-    const saved = w / 40 - (w / 150) * 1.2;
-    const min = Math.round(saved), h = Math.round((saved * 21) / 60), d = Math.round((saved * 21 * 11) / 60 / 8);
+    const w = +words.value, saved = w / 40 - (w / 150) * 1.2;
+    const min = Math.round(saved), h = Math.round((saved * 21) / 60);
     document.getElementById("words-out").textContent = w.toLocaleString("cs-CZ");
-    document.getElementById("per-day").textContent = min >= 60
-      ? `${Math.floor(min / 60)} h ${min % 60} min` : `${min} ${plural(min, "minutu", "minuty", "minut")}`;
+    document.getElementById("per-day").textContent = min >= 60 ? `${Math.floor(min / 60)} h ${min % 60} min` : `${min} ${plural(min, "minutu", "minuty", "minut")}`;
     document.getElementById("per-month").textContent = `${h} ${plural(h, "hodinu", "hodiny", "hodin")}`;
-    document.getElementById("per-year").textContent = `${d} ${plural(d, "pracovní den", "pracovní dny", "pracovních dní")}`;
   }
-  words.addEventListener("input", calc);
-  calc();
-})();
-(() => {
-  // Nahrávací scéna: klávesa se stiskne, vlna reaguje na "hlas", po puštění se vloží přepis.
-  // [aplikace, kanál/předmět, zástupný text pole, barva, přepis]
-  const SAMPLES = [
-    ["Slack", "#web-redesign", "Napište zprávu do #web-redesign", "#7A4BE0", "Úpravy košíku jsou hotové, zítra ráno je nahraju na testovací web. Klientovi můžeš napsat, že v pátek to spustíme naostro."],
-    ["Outlook", "RE: Nabídka nového e-shopu", "Napište odpověď…", "#2F8FE0", "Dobrý den, v příloze posílám upravenou nabídku včetně druhé fáze. Termín zahájení bych navrhl na začátek listopadu."],
-    ["Claude", "Nová konverzace", "Jak vám mohu pomoci?", "#E08A12", "Projdi mi poznámky z dnešní schůzky a sepiš z nich úkoly pro jednotlivé lidi, seřazené podle termínu."],
-  ];
-  const wave = document.getElementById("wave"), key = document.getElementById("key");
-  const said = document.getElementById("said"), where = document.getElementById("where");
-  const composer = document.getElementById("composer"), ph = document.getElementById("ph");
-  const setApp = ([app, chan, placeholder, color]) => {
-    document.getElementById("app").textContent = app;
-    document.getElementById("chan").textContent = chan;
-    document.getElementById("app-dot").style.background = color;
-    ph.textContent = placeholder;
-  };
-  const N = Math.max(40, Math.floor((wave.clientWidth || 900) / 9));
-  for (let i = 0; i < N; i++) wave.appendChild(document.createElement("i"));
-  const bars = [...wave.children];
-  const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
-  const setText = (s) => { said.innerHTML = s.split(" ").map((w) => `<span class="w">${esc(w)}</span>`).join(" "); };
+  words.addEventListener("input", calc); calc();
 
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    setApp(SAMPLES[0]); ph.hidden = true; said.textContent = SAMPLES[0][4]; composer.classList.add("filled");
-    where.textContent = "Vloženo diktováním"; return;
+  /* ---------- ukázka řízená rolováním ---------- */
+  const TEXT = "Úpravy košíku jsou hotové, zítra ráno je nahraju na testovací web. Klientovi můžeš napsat, že v pátek to spustíme naostro.";
+  const story = document.getElementById("ukazka"), key = document.getElementById("key"), wave = document.getElementById("wave");
+  const composer = document.getElementById("composer"), said = document.getElementById("said"), ph = document.getElementById("ph");
+  const state = document.getElementById("state"), hint = document.getElementById("hint");
+  const beats = [...document.querySelectorAll(".beat")];
+  said.innerHTML = TEXT.split(" ").map((w) => `<span class="w">${w}</span>`).join(" ");
+  const wordEls = [...said.children];
+  for (let i = 0; i < 44; i++) wave.appendChild(document.createElement("i"));
+  const bars = [...wave.children];
+  let storyP = 0, lastShown = -1;
+
+  function renderStory(p) {
+    // 0–0.15 kurzor v poli, 0.15–0.7 nahrávání (slova se "vyslovují"), 0.7–1 vloženo
+    const beat = p < 0.15 ? 0 : p < 0.72 ? 1 : 2;
+    beats.forEach((b, i) => b.classList.toggle("on", i === beat));
+    const rec = beat === 1;
+    key.classList.toggle("down", rec);
+    wave.classList.toggle("live", rec);
+    composer.classList.toggle("focus", beat < 2);
+    composer.classList.toggle("filled", beat === 2);
+    const shown = beat === 0 ? 0 : beat === 2 ? wordEls.length : Math.round(((p - 0.15) / 0.57) * wordEls.length);
+    if (shown !== lastShown) {
+      wordEls.forEach((w, i) => w.classList.toggle("in", i < shown));
+      ph.hidden = shown > 0 || beat === 2 ? true : false;
+      lastShown = shown;
+    }
+    state.textContent = beat === 0 ? "Kurzor je v poli" : beat === 1 ? "● Nahrávám…" : "✓ Vloženo diktováním";
+    state.style.color = beat === 1 ? "#FF5A6E" : "";
+    hint.style.opacity = p > 0.9 ? 0 : 1;
   }
-  let mode = "idle", t0 = 0;
-  function frame(now) {
-    const t = (now - t0) / 1000;
+  function animateWave(now) {
+    const rec = wave.classList.contains("live");
     bars.forEach((b, i) => {
-      let h = 4;
-      if (mode === "rec") {
-        const env = 0.55 + 0.45 * Math.sin(t * 2.3 + i * 0.05);
-        h = 6 + Math.abs(Math.sin(t * 7 + i * 0.55) * Math.sin(t * 3.1 + i * 0.21)) * 84 * env * (0.6 + Math.random() * 0.4);
-      } else if (mode === "think") {
-        const p = ((t * 0.9 - i / N) % 1 + 1) % 1;
-        h = 4 + Math.exp(-((p - 0.5) ** 2) / 0.004) * 40;
-      }
+      const h = rec ? 6 + Math.abs(Math.sin(now / 140 + i * 0.55) * Math.sin(now / 330 + i * 0.2)) * 58 * (0.6 + Math.random() * 0.4) : 4;
       b.style.height = h + "px";
     });
-    requestAnimationFrame(frame);
+    requestAnimationFrame(animateWave);
   }
-  requestAnimationFrame(frame);
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  // Zvuk ukázky: česká syntéza řeči z prohlížeče (zapíná se až kliknutím).
-  const btn = document.getElementById("sound"), label = document.getElementById("sound-label");
-  const synth = window.speechSynthesis;
-  let soundOn = false, voice = null;
-  const pickVoice = () => {
-    const cs = (synth ? synth.getVoices() : []).filter((v) => v.lang.toLowerCase().startsWith("cs"));
-    voice = cs.find((v) => /natural|online|google/i.test(v.name)) || cs[0] || null;
-  };
-  if (synth) { pickVoice(); synth.addEventListener?.("voiceschanged", pickVoice); } else { btn.parentElement.hidden = true; }
-  btn.addEventListener("click", () => {
-    soundOn = !soundOn;
-    btn.setAttribute("aria-pressed", soundOn);
-    label.textContent = soundOn ? "Zvuk zapnutý" : "Pusťte si to se zvukem";
-    btn.setAttribute("aria-label", soundOn ? "Vypnout zvuk ukázky" : "Pustit ukázku se zvukem");
-    if (!soundOn) synth.cancel();
-    else if (!voice) { pickVoice(); if (!voice) label.textContent = "Prohlížeč nemá český hlas"; }
-  });
-  function speak(text) {
-    return new Promise((resolve) => {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = "cs-CZ"; if (voice) u.voice = voice; u.rate = 1.45; // svižně, jako když člověk diktuje
-      let done = false; const finish = () => { if (!done) { done = true; resolve(); } };
-      u.onend = finish; u.onerror = finish;
-      setTimeout(finish, 15000); // pojistka, kdyby prohlížeč konec neohlásil
-      synth.speak(u);
+  /* ---------- snímek historie se narovná ---------- */
+  const shot = document.getElementById("shot");
+  function renderShot() {
+    const r = shot.getBoundingClientRect(), vh = innerHeight;
+    const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.9)));
+    const e = 1 - Math.pow(1 - p, 2);
+    shot.style.setProperty("--rx", `${22 * (1 - e)}deg`);
+    shot.style.setProperty("--ry", `${-14 * (1 - e)}deg`);
+    shot.style.setProperty("--sc", `${0.9 + 0.1 * e}`);
+  }
+
+  /* ---------- ukazatel polohy na stránce ---------- */
+  const SECTIONS = [["top", "Úvod"], ["ukazka", "Ukázka"], ["uspora", "Úspora času"], ["historie", "Historie"], ["funkce", "Funkce"], ["instalace", "Instalace"]];
+  document.querySelector(".hero").id = "top";
+  const dotsEl = document.getElementById("rail-dots"), railFill = document.getElementById("rail-fill"), pct = document.getElementById("pct");
+  dotsEl.innerHTML = SECTIONS.map(([id, label]) => `<li><a href="#${id}"><span>${label}</span></a></li>`).join("");
+  const dots = [...dotsEl.children];
+  function placeDots() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    SECTIONS.forEach(([id], i) => {
+      const top = Math.min(max, document.getElementById(id).offsetTop);
+      dots[i].style.top = `${(top / max) * 100}%`;
     });
   }
+  function renderRail(p) {
+    railFill.style.transform = `scaleY(${p})`;
+    pct.textContent = `${Math.round(p * 100)} %`;
+    const y = scrollY + innerHeight * 0.35;
+    let cur = 0;
+    SECTIONS.forEach(([id], i) => { if (document.getElementById(id).offsetTop <= y) cur = i; });
+    if (p > 0.995) cur = SECTIONS.length - 1;
+    dots.forEach((d, i) => { d.classList.toggle("on", i === cur); d.classList.toggle("done", i < cur); });
+  }
+  addEventListener("load", placeDots);
+  addEventListener("resize", placeDots);
+  placeDots();
 
-  (async () => {
-    for (let k = 0; ; k = (k + 1) % SAMPLES.length) {
-      const text = SAMPLES[k][4];
-      setApp(SAMPLES[k]); said.innerHTML = ""; ph.hidden = false; composer.className = "composer focus";
-      where.className = "where"; where.textContent = "Kurzor je v poli. Podržte klávesu a mluvte.";
-      await sleep(1300);
-      key.classList.add("down"); mode = "rec"; t0 = performance.now(); wave.className = "wave live";
-      where.className = "where live"; where.textContent = "● Nahrávám…";
-      if (soundOn) { await speak(text); await sleep(150); } else await sleep(3000);
-      key.classList.remove("down"); mode = "think"; t0 = performance.now(); wave.className = "wave think";
-      where.className = "where"; where.textContent = "Přepisuji…";
-      await sleep(700);
-      mode = "idle"; wave.className = "wave";
-      ph.hidden = true; setText(text); composer.className = "composer focus filled";
-      [...said.children].forEach((w, i) => setTimeout(() => w.classList.add("in"), i * 18));
-      where.textContent = "✓ Vloženo diktováním";
-      await sleep(4200);
-      composer.className = "composer filled";
-      await sleep(500);
-    }
-  })();
+  const bar = document.getElementById("progress");
+  function onScroll() {
+    const doc = document.documentElement;
+    const p = Math.min(1, Math.max(0, doc.scrollTop / (doc.scrollHeight - innerHeight)));
+    bar.style.transform = `scaleX(${p})`;
+    renderRail(p);
+    const r = story.getBoundingClientRect();
+    storyP = Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)));
+    renderStory(storyP);
+    if (!reduce) renderShot();
+  }
+  let ticking = false;
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { onScroll(); ticking = false; }); } }, { passive: true });
+  addEventListener("resize", onScroll);
+  onScroll();
+  if (!reduce) requestAnimationFrame(animateWave);
+
+  /* ---------- mikrofon v úvodu promluví ---------- */
+  const zone = document.getElementById("mic-zone"), mic = document.getElementById("mic"), tip = document.getElementById("mic-tip");
+  const synth = window.speechSynthesis;
+  const voiceCs = () => { const v = (synth?.getVoices() || []).filter((x) => x.lang.toLowerCase().startsWith("cs")); return v.find((x) => /natural|online|google/i.test(x.name)) || v[0] || null; };
+  mic.addEventListener("click", () => {
+    if (!synth) { tip.textContent = "Prohlížeč neumí přehrát ukázku"; return; }
+    if (synth.speaking) { synth.cancel(); return; }
+    const u = new SpeechSynthesisUtterance(TEXT);
+    u.lang = "cs-CZ"; u.rate = 1.45; const v = voiceCs(); if (v) u.voice = v;
+    u.onstart = () => { zone.classList.add("speaking"); tip.textContent = "Takhle rychle diktujete…"; };
+    u.onend = u.onerror = () => { zone.classList.remove("speaking"); tip.textContent = "Pár vteřin mluvení. Na klávesnici by to trvalo půl minuty."; };
+    synth.speak(u);
+  });
 })();
 </script>
 </body>

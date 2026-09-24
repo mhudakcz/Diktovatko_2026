@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.7.1 – 2026-09-24
+
+- Varianta 2 webu je teď hlavní stránka. Stará adresa `v2.html` přesměruje na hlavní stránku, původní varianta zůstává jen v historii gitu.
+
 ## 0.7.0 – 2026-09-24
 
 - Nová varianta webu (`docs/v2.html`): ukázka diktování řízená rolováním, animace při rolování, mikrofon, který po kliknutí promluví, běžící pás aplikací.
