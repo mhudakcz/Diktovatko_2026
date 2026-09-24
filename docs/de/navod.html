@@ -198,7 +198,7 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
   <article>
     <h1>Anleitung Schritt für Schritt</h1>
     <p class="lede">Von der Installation bis zum ersten diktierten Satz. Sie brauchen keine technischen Kenntnisse, folgen Sie einfach den Schritten der Reihe nach.</p>
-    <p class="meta">Diese Anleitung gilt für <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">Version 0.10.1</a>. Wählen Sie oben, ob Sie <b>Windows</b> oder einen <b>Mac</b> haben. Die Anleitung passt sich daran an.</p>
+    <p class="meta">Diese Anleitung gilt für <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">Version 0.10.2</a>. Wählen Sie oben, ob Sie <b>Windows</b> oder einen <b>Mac</b> haben. Die Anleitung passt sich daran an.</p>
 
     <div class="tldr">
       <h2 class="tldr-h">Kurz gesagt</h2>
@@ -366,11 +366,12 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
         <li><div>Es erscheint ein Schlüssel, der mit <code>gsk_</code> beginnt. Klicken Sie auf <b>Copy</b>. Der Schlüssel wird nur einmal angezeigt. Wenn Sie ihn verlieren, erstellen Sie einfach einen neuen.</div></li>
         <li><div>Klicken Sie auf das Diktovátko-Symbol und wählen Sie oben <b>Einstellungen</b>.</div></li>
         <li><div>Fügen Sie den Schlüssel in das Feld <b>Groq-API-Schlüssel</b> ein (<kbd class="win">Ctrl</kbd><kbd class="mac">⌘</kbd> + <kbd>V</kbd>) und klicken Sie unten auf <b>Einstellungen speichern</b>. Fertig, das nächste Diktat läuft über Groq.</div></li>
+        <li><div><b>Empfehlung:</b> Öffnen Sie <a href="https://console.groq.com/settings/data-controls">console.groq.com/settings/data-controls</a> und schalten Sie <b>Zero Data Retention</b> ein. Groq speichert dann gar nichts mehr, auch nicht vorübergehend zur Fehlersuche oder Missbrauchsprüfung.</div></li>
       </ol>
       <h3>Gut zu wissen</h3>
       <ul>
         <li><b>Kostenlos:</b> Der kostenlose Tarif von Groq reicht für mehrere Stunden Diktat pro Tag. Ohne hinterlegte Karte wird Ihnen nie etwas berechnet. Wenn Sie das Limit überschreiten, warten Sie nur kurz.</li>
-        <li><b>Datenschutz:</b> Mit Schlüssel wird die Aufnahme an die Server von Groq in den USA geschickt. Vertrauliches können Sie offline diktieren, löschen Sie dazu einfach den Schlüssel in den Einstellungen.</li>
+        <li><b>Datenschutz:</b> Mit Schlüssel wird die Aufnahme verschlüsselt an die Server von Groq in den USA geschickt. Sie wird nirgends veröffentlicht, und laut den Bedingungen von Groq werden damit keine Modelle trainiert, auch nicht im kostenlosen Tarif. Ohne Zero Data Retention kann Groq sie ausnahmsweise bis zu 30 Tage zur Fehlersuche oder bei Missbrauchsverdacht aufbewahren. Vertrauliches können Sie offline diktieren, löschen Sie dazu einfach den Schlüssel in den Einstellungen.</li>
         <li><b>Wenn Ihr Schlüssel in falsche Hände gerät</b>, löschen Sie ihn auf <a href="https://console.groq.com/keys">console.groq.com/keys</a> mit dem Papierkorbsymbol und erstellen Sie einen neuen.</li>
       </ul>
     </section>

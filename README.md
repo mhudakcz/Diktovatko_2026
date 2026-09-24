@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.10.1**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.10.2**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
@@ -114,6 +114,7 @@ Na Macu použijte `.venv/bin/python`.
 
 - Při lokálním přepisu nic neopouští počítač.
 - S Groq klíčem se nahrávka posílá na servery Groq (USA). Text ani historie se nikam neposílají.
+- Groq podle svých podmínek na nahrávkách netrénuje modely (ani u bezplatného účtu) a standardně je neukládá, výjimečně je může uchovat až 30 dní kvůli poruchám nebo zneužití. Doporučujeme v účtu Groq zapnout **Zero Data Retention** ([console.groq.com/settings/data-controls](https://console.groq.com/settings/data-controls)), pak neuchová nic.
 - Groq klíč je v systémovém trezoru hesel (Správce přihlašovacích údajů / Klíčenka), ne v souboru. Do okna aplikace se neposílá.
 - Log neobsahuje nadiktovaný text, jen délky a časy, a rotuje se (max. 3 MB).
 - Nadiktovaný text se ve Windows neukládá do historie schránky (Win+V) ani do cloudové schránky. Na Macu je označený jako dočasný.

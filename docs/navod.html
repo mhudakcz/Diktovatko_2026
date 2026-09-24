@@ -198,7 +198,7 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
   <article>
     <h1>Návod krok za krokem</h1>
     <p class="lede">Od instalace po první nadiktovanou větu. Nepotřebujete žádné programátorské znalosti, stačí postupovat bod po bodu.</p>
-    <p class="meta">Návod platí pro <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.10.1</a>. Nahoře si přepněte, jestli máte <b>Windows</b> nebo <b>Mac</b>. Návod se podle toho upraví.</p>
+    <p class="meta">Návod platí pro <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.10.2</a>. Nahoře si přepněte, jestli máte <b>Windows</b> nebo <b>Mac</b>. Návod se podle toho upraví.</p>
 
     <div class="tldr">
       <h2 class="tldr-h">Ve zkratce</h2>
@@ -366,11 +366,12 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
         <li><div>Zobrazí se klíč začínající <code>gsk_</code>. Klikněte na <b>Copy</b>. Klíč se ukáže jen jednou, kdybyste ho ztratili, jednoduše vytvoříte nový.</div></li>
         <li><div>Klikněte na ikonu Diktovátka a nahoře zvolte <b>Nastavení</b>.</div></li>
         <li><div>Klíč vložte do pole <b>Groq API klíč</b> (<kbd class="win">Ctrl</kbd><kbd class="mac">⌘</kbd> + <kbd>V</kbd>) a dole klikněte na <b>Uložit nastavení</b>. Hotovo, další diktování už půjde přes Groq.</div></li>
+        <li><div><b>Doporučujeme:</b> otevřete <a href="https://console.groq.com/settings/data-controls">console.groq.com/settings/data-controls</a> a zapněte <b>Zero Data Retention</b>. Groq pak neuchová vůbec nic, ani dočasně kvůli poruchám nebo zneužití.</div></li>
       </ol>
       <h3>Co je dobré vědět</h3>
       <ul>
         <li><b>Zdarma:</b> bezplatný tarif Groq stačí na několik hodin diktování denně. Bez zadané karty vám nikdy nic nenaúčtují, při překročení limitu jen chvíli počkáte.</li>
-        <li><b>Soukromí:</b> s klíčem se nahrávka posílá na servery Groq v USA. Citlivé věci můžete diktovat offline, stačí klíč z nastavení smazat.</li>
+        <li><b>Soukromí:</b> s klíčem se nahrávka posílá šifrovaně na servery Groq v USA. Nikde se nezveřejňuje a Groq na ní podle svých podmínek netrénuje modely, a to ani u bezplatného účtu. Bez Zero Data Retention ji může výjimečně uchovat až 30 dní kvůli poruchám nebo podezření na zneužití. Citlivé věci můžete diktovat offline, stačí klíč z nastavení smazat.</li>
         <li><b>Když klíč unikne</b>, na <a href="https://console.groq.com/keys">console.groq.com/keys</a> ho u koše smažte a vytvořte nový.</li>
       </ul>
     </section>

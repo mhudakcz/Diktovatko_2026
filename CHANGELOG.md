@@ -2,6 +2,11 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.10.2 – 2026-09-24
+
+- Návod (CZ, EN, DE): doporučený krok zapnout v účtu Groq Zero Data Retention a přesnější popis, co se s nahrávkou u Groq děje (nezveřejňuje se, netrénuje se na ní, bez ZDR se výjimečně uchová až 30 dní).
+- Web: v porovnání offline/online bod o Zero Data Retention.
+
 ## 0.10.1 – 2026-09-24
 
 - Kontrola aktualizací běží jednou za 2 hodiny (dřív 6).
