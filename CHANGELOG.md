@@ -2,6 +2,11 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.12.4 – 2026-09-25
+
+- Web (CZ, EN, DE): nový úvod – kolem mikrofonu kruhový ekvalizér, měnící se barevný tvar a oběžné dráhy s tečkami, mikrofon jemně dýchá, v pozadí plují abstraktní tvary. Při přehrání ukázky ekvalizér zrychlí a zbarví se.
+- Pomalu kroužící světlo i v kartách Offline/Online, Co je nového, Jak pomoct, v kartách instalace a v bloku s cenou (tlumené barvy, každý blok jiným tempem).
+
 ## 0.12.3 – 2026-09-25
 
 - Web (CZ, EN, DE): efekty na úvodní stránce – plující barevné záře a zvukové vlny v úvodu, přelévající se barvy v nadpisu, odlesk na žlutých tlačítkách, pomalu kroužící světlo v tmavých panelech. Při omezených animacích v systému se nehýbe nic.
