@@ -302,6 +302,10 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
           <div><div class="t" data-i18n="set.groq.t">Groq API klíč</div><div class="d"><span data-i18n="set.groq.d"></span> <button type="button" class="link" id="groq-link" data-i18n="set.groq.link">Získat klíč zdarma</button></div></div>
           <div class="inline"><input class="field" id="groq" type="password" autocomplete="off" spellcheck="false" placeholder="gsk_…"><button type="button" class="btn" id="groq-show" data-i18n="set.groq.show">Zobrazit</button><button type="button" class="btn" id="groq-remove" data-i18n="set.groq.remove" hidden>Smazat klíč</button></div>
         </div>
+        <div class="row" id="offline-row">
+          <div><div class="t" data-i18n="set.offline.t">Přepisovat offline</div><div class="d" data-i18n="set.offline.d"></div></div>
+          <label class="switch"><input type="checkbox" id="offline"><span></span></label>
+        </div>
         <div class="row">
           <div><div class="t" data-i18n="set.model.t">Lokální model</div><div class="d" data-i18n="set.model.d">Používá se, když není vyplněný Groq klíč. Při první změně se model stáhne.</div></div>
           <select class="field" id="model"></select>
@@ -643,6 +647,8 @@ async function loadSettings() {
   $("groq").value = "";
   $("groq").placeholder = state.settings.has_key ? t("set.groq.saved") : "gsk_…";
   $("groq-remove").hidden = !state.settings.has_key;
+  $("offline").checked = c.offline;
+  $("offline-row").hidden = !state.settings.has_key;
   $("hist-days").innerHTML = state.settings.history_days.map((d) => `<option value="${d}" ${c.history_days === d ? "selected" : ""}>${d ? t("set.days", { n: d }) : t("set.forever")}</option>`).join("");
   $("titles").checked = c.store_titles;
   $("check-updates").checked = c.check_updates;
@@ -696,7 +702,7 @@ $("save").onclick = async () => {
   const hotkeys = chosenHotkey() ? [chosenHotkey()] : [];
   const cfg = {
     hotkeys, mode: $("mode").dataset.v, language: $("language").value || null, model: $("model").value,
-    initial_prompt: $("prompt").value.trim(), history_days: +$("hist-days").value, store_titles: $("titles").checked, check_updates: $("check-updates").checked,
+    initial_prompt: $("prompt").value.trim(), history_days: +$("hist-days").value, store_titles: $("titles").checked, check_updates: $("check-updates").checked, offline: $("offline").checked,
     duck_audio: $("duck").checked, duck_level: +$("duck-level").value / 100,
     overlay: $("overlay").checked, sounds: $("sounds").checked, trailing_space: $("trailing").checked, history: $("hist").checked,
     ui_language: $("ui-language").value,

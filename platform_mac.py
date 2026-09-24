@@ -310,14 +310,15 @@ def audio_ducker(level):
 
 
 # --- indikátor nahrávání -----------------------------------------------------------------
-def overlay(level_source):
+def overlay(level_source, engine_source, on_toggle):
     from overlay import OverlayState, W, H, BOTTOM_MARGIN, render_pill
 
     class MacOverlay(OverlayState):
-        """NSPanel, který nebere fokus, propouští kliknutí a je vidět na všech plochách."""
+        """NSPanel, který nebere fokus, propouští kliknutí a je vidět na všech plochách.
+        Štítek Cloud / Local se na Macu jen zobrazuje, přepíná se v menu ikony."""
 
         def __init__(self):
-            super().__init__(level_source)
+            super().__init__(level_source, engine_source, on_toggle)
             from PyObjCTools import AppHelper
 
             AppHelper.callAfter(self._create)
@@ -365,8 +366,9 @@ def overlay(level_source):
                         self.panel.orderOut_(None)
                         self.visible = False
                     return
+                engine, _ = self.engine_source()
                 img = render_pill(state, time.time() - self.since, self.level_source(), self.scale,
-                                  self.message, transparent=True)
+                                  self.message, transparent=True, engine=engine)
                 buf = io.BytesIO()
                 img.save(buf, "PNG")
                 data = NSData.dataWithBytes_length_(buf.getvalue(), len(buf.getvalue()))

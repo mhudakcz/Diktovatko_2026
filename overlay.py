@@ -1,8 +1,9 @@
 """Plovoucí indikátor nahrávání ("pilulka") dole uprostřed obrazovky.
 
 render_pill() kreslí samotnou pilulku a sdílí ho Windows i macOS.
-Třída Overlay je Windows verze: běží ve vlastním vlákně s Tk, nikdy nebere
-fokus a propouští kliknutí, takže text se dál vkládá do okna s kurzorem.
+Třída Overlay je Windows verze: běží ve vlastním vlákně s Tk a nikdy nebere
+fokus, takže text se dál vkládá do okna s kurzorem. Kliknout jde jen na štítek
+Groq / Offline vpravo, který přepíná způsob přepisu.
 """
 
 import logging
@@ -20,8 +21,11 @@ EDGE = (52, 61, 80)
 VOICE = (240, 64, 90)
 ULTRA = (141, 150, 255)
 WHITE = (240, 243, 248)
+MUTED = (170, 178, 196)
+OFFLINE = (94, 214, 160)
 
-W, H = 176, 44  # logická velikost (při 100 % měřítku)
+W, H = 260, 44  # logická velikost (při 100 % měřítku)
+BADGE_X0, BADGE_X1 = 166, 252  # štítek Groq / Offline (logické souřadnice)
 SS = 2  # supersampling kvůli vyhlazeným okrajům (2× stačí, 3× zbytečně zatěžovalo CPU)
 FRAME_MS = 42  # ~24 snímků za sekundu
 BOTTOM_MARGIN = 28
@@ -43,8 +47,25 @@ def _font(size):
     return _fonts[size]
 
 
-def render_pill(state, t, levels, scale, message="", transparent=False):
-    """Vykreslí pilulku. t = sekundy od začátku stavu, levels = úrovně hlasitosti 0..1."""
+def _badge(d, engine, clickable, s, cy):
+    """Štítek se způsobem přepisu: engine = "groq" (Cloud · fast) / "offline" (Local · slow)."""
+    col = ULTRA if engine == "groq" else OFFLINE
+    x0, x1, bh = BADGE_X0 * s, BADGE_X1 * s, 13 * s
+    fill = tuple(int(INK[k] * 0.78 + col[k] * 0.22) for k in range(3))
+    d.rounded_rectangle((x0, cy - bh, x1, cy + bh), radius=bh, fill=fill,
+                        outline=col if clickable else None, width=max(1, int(s)))
+    # "Cloud · fast" / "Local · slow": hlavní slovo bíle, rychlost tlumeně
+    main, speed = ("Cloud", " · fast") if engine == "groq" else ("Local", " · slow")
+    f1, f2 = _font(int(12 * s)), _font(int(11 * s))
+    tw = d.textlength(main, font=f1) + d.textlength(speed, font=f2)
+    x = (x0 + x1 - tw) / 2
+    d.text((x, cy), main, font=f1, fill=WHITE if clickable else MUTED, anchor="lm")
+    d.text((x + d.textlength(main, font=f1), cy), speed, font=f2, fill=col if clickable else MUTED, anchor="lm")
+
+
+def render_pill(state, t, levels, scale, message="", transparent=False, engine=None, clickable=False):
+    """Vykreslí pilulku. t = sekundy od začátku stavu, levels = úrovně hlasitosti 0..1,
+    engine = štítek vpravo ("groq" / "offline" / None), clickable = štítek jde přepnout."""
     w, h = int(W * scale) * SS, int(H * scale) * SS
     if transparent:
         img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
@@ -74,12 +95,13 @@ def render_pill(state, t, levels, scale, message="", transparent=False):
             d.rounded_rectangle((x, cy - bh / 2, x + bw, cy + bh / 2), radius=bw / 2, fill=WHITE)
         secs = int(t)
         txt = f"{secs // 60}:{secs % 60:02d}"
-        tw = d.textlength(txt, font=font)
-        d.text((w - 18 * s - tw, cy), txt, font=font, fill=(170, 178, 196), anchor="lm")
+        right = (BADGE_X0 - 10) * s if engine else w - 18 * s
+        d.text((right, cy), txt, font=font, fill=MUTED, anchor="rm")
     elif state == "transcribing":
         # vlna, která běží zleva doprava
-        n, bw, gap = 24, 2.6 * s, 2.4 * s
-        x0 = (w - (n * (bw + gap) - gap)) / 2
+        n, bw, gap = (20 if engine else 24), 2.6 * s, 2.4 * s
+        area = BADGE_X0 * s if engine else w
+        x0 = (area - (n * (bw + gap) - gap)) / 2
         for i in range(n):
             phase = (t * 2.2 - i / n) % 1.0
             amp = math.exp(-((phase - 0.5) ** 2) / 0.02)
@@ -89,6 +111,10 @@ def render_pill(state, t, levels, scale, message="", transparent=False):
             d.rounded_rectangle((x, cy - bh / 2, x + bw, cy + bh / 2), radius=bw / 2, fill=col)
     elif state == "error":
         d.text((w / 2, cy), message or "Přepis se nepovedl", font=font, fill=VOICE, anchor="mm")
+        engine = None
+
+    if engine and state in ("recording", "transcribing"):
+        _badge(d, engine, clickable and state == "recording", s, cy)
 
     return img.resize((w // SS, h // SS), Image.LANCZOS)
 
@@ -96,8 +122,10 @@ def render_pill(state, t, levels, scale, message="", transparent=False):
 class OverlayState:
     """Společný stav indikátoru – volá se z libovolného vlákna."""
 
-    def __init__(self, level_source):
+    def __init__(self, level_source, engine_source=lambda: (None, False), on_toggle=None):
         self.level_source = level_source  # funkce -> seznam posledních úrovní 0..1
+        self.engine_source = engine_source  # funkce -> ("groq" / "offline" / None, jde přepnout)
+        self.on_toggle = on_toggle  # kliknutí na štítek
         self.state = "hidden"
         self.message = ""
         self.since = time.time()
@@ -116,10 +144,10 @@ class OverlayState:
 
 
 class Overlay(OverlayState):
-    """Windows: Tk okno s průhlednou barvou, bez fokusu a propouštějící kliknutí."""
+    """Windows: Tk okno s průhlednou barvou, které nebere fokus ani při kliknutí."""
 
-    def __init__(self, level_source):
-        super().__init__(level_source)
+    def __init__(self, level_source, engine_source=lambda: (None, False), on_toggle=None):
+        super().__init__(level_source, engine_source, on_toggle)
         self._ready = threading.Event()
         threading.Thread(target=self._run, daemon=True).start()
         self._ready.wait(5)
@@ -149,19 +177,36 @@ class Overlay(OverlayState):
 
         self.label = tk.Label(self.root, bg=key_hex, bd=0, highlightthickness=0)
         self.label.pack()
+        self.label.bind("<Button-1>", self._click)
+        self.label.bind("<Motion>", self._motion)
         self.root.update_idletasks()
 
         self.hwnd = ctypes.windll.user32.GetParent(self.root.winfo_id())
         GWL_EXSTYLE = -20
         style = ctypes.windll.user32.GetWindowLongW(self.hwnd, GWL_EXSTYLE)
-        # WS_EX_NOACTIVATE | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TOPMOST
-        style |= 0x08000000 | 0x20 | 0x80 | 0x80000 | 0x8
+        # WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TOPMOST
+        # (bez WS_EX_TRANSPARENT, aby šlo kliknout na štítek; fokus okno i tak nevezme)
+        style |= 0x08000000 | 0x80 | 0x80000 | 0x8
         ctypes.windll.user32.SetWindowLongW(self.hwnd, GWL_EXSTYLE, style)
         ctypes.windll.user32.ShowWindow(self.hwnd, 0)  # SW_HIDE
         self.visible = False
         self._ready.set()
         self._tick()
         self.root.mainloop()
+
+    def _on_badge(self, x):
+        engine, clickable = self.engine_source()
+        return bool(engine and clickable and self.current() == "recording"
+                    and BADGE_X0 <= x / self.scale <= BADGE_X1)
+
+    def _click(self, e):
+        if self._on_badge(e.x) and self.on_toggle:
+            threading.Thread(target=self.on_toggle, daemon=True).start()
+
+    def _motion(self, e):
+        cur = "hand2" if self._on_badge(e.x) else ""
+        if self.label.cget("cursor") != cur:
+            self.label.config(cursor=cur)
 
     def _set_visible(self, on):
         import ctypes
@@ -179,7 +224,9 @@ class Overlay(OverlayState):
             if state == "hidden":
                 self._set_visible(False)
             else:
-                img = render_pill(state, time.time() - self.since, self.level_source(), self.scale, self.message)
+                engine, clickable = self.engine_source()
+                img = render_pill(state, time.time() - self.since, self.level_source(), self.scale, self.message,
+                                  engine=engine, clickable=clickable)
                 self._photo = self._ImageTk.PhotoImage(img)
                 self.label.config(image=self._photo)
                 self._set_visible(True)

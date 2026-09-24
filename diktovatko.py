@@ -98,7 +98,7 @@ class Transcriber:
         self._lock = threading.Lock()
 
     def uses_groq(self):
-        return bool(config.groq_key(self.cfg))
+        return not self.cfg["offline"] and bool(config.groq_key(self.cfg))
 
     def wanted_engine(self):
         return "groq" if self.uses_groq() else self.cfg["model"]
@@ -266,6 +266,12 @@ class App:
                     visible=lambda _: bool(self.update),
                 ),
                 pystray.Menu.SEPARATOR,
+                pystray.MenuItem(
+                    tr("menu.offline"),
+                    self.toggle_offline,
+                    checked=lambda _: self.cfg["offline"] or not config.groq_key(self.cfg),
+                    enabled=lambda _: bool(config.groq_key(self.cfg)),
+                ),
                 pystray.MenuItem(tr("menu.history"), lambda: self.open_window("history"), default=True),
                 pystray.MenuItem(tr("menu.stats"), lambda: self.open_window("stats")),
                 pystray.MenuItem(tr("menu.settings"), lambda: self.open_window("settings")),
@@ -279,7 +285,7 @@ class App:
 
     def _ensure_extras(self):
         if self.cfg["overlay"] and self.overlay is None:
-            self.overlay = plat.overlay(lambda: list(self.levels))
+            self.overlay = plat.overlay(lambda: list(self.levels), self.engine_badge, self.toggle_offline)
         if self.ducker is None:
             self.ducker = plat.audio_ducker(self.cfg["duck_level"])
             self.ducker.restore_leftover()  # hlasitost ztlumená před pádem aplikace se vrátí
@@ -489,6 +495,25 @@ class App:
             if new["history_days"] != old["history_days"]:
                 self._prune()
             self._maybe_reload_engine()
+
+    def engine_badge(self):
+        """Pro štítek v indikátoru: ("groq" / "offline", jde přepnout)."""
+        has_key = bool(config.groq_key(self.cfg))
+        return ("offline" if self.cfg["offline"] or not has_key else "groq"), has_key
+
+    def toggle_offline(self):
+        """Přepnout Groq ↔ offline (menu ikony, štítek v indikátoru).
+
+        Platí hned, i pro právě běžící nahrávku: transcribe() si způsob přepisu
+        čte z nastavení až po puštění klávesy a lokální model případně načte sám.
+        """
+        with self.lock:
+            new = config.validate(dict(self.cfg, offline=not self.cfg["offline"]))
+            self.cfg = new
+            self.transcriber.cfg = new
+            config.save_config(new)
+        log.info("Přepis %s", "offline" if new["offline"] else "přes Groq")
+        plat.run_on_main(self.icon.update_menu)
 
     def _prune(self):
         try:

@@ -2,6 +2,12 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.11.0 – 2026-09-24
+
+- Přepínání Cloud / Local bez mazání klíče: v indikátoru při diktování je vpravo štítek **Cloud · fast** (Groq) nebo **Local · slow** (v počítači). Kliknutím myší se přepne, a to hned pro nahrávku, která právě běží. Okno přitom nevezme fokus.
+- Totéž v menu ikony (*Přepisovat offline*) a v Nastavení → Přepis. Nová volba `offline` v `config.json`.
+- Na Macu se štítek zatím jen zobrazuje, přepíná se v menu ikony.
+
 ## 0.10.2 – 2026-09-24
 
 - Návod (CZ, EN, DE): doporučený krok zapnout v účtu Groq Zero Data Retention a přesnější popis, co se s nahrávkou u Groq děje (nezveřejňuje se, netrénuje se na ní, bez ZDR se výjimečně uchová až 30 dní).

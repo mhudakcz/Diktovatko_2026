@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.10.2**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.11.0**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
@@ -59,6 +59,8 @@ Každý si vytváří **vlastní** bezplatný klíč. V repozitáři žádný kl
 
 Bez klíče se přepisuje offline. Při prvním použití se stáhne model Whisper (~1,6 GB).
 
+S klíčem jde mezi Groq a offline přepínat bez mazání klíče: kliknutím na štítek **Cloud · fast** / **Local · slow** v indikátoru během diktování (platí hned pro běžící nahrávku), v menu ikony (*Přepisovat offline*) nebo v Nastavení. V `config.json` je to volba `offline`.
+
 ## Aktualizace
 
 Od verze 0.10.0 se Diktovátko aktualizuje samo. Jednou za 2 hodiny se podívá na [GitHub Releases](https://github.com/mhudakcz/Diktovatko_2026/releases), a když je k dispozici nová verze, zobrazí upozornění. Instaluje se po kliknutí na *Aktualizovat* v menu ikony nebo v *Nastavení → Aktualizace*: stáhne se ZIP dané verze, přepíší se jen soubory programu (nastavení, klíč, historie a `.venv` zůstanou), doinstalují se případné nové knihovny a aplikace se restartuje. Vývojová kopie z gitu (složka s `.git`) se takto nepřepisuje, aktualizuje se přes `git pull`.
@@ -96,6 +98,7 @@ Nejjednodušší je nastavovat v okně aplikace (sekce *Nastavení*). Soubor se 
 | `history` | `true` | ukládání historie |
 | `sounds` | `true` | pípnutí při startu a konci nahrávání |
 | `trailing_space` | `true` | mezera za vloženým textem |
+| `offline` | `false` | přepisovat v počítači i s uloženým Groq klíčem |
 | `check_updates` | `true` | jednou za 2 hodiny zkontrolovat, jestli nevyšla nová verze |
 
 ## Historie a export z příkazové řádky

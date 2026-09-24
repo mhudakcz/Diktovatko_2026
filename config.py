@@ -35,6 +35,8 @@ DEFAULT_CONFIG = {
     # Pole zůstává jen kvůli převodu starších konfigurací a pro systémy bez trezoru.
     "groq_api_key": "",
     "groq_model": "whisper-large-v3-turbo",
+    # Přepisovat v počítači i s uloženým Groq klíčem (pomalejší, nahrávka neopustí počítač)
+    "offline": False,
     "sounds": True,
     # Za přepsaný text přidat mezeru (hodí se při diktování po kouscích)
     "trailing_space": True,
@@ -134,7 +136,7 @@ def validate(cfg):
         out["model"] = d["model"]
     if out["ui_language"] not in UI_LANGUAGES:
         out["ui_language"] = d["ui_language"]
-    for k in ("sounds", "trailing_space", "history", "store_titles", "overlay", "duck_audio", "check_updates"):
+    for k in ("sounds", "trailing_space", "history", "store_titles", "overlay", "duck_audio", "check_updates", "offline"):
         out[k] = bool(out[k])
     try:
         out["duck_level"] = max(0.0, min(1.0, float(out["duck_level"])))
