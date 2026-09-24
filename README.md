@@ -1,5 +1,7 @@
 # Diktovátko
 
+**Verze 0.7.0**, viz [přehled změn](CHANGELOG.md).
+
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
 Bezplatná open-source alternativa k [Wispr Flow](https://wisprflow.ai) pro **Windows a Mac**. Funguje v jakékoli aplikaci, třeba ve Slacku, Outlooku, prohlížeči, Teams, Jiře nebo v chatu s AI. Umí česky i dalších 90+ jazyků.

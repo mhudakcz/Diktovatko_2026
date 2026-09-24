@@ -6,6 +6,7 @@ import webview
 import config
 import history
 import plat
+from version import VERSION
 
 APP_DIR = config.APP_DIR
 UI_REQUEST = APP_DIR / ".ui_request"
@@ -52,6 +53,7 @@ class Api:
             "config": config.load_config(),
             "presets": plat.presets(),
             "platform": plat.NAME,
+            "version": VERSION,
             "languages": LANGUAGES,
             "models": MODELS,
             "autostart": config.autostart_enabled(),

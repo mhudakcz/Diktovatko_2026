@@ -25,6 +25,7 @@ from PIL import Image, ImageDraw
 import config
 import history
 import plat
+from version import VERSION
 
 APP_DIR = config.APP_DIR
 LOG_PATH = APP_DIR / "diktovatko.log"
@@ -212,6 +213,7 @@ class App:
             ICONS["loading"],
             "Diktovátko",
             menu=pystray.Menu(
+                pystray.MenuItem(f"Diktovátko {VERSION}", None, enabled=False),
                 pystray.MenuItem(lambda _: STATUS_TEXT[self.state], None, enabled=False),
                 pystray.MenuItem(
                     lambda _: "Zkratka: " + ", ".join(hotkey_label(h) for h in self.cfg["hotkeys"]),
@@ -403,7 +405,7 @@ class App:
         self.hotkeys.set_hotkeys(self.cfg["hotkeys"])
         if self.cfg["sounds"]:
             plat.beep("ready")
-        log.info("Připraveno, zkratky: %s (%s)", self.cfg["hotkeys"], self.cfg["mode"])
+        log.info("Diktovátko %s připraveno, zkratky: %s (%s)", VERSION, self.cfg["hotkeys"], self.cfg["mode"])
 
     def open_window(self, view):
         UI_REQUEST.write_text(view, encoding="utf-8")
