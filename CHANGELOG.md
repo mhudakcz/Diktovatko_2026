@@ -2,6 +2,11 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.7.2 – 2026-09-24
+
+- Web na telefonu: mikrofon v úvodu už se nesmrskne, nadpisy Windows/Mac se nelámou, nahoře zůstává tlačítko Návod.
+- Úvod webu zmiňuje, že jde o bezplatnou alternativu k Wispr Flow (v aplikaci ani v nastavení tato zmínka není).
+
 ## 0.7.1 – 2026-09-24
 
 - Varianta 2 webu je teď hlavní stránka. Stará adresa `v2.html` přesměruje na hlavní stránku, původní varianta zůstává jen v historii gitu.
