@@ -415,12 +415,12 @@ a.coffee::before { animation-delay: 2.6s; }
 .mode::after, .news::after, .free-help::after, .os::after, .price::after {
   content: ""; position: absolute; z-index: -1; left: 50%; top: 50%; width: 260%; aspect-ratio: 1; translate: -50% -50%; pointer-events: none;
   background: conic-gradient(from 0deg, rgb(143 135 232 / .16), transparent 28%, rgb(255 90 110 / .08), transparent 58%, rgb(255 210 63 / .10), transparent 86%);
-  animation: swirl 30s linear infinite;
+  opacity: .5; animation: swirl 60s linear infinite;
 }
 .os::after { background: conic-gradient(from 0deg, rgb(185 179 255 / .22), transparent 30%, rgb(255 90 110 / .14), transparent 62%, rgb(255 210 63 / .10), transparent 88%); }
-.price::after { width: 160%; background: conic-gradient(from 0deg, rgb(255 255 255 / .38), transparent 22%, rgb(255 90 110 / .10), transparent 50%, rgb(255 255 255 / .28), transparent 78%); animation-duration: 45s; }
-.mode.on::after, .news:nth-child(2)::after, .os:nth-child(2)::after { animation-direction: reverse; animation-duration: 36s; }
-.news:nth-child(3)::after, .free-help::after { animation-duration: 26s; }
+.price::after { width: 160%; background: conic-gradient(from 0deg, rgb(255 255 255 / .38), transparent 22%, rgb(255 90 110 / .10), transparent 50%, rgb(255 255 255 / .28), transparent 78%); opacity: .6; animation-duration: 90s; }
+.mode.on::after, .news:nth-child(2)::after, .os:nth-child(2)::after { animation-direction: reverse; animation-duration: 75s; }
+.news:nth-child(3)::after, .free-help::after { animation-duration: 52s; }
 .price > .wrap { position: relative; }
 
 /* tlačítko na kafe v horní liště, vždy vidět */
@@ -643,9 +643,9 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
       <h2 class="reveal">Neuigkeiten</h2>
       <p class="intro reveal" style="--d:.1s">Diktovátko wird laufend weiterentwickelt. Das kam zuletzt dazu.</p>
       <div class="news-grid">
-        <div class="news reveal" style="--d:0.0s"><h3>0.12.4 <time datetime="2026-09-25">25. September 2026</time> <span class="new">neueste</span></h3><ul><li>Neuer Einstieg der Website: Das Mikrofon ist von einem kreisförmigen Equalizer, einer wechselnden Farbform und Umlaufbahnen umgeben, es atmet sanft, und im Hintergrund schweben abstrakte Formen.</li><li>Das langsam kreisende Licht gibt es jetzt auch in weiteren Blöcken: Offline/Online-Karten, Neuigkeiten, Installation und Preis.</li></ul></div>
-        <div class="news reveal" style="--d:0.1s"><h3>0.12.3 <time datetime="2026-09-25">25. September 2026</time></h3><ul><li>Die Website wird lebendig: Im Einstieg ziehen farbige Lichter und Schallwellen vorbei, die Überschrift wechselt die Farben, gelbe Schaltflächen schimmern und dunkle Flächen haben ein langsam kreisendes Licht. Bei reduzierter Bewegung bleibt die Seite ruhig.</li></ul></div>
-        <div class="news reveal" style="--d:0.2s"><h3>0.12.2 <time datetime="2026-09-24">24. September 2026</time></h3><ul><li>Die App-Sprache (Tschechisch, Englisch, Deutsch) lässt sich direkt unten links im Fenster umschalten und gilt sofort. In den Einstellungen steht die Sprachwahl jetzt ganz oben.</li><li>Die Website hat einen Änderungsverlauf: Neuigkeiten auf der Startseite und eine eigene Seite mit allen Versionen.</li></ul></div>
+        <div class="news reveal" style="--d:0.0s"><h3>0.12.5 <time datetime="2026-09-25">25. September 2026</time> <span class="new">neueste</span></h3><ul><li>Das kreisende Licht in den Karten ist dezenter und langsamer.</li></ul></div>
+        <div class="news reveal" style="--d:0.1s"><h3>0.12.4 <time datetime="2026-09-25">25. September 2026</time></h3><ul><li>Neuer Einstieg der Website: Das Mikrofon ist von einem kreisförmigen Equalizer, einer wechselnden Farbform und Umlaufbahnen umgeben, es atmet sanft, und im Hintergrund schweben abstrakte Formen.</li><li>Das langsam kreisende Licht gibt es jetzt auch in weiteren Blöcken: Offline/Online-Karten, Neuigkeiten, Installation und Preis.</li></ul></div>
+        <div class="news reveal" style="--d:0.2s"><h3>0.12.3 <time datetime="2026-09-25">25. September 2026</time></h3><ul><li>Die Website wird lebendig: Im Einstieg ziehen farbige Lichter und Schallwellen vorbei, die Überschrift wechselt die Farben, gelbe Schaltflächen schimmern und dunkle Flächen haben ein langsam kreisendes Licht. Bei reduzierter Bewegung bleibt die Seite ruhig.</li></ul></div>
       </div>
       <a class="news-more reveal" href="zmeny.html">Vollständiger Änderungsverlauf</a>
     </div>
@@ -667,7 +667,7 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
 <footer class="bigfoot">
   <div class="wrap">
     <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
-    <div class="foot-row"><span>Diktovátko <a href="zmeny.html">Version 0.12.4</a> von Michal Hudák. MIT-Lizenz.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+    <div class="foot-row"><span>Diktovátko <a href="zmeny.html">Version 0.12.5</a> von Michal Hudák. MIT-Lizenz.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
   </div>
 </footer>
 

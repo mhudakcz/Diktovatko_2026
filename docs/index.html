@@ -415,12 +415,12 @@ a.coffee::before { animation-delay: 2.6s; }
 .mode::after, .news::after, .free-help::after, .os::after, .price::after {
   content: ""; position: absolute; z-index: -1; left: 50%; top: 50%; width: 260%; aspect-ratio: 1; translate: -50% -50%; pointer-events: none;
   background: conic-gradient(from 0deg, rgb(143 135 232 / .16), transparent 28%, rgb(255 90 110 / .08), transparent 58%, rgb(255 210 63 / .10), transparent 86%);
-  animation: swirl 30s linear infinite;
+  opacity: .5; animation: swirl 60s linear infinite;
 }
 .os::after { background: conic-gradient(from 0deg, rgb(185 179 255 / .22), transparent 30%, rgb(255 90 110 / .14), transparent 62%, rgb(255 210 63 / .10), transparent 88%); }
-.price::after { width: 160%; background: conic-gradient(from 0deg, rgb(255 255 255 / .38), transparent 22%, rgb(255 90 110 / .10), transparent 50%, rgb(255 255 255 / .28), transparent 78%); animation-duration: 45s; }
-.mode.on::after, .news:nth-child(2)::after, .os:nth-child(2)::after { animation-direction: reverse; animation-duration: 36s; }
-.news:nth-child(3)::after, .free-help::after { animation-duration: 26s; }
+.price::after { width: 160%; background: conic-gradient(from 0deg, rgb(255 255 255 / .38), transparent 22%, rgb(255 90 110 / .10), transparent 50%, rgb(255 255 255 / .28), transparent 78%); opacity: .6; animation-duration: 90s; }
+.mode.on::after, .news:nth-child(2)::after, .os:nth-child(2)::after { animation-direction: reverse; animation-duration: 75s; }
+.news:nth-child(3)::after, .free-help::after { animation-duration: 52s; }
 .price > .wrap { position: relative; }
 
 /* tlačítko na kafe v horní liště, vždy vidět */
@@ -643,9 +643,9 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
       <h2 class="reveal">Co je nového</h2>
       <p class="intro reveal" style="--d:.1s">Diktovátko se vyvíjí průběžně. Tohle přibylo naposledy.</p>
       <div class="news-grid">
-        <div class="news reveal" style="--d:0.0s"><h3>0.12.4 <time datetime="2026-09-25">25. září 2026</time> <span class="new">nejnovější</span></h3><ul><li>Nový úvod webu: mikrofon obklopuje kruhový ekvalizér, měnící se barevný tvar a oběžné dráhy, mikrofon jemně dýchá a pozadím plují abstraktní tvary.</li><li>Pomalu kroužící světlo je i v dalších blocích: karty Offline/Online, Co je nového, instalace a cena.</li></ul></div>
-        <div class="news reveal" style="--d:0.1s"><h3>0.12.3 <time datetime="2026-09-25">25. září 2026</time></h3><ul><li>Web ožil: v úvodu plují barevné záře a zvukové vlny, nadpis se přelévá barvami, žlutá tlačítka mají odlesk a tmavé panely jemně kroužící světlo. Kdo má v systému omezené animace, uvidí stránku v klidu.</li></ul></div>
-        <div class="news reveal" style="--d:0.2s"><h3>0.12.2 <time datetime="2026-09-24">24. září 2026</time></h3><ul><li>Jazyk aplikace (čeština, angličtina, němčina) jde přepnout hned vlevo dole v okně, platí okamžitě. V Nastavení je volba jazyka nově nahoře.</li><li>Na webu je historie změn: novinky na úvodní stránce a samostatná stránka se všemi verzemi.</li></ul></div>
+        <div class="news reveal" style="--d:0.0s"><h3>0.12.5 <time datetime="2026-09-25">25. září 2026</time> <span class="new">nejnovější</span></h3><ul><li>Kroužící světlo v kartách je jemnější a pomalejší.</li></ul></div>
+        <div class="news reveal" style="--d:0.1s"><h3>0.12.4 <time datetime="2026-09-25">25. září 2026</time></h3><ul><li>Nový úvod webu: mikrofon obklopuje kruhový ekvalizér, měnící se barevný tvar a oběžné dráhy, mikrofon jemně dýchá a pozadím plují abstraktní tvary.</li><li>Pomalu kroužící světlo je i v dalších blocích: karty Offline/Online, Co je nového, instalace a cena.</li></ul></div>
+        <div class="news reveal" style="--d:0.2s"><h3>0.12.3 <time datetime="2026-09-25">25. září 2026</time></h3><ul><li>Web ožil: v úvodu plují barevné záře a zvukové vlny, nadpis se přelévá barvami, žlutá tlačítka mají odlesk a tmavé panely jemně kroužící světlo. Kdo má v systému omezené animace, uvidí stránku v klidu.</li></ul></div>
       </div>
       <a class="news-more reveal" href="zmeny.html">Celá historie změn</a>
     </div>
@@ -667,7 +667,7 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
 <footer class="bigfoot">
   <div class="wrap">
     <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
-    <div class="foot-row"><span>Diktovátko <a href="zmeny.html">verze 0.12.4</a> vytvořil Michal Hudák. Licence MIT.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+    <div class="foot-row"><span>Diktovátko <a href="zmeny.html">verze 0.12.5</a> vytvořil Michal Hudák. Licence MIT.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
   </div>
 </footer>
 

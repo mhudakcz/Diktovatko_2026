@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.12.5 – 2026-09-25
+
+- Web: kroužící světlo v kartách Offline/Online, Co je nového, Jak pomoct, instalace a v bloku s cenou je o polovinu slabší a dvakrát pomalejší. Panel s přepínačem a sekce Instalace zůstaly beze změny.
+
 ## 0.12.4 – 2026-09-25
 
 - Web (CZ, EN, DE): nový úvod – kolem mikrofonu kruhový ekvalizér, měnící se barevný tvar a oběžné dráhy s tečkami, mikrofon jemně dýchá, v pozadí plují abstraktní tvary. Při přehrání ukázky ekvalizér zrychlí a zbarví se.
