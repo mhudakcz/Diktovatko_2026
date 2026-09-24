@@ -2,6 +2,12 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.8.1 – 2026-09-24
+
+- Web (CZ, EN, DE): zdůraznění, že jde o alternativu bez měsíčních poplatků (řádek v úvodu a sekce „0 Kč měsíčně“).
+- Nová sekce o rychlém přepisu: proč je potřeba klíč, postup, jak ho získat a vložit do aplikace, s náhledem nastavení.
+- Nová sekce „Offline, nebo online“ s varováním, že v online režimu odchází nahrávka na servery Groq v USA.
+
 ## 0.8.0 – 2026-09-24
 
 - Jazykové verze: aplikace (okno, menu ikony, indikátor, export) v češtině, angličtině a němčině. Volba „Jazyk aplikace“ v nastavení, výchozí je čeština.

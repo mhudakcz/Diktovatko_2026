@@ -60,6 +60,62 @@ p { margin: 0; }
 .rail li.on a { background: var(--sun); border-color: var(--sun); transform: scale(1.35); }
 .rail a span { position: absolute; right: 30px; top: 50%; translate: 0 -50%; padding: 5px 10px; border-radius: 8px; background: var(--night); color: #fff; font: 500 13px var(--body); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; border: 1px solid rgb(185 179 255 / .25); }
 .rail li.on a span, .rail a:hover span, .rail a:focus-visible span { opacity: 1; }
+/* bez poplatků, klíč, offline/online */
+.keysec { background: var(--card); }
+.free { margin-top: 18px; font-size: 16px; color: var(--lilac); animation: fade .8s .6s both; }
+.free b { color: var(--sun); font-weight: 700; }
+.price { background: var(--sun); color: #16133A; }
+.price h2 { color: #16133A; }
+.price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.zero { font: 900 clamp(88px, 15vw, 210px)/.82 var(--display); letter-spacing: -0.06em; }
+.zero small { display: block; margin-top: 14px; font: 700 clamp(20px, 2.4vw, 30px)/1.1 var(--display); letter-spacing: -0.02em; }
+.price ul { margin: 26px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; font-size: 18px; }
+.price li { display: flex; gap: 12px; align-items: baseline; }
+.price li::before { content: "✓"; font-weight: 900; }
+.price .intro { color: #3A3560; }
+.key-grid { display: grid; grid-template-columns: 1fr .95fr; gap: 64px; align-items: start; margin-top: 56px; }
+.speed { display: grid; gap: 14px; margin-top: 8px; }
+.speed div { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: center; font-size: 15px; }
+.speed .b { height: 14px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.speed .b span { display: block; height: 100%; border-radius: 999px; }
+.speed .off .b span { width: 100%; background: #CFCBEA; }
+.speed .on .b span { width: 6%; background: var(--coral); }
+.speed em { font-style: normal; color: var(--muted); font-size: 14px; }
+.ksteps { list-style: none; margin: 34px 0 0; padding: 0; display: grid; gap: 18px; counter-reset: k; }
+.ksteps li { counter-increment: k; display: grid; grid-template-columns: 40px 1fr; gap: 14px; color: var(--ink-2); }
+.ksteps li::before { content: counter(k); width: 40px; height: 40px; border-radius: 50%; background: var(--night); color: var(--sun); display: grid; place-items: center; font: 700 16px var(--display); }
+.ksteps b { color: var(--ink); }
+.ksteps a { color: var(--coral); }
+.mock { position: sticky; top: 96px; border-radius: 22px; background: var(--paper); border: 1px solid var(--line); box-shadow: 0 40px 80px -40px rgb(26 20 70 / .45); overflow: hidden; }
+.mock-top { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: var(--night); color: #fff; font: 600 13px var(--body); }
+.mock-top i { width: 10px; height: 10px; border-radius: 50%; background: var(--coral); }
+.mock-body { padding: 22px; display: grid; gap: 14px; }
+.mock-body h4 { margin: 0; font: 700 16px var(--display); }
+.mock-row { display: grid; gap: 8px; }
+.mock-row label { font-weight: 600; font-size: 15px; }
+.mock-row p { font-size: 13px; color: var(--muted); }
+.mock-field { display: flex; gap: 8px; }
+.mock-field span { flex: 1; padding: 10px 12px; border-radius: 10px; border: 2px solid var(--coral); background: #FFF6F7; font: 500 14px "Cascadia Code", Consolas, monospace; color: #16133A; overflow: hidden; white-space: nowrap; }
+.mock-field b { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); font-size: 13px; font-weight: 500; }
+.mock-save { justify-self: start; padding: 10px 18px; border-radius: 10px; background: #0E9F6E; color: #fff; font-weight: 600; font-size: 14px; }
+.keynote { margin-top: 26px; padding: 16px 18px; border-radius: 14px; background: var(--paper); border: 1px solid var(--line); font-size: 15px; color: var(--ink-2); }
+.modes { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 56px; }
+.mode { padding: 30px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); }
+.mode h3 { font: 700 22px/1.2 var(--display); letter-spacing: -0.02em; }
+.mode .tag { display: inline-block; margin-bottom: 12px; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.mode.off .tag { background: #E3F6EE; color: #0B6B4B; }
+.mode.on .tag { background: #FFE8EB; color: #B2253A; }
+.mode ul { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; color: var(--ink-2); }
+.mode li { padding-left: 26px; position: relative; }
+.mode li::before { position: absolute; left: 0; top: 0; font-weight: 800; }
+.mode li.plus::before { content: "+"; color: #0E9F6E; }
+.mode li.minus::before { content: "−"; color: var(--coral); }
+.alert { margin-top: 24px; display: grid; grid-template-columns: 44px 1fr; gap: 16px; padding: 22px 24px; border-radius: 20px; background: #FFF3C4; color: #4A3900; border: 2px solid var(--sun); }
+.alert svg { width: 30px; height: 30px; }
+.alert h3 { font: 700 19px/1.3 var(--display); color: #2E2400; margin-bottom: 6px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .alert { background: #3A2F0A; color: #FFE8A3; } :root:not([data-theme="light"]) .alert h3 { color: #FFF3C4; } :root:not([data-theme="light"]) .mock-field span { background: #2A1F55; color: #fff; } }
+@media (max-width: 900px) { .price-grid, .key-grid, .modes { grid-template-columns: 1fr; gap: 32px; } .mock { position: static; } .speed div { grid-template-columns: 1fr; gap: 6px; } }
+
 @media (max-width: 900px) { .rail { display: none; } .progress { height: 5px; } }
 
 /* ================= hero ================= */
@@ -285,6 +341,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
           <a class="btn solid" id="dl-win" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.4 4.6v7H3zM11.4 4.4 21 3v8.6h-9.6zM3 12.4h7.4v7L3 18.4zM11.4 12.4H21V21l-9.6-1.4z"/></svg>Download for Windows</a>
           <a class="btn line" id="dl-mac" href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>Download for Mac</a>
         </div>
+        <p class="free"><b>$0 a month.</b> No subscription, no account, no word limit.</p>
       </div>
       <div class="mic-zone" id="mic-zone">
         <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
@@ -373,6 +430,55 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
     </div>
   </section>
 
+  <section class="block price" id="cena">
+    <div class="wrap price-grid">
+      <div class="zero reveal">$0<small>a month, for good</small></div>
+      <div>
+        <h2 class="reveal">No monthly fees. Ever.</h2>
+        <p class="intro reveal" style="--d:.1s">Paid dictation apps charge a subscription every month. Diktovátko is open source and free. No card, no account, and no counting how many words you have left.</p>
+        <ul class="reveal" style="--d:.2s"><li>No subscription and no trial that runs out</li><li>No account, no sign-up</li><li>No limit on words or dictation length</li><li>Fast transcription via Groq is free on its free tier too</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block keysec" id="klic">
+    <div class="wrap">
+      <h2 class="reveal">Want text in a second? Get a free key.</h2>
+      <p class="intro reveal" style="--d:.1s">Without a key, Diktovátko transcribes on your computer. It works right away, but transcription takes about as long as the recording. With a free key from Groq, the text is ready in about a second.</p>
+      <div class="key-grid">
+        <div>
+          <div class="speed reveal" role="img" aria-label="10 s of speech, about 10 s wait; 10 s of speech, about 1 s wait">
+            <div class="off"><span>Offline on your computer<br><em>10 s of speech, about 10 s wait</em></span><span class="b"><span></span></span></div>
+            <div class="on"><span>With a Groq key<br><em>10 s of speech, about 1 s wait</em></span><span class="b"><span></span></span></div>
+          </div>
+          <ol class="ksteps"><li><span>Open <a href="https://console.groq.com/keys">console.groq.com/keys</a>.</span></li><li><span>Sign in with <b>Google</b> or email. No credit card needed.</span></li><li><span>Click <b>Create API Key</b>, name it for example <i>Diktovátko</i> and confirm.</span></li><li><span>Copy the key starting with <b>gsk_</b> using <b>Copy</b>. It is shown only once.</span></li><li><span>Click the Diktovátko icon, open <b>Settings</b>, paste the key into <b>Groq API key</b> and click <b>Save settings</b>. Done, your next dictation goes through Groq.</span></li></ol>
+          <p class="keynote"><b>The key is yours alone.</b> Every user creates their own, it is stored only on your computer, and you shouldn't send it to anyone. If it leaks, delete it at console.groq.com and create a new one. The free tier covers hours of dictation a day, and without a card on file you are never charged.</p>
+        </div>
+        <div class="mock reveal" aria-hidden="true">
+          <div class="mock-top"><i></i>Diktovátko, Settings</div>
+          <div class="mock-body">
+            <h4>Transcription</h4>
+            <div class="mock-row"><label>Groq API key</label><p>With a key, transcription takes about a second.</p>
+              <div class="mock-field"><span>gsk_••••••••••••••••••••••</span><b>Show</b></div></div>
+            <span class="mock-save">✓ Saved</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="soukromi">
+    <div class="wrap">
+      <h2 class="reveal">Offline or online. You decide.</h2>
+      <p class="intro reveal" style="--d:.1s">Diktovátko can transcribe in two ways. You switch between them simply by whether a Groq key is filled in under Settings.</p>
+      <div class="modes">
+        <div class="mode off reveal"><span class="tag">No key</span><h3>Offline on your computer</h3><ul><li class="plus">Your recording and text never leave your computer</li><li class="plus">Works without internet</li><li class="minus">Transcription takes about as long as the recording</li><li class="minus">About 1.6 GB downloads on first use</li></ul></div>
+        <div class="mode on reveal" style="--d:.12s"><span class="tag">With a Groq key</span><h3>Online via Groq</h3><ul><li class="plus">Text is ready in about a second</li><li class="plus">Light on your computer</li><li class="minus">The recording of your voice leaves your computer</li><li class="minus">Needs an internet connection</li></ul></div>
+      </div>
+      <div class="alert reveal" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div><h3>Heads up: in online mode, what you say leaves your computer</h3><p>With a key, the recording of your voice is sent to Groq servers in the USA and turned into text there. Don't dictate anything that must not leave your company this way: passwords, client personal data, health information or confidential contracts. For sensitive content, delete the key in Settings and transcription runs offline. Your dictation history is stored only on your computer in both modes.</p></div></div>
+    </div>
+  </section>
+
   <section class="block inst" id="instalace">
     <div class="wrap">
       <h2 class="reveal">Dictating in ten minutes.</h2>
@@ -399,7 +505,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
 <footer class="bigfoot">
   <div class="wrap">
     <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
-    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">version 0.8.0</a> by Michal Hudák. MIT licence.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">version 0.8.1</a> by Michal Hudák. MIT licence.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
   </div>
 </footer>
 
@@ -497,7 +603,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
   }
 
   /* ---------- page position rail ---------- */
-  const SECTIONS = [["top", "Intro"], ["ukazka", "Demo"], ["uspora", "Time saved"], ["historie", "History"], ["funkce", "Features"], ["instalace", "Install"]];
+  const SECTIONS = [["top", "Intro"], ["ukazka", "Demo"], ["uspora", "Time saved"], ["historie", "History"], ["funkce", "Features"], ["cena", "Price"], ["klic", "Fast mode"], ["soukromi", "Privacy"], ["instalace", "Install"]];
   document.querySelector(".hero").id = "top";
   const dotsEl = document.getElementById("rail-dots"), railFill = document.getElementById("rail-fill"), pct = document.getElementById("pct");
   dotsEl.innerHTML = SECTIONS.map(([id, label]) => `<li><a href="#${id}"><span>${label}</span></a></li>`).join("");
