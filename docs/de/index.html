@@ -131,6 +131,27 @@ p { margin: 0; }
 .free-help a { color: var(--coral); }
 @media (max-width: 900px) { .support-grid { grid-template-columns: 1fr; gap: 32px; } }
 
+.sw { margin-top: 32px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: center; padding: 30px 34px; border-radius: 24px; background: var(--night); color: #fff; }
+.sw h3 { font: 700 22px/1.2 var(--display); letter-spacing: -0.02em; margin: 0 0 10px; }
+.sw p { margin: 0; color: var(--lilac); }
+.sw-pill { justify-self: center; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 18px; border-radius: 999px; background: #1B2230; border: 1px solid #343D50; max-width: 100%; }
+.sw-pill .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--coral); flex: none; }
+.sw-pill .bars { display: flex; align-items: center; gap: 3px; height: 26px; }
+.sw-pill .bars i { width: 3px; height: calc(var(--h) * 1%); border-radius: 2px; background: #F0F3F8; animation: swb 1.1s ease-in-out infinite alternate; }
+.sw-pill .bars i:nth-child(3n) { animation-delay: -.4s; } .sw-pill .bars i:nth-child(3n+1) { animation-delay: -.8s; }
+@keyframes swb { to { height: calc(var(--h) * .35%); } }
+.sw-pill .time { font: 500 14px var(--body); color: #AAB2C4; }
+.sw-badge { --c: #8D96FF; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--c); background: color-mix(in srgb, var(--c) 22%, #1B2230); color: #fff; font: 600 14px var(--body); cursor: pointer; white-space: nowrap; transition: background .2s, border-color .2s; }
+.sw-badge:hover { background: color-mix(in srgb, var(--c) 34%, #1B2230); }
+.sw-badge:focus-visible { outline: 2px solid var(--sun); outline-offset: 3px; }
+.sw-badge svg { width: 16px; height: 16px; color: var(--c); }
+.sw-badge .sp { color: var(--c); font-weight: 500; }
+.sw-badge .i-slow, .sw-badge.local .i-fast { display: none; }
+.sw-badge.local { --c: #5ED6A0; } .sw-badge.local .i-slow { display: block; }
+.sw-note { grid-column: 1 / -1; margin-top: -12px; font-size: 14px; color: var(--lilac-2); min-height: 1.4em; }
+@media (max-width: 900px) { .sw { grid-template-columns: 1fr; padding: 26px 20px; } .sw-pill { justify-self: start; } .sw-note { margin-top: 0; } }
+@media (max-width: 420px) { .sw-pill .bars i:nth-child(n+8) { display: none; } }
+@media (prefers-reduced-motion: reduce) { .sw-pill .bars i { animation: none; } }
 @media (max-width: 900px) { .price-grid, .key-grid, .modes { grid-template-columns: 1fr; gap: 32px; } .mock { position: static; } .speed div { grid-template-columns: 1fr; gap: 6px; } }
 
 @media (max-width: 900px) { .rail { display: none; } .progress { height: 5px; } }
@@ -495,12 +516,17 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
   <section class="block" id="soukromi">
     <div class="wrap">
       <h2 class="reveal">Offline oder online. Sie entscheiden.</h2>
-      <p class="intro reveal" style="--d:.1s">Diktovátko kann auf zwei Arten transkribieren. Sie wechseln einfach dadurch, ob in den Einstellungen ein Groq-Schlüssel eingetragen ist.</p>
+      <p class="intro reveal" style="--d:.1s">Diktovátko kann auf zwei Arten transkribieren. Mit gespeichertem Schlüssel wechseln Sie mit einem Klick direkt im Indikator.</p>
       <div class="modes">
-        <div class="mode off reveal"><span class="tag">Ohne Schlüssel</span><h3>Offline auf dem Computer</h3><ul><li class="plus">Aufnahme und Text verlassen nie Ihren Computer</li><li class="plus">Funktioniert ohne Internet</li><li class="plus">Auch mit Schlüssel per Klick im Indikator umschaltbar</li><li class="minus">Die Transkription dauert etwa so lange wie die Aufnahme</li><li class="minus">Beim ersten Mal werden etwa 1,6 GB heruntergeladen</li></ul></div>
-        <div class="mode on reveal" style="--d:.12s"><span class="tag">Mit Groq-Schlüssel</span><h3>Online über Groq</h3><ul><li class="plus">Der Text ist in etwa einer Sekunde fertig</li><li class="plus">Schont Ihren Computer</li><li class="plus">Nichts wird veröffentlicht, Groq trainiert nicht mit Aufnahmen und speichert mit Zero Data Retention nichts</li><li class="minus">Die Aufnahme Ihrer Stimme verlässt Ihren Computer</li><li class="minus">Braucht eine Internetverbindung</li></ul></div>
+        <div class="mode off reveal"><span class="tag">Local · slow</span><h3>Offline auf dem Computer</h3><ul><li class="plus">Aufnahme und Text verlassen nie Ihren Computer</li><li class="plus">Funktioniert ohne Internet</li><li class="minus">Die Transkription dauert etwa so lange wie die Aufnahme</li><li class="minus">Beim ersten Mal werden etwa 1,6 GB heruntergeladen</li></ul></div>
+        <div class="mode on reveal" style="--d:.12s"><span class="tag">Cloud · fast, mit Groq-Schlüssel</span><h3>Online über Groq</h3><ul><li class="plus">Der Text ist in etwa einer Sekunde fertig</li><li class="plus">Schont Ihren Computer</li><li class="plus">Nichts wird veröffentlicht, Groq trainiert nicht mit Aufnahmen und speichert mit Zero Data Retention nichts</li><li class="minus">Die Aufnahme Ihrer Stimme verlässt Ihren Computer</li><li class="minus">Braucht eine Internetverbindung</li></ul></div>
       </div>
-      <div class="alert reveal" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div><h3>Achtung: Im Online-Modus verlässt das Gesagte Ihren Computer</h3><p>Mit Schlüssel wird die Aufnahme Ihrer Stimme an Server von Groq in den USA gesendet und dort in Text umgewandelt. Diktieren Sie so nichts, was das Unternehmen nicht verlassen darf: Passwörter, personenbezogene Kundendaten, Gesundheitsdaten oder vertrauliche Verträge. Für Sensibles löschen Sie den Schlüssel in den Einstellungen, dann läuft die Transkription offline. Der Diktatverlauf wird in beiden Modi nur auf Ihrem Computer gespeichert.</p></div></div>
+      <div class="sw reveal">
+        <div><h3>Der Schalter sitzt direkt im Indikator</h3><p>Beim Diktieren zeigt der Indikator rechts ein Etikett. Ein Klick entscheidet, ob die Aufnahme in die Cloud geht oder auf dem Computer bleibt. Das gilt sofort, auch für den Satz, den Sie gerade sprechen, und der Schlüssel bleibt gespeichert. Klicken Sie ruhig auf das Etikett.</p></div>
+        <div class="sw-pill"><span class="dot"></span><span class="bars" aria-hidden="true"><i style="--h:30"></i><i style="--h:60"></i><i style="--h:45"></i><i style="--h:85"></i><i style="--h:55"></i><i style="--h:95"></i><i style="--h:40"></i><i style="--h:70"></i><i style="--h:50"></i><i style="--h:80"></i><i style="--h:35"></i><i style="--h:65"></i></span><span class="time">0:07</span><button type="button" class="sw-badge" id="sw-badge" aria-pressed="false" aria-label="Zwischen Cloud und Transkription auf dem Computer wechseln" data-fast="Cloud" data-slow="Local" data-sfast=" · fast" data-sslow=" · slow" data-nfast="Cloud · fast: Transkription über Groq, fertig in etwa einer Sekunde." data-nslow="Local · slow: Die Aufnahme bleibt auf Ihrem Computer, die Transkription dauert länger."><svg class="i-fast" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg><svg class="i-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="12" r="5"/><path d="M9 12a1.6 1.6 0 1 1 1.6-1.6"/><path d="M2 18h16a3 3 0 0 0 3-3v-2"/><path d="m19.5 13-1.2-4M21 13l1.6-3.6"/></svg><span class="nm">Cloud</span><span class="sp"> · fast</span></button></div>
+        <p class="sw-note" id="sw-note" aria-live="polite">Cloud · fast: Transkription über Groq, fertig in etwa einer Sekunde.</p>
+      </div>
+      <div class="alert reveal" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div><h3>Achtung: Im Online-Modus verlässt das Gesagte Ihren Computer</h3><p>Mit Schlüssel wird die Aufnahme Ihrer Stimme an Server von Groq in den USA gesendet und dort in Text umgewandelt. Diktieren Sie so nichts, was das Unternehmen nicht verlassen darf: Passwörter, personenbezogene Kundendaten, Gesundheitsdaten oder vertrauliche Verträge. Für Sensibles schalten Sie den Indikator auf Local · slow, dann läuft die Transkription offline. Der Diktatverlauf wird in beiden Modi nur auf Ihrem Computer gespeichert.</p></div></div>
     </div>
   </section>
 
@@ -541,7 +567,7 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
 <footer class="bigfoot">
   <div class="wrap">
     <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
-    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">Version 0.12.0</a> von Michal Hudák. MIT-Lizenz.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">Version 0.12.1</a> von Michal Hudák. MIT-Lizenz.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
   </div>
 </footer>
 
@@ -693,6 +719,19 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
     u.onstart = () => { zone.classList.add("speaking"); tip.textContent = "So schnell diktieren Sie…"; };
     u.onend = u.onerror = () => { zone.classList.remove("speaking"); tip.textContent = "Ein paar Sekunden Sprechen. Getippt hätte es eine halbe Minute gedauert."; };
     synth.speak(u);
+  });
+})();
+</script>
+<script>
+(() => {
+  const b = document.getElementById("sw-badge"), n = document.getElementById("sw-note");
+  if (!b) return;
+  b.addEventListener("click", () => {
+    const local = b.classList.toggle("local");
+    b.setAttribute("aria-pressed", local);
+    b.querySelector(".nm").textContent = local ? b.dataset.slow : b.dataset.fast;
+    b.querySelector(".sp").textContent = local ? b.dataset.sslow : b.dataset.sfast;
+    n.textContent = local ? b.dataset.nslow : b.dataset.nfast;
   });
 })();
 </script>

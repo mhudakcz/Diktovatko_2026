@@ -90,6 +90,19 @@ class Api:
             "autostart": config.autostart_enabled(),
         }
 
+    def engine(self):
+        """Způsob přepisu pro přepínač v levém panelu (mění se i z indikátoru a menu ikony)."""
+        cfg = config.load_config()
+        return {"offline": cfg["offline"], "has_key": bool(config.groq_key(cfg))}
+
+    def set_offline(self, on):
+        """Přepnout Cloud / Local hned, bez tlačítka Uložit (tray aplikace si změnu načte sama)."""
+        cfg = config.load_config()
+        cfg["offline"] = bool(on)
+        config.save_config(cfg)
+        log.info("Přepis přepnut z okna: %s", "offline" if on else "Groq")
+        return self.engine()
+
     def save_settings(self, cfg, autostart, key_action="keep", new_key=""):
         """key_action: "keep" = klíč nechat, "set" = uložit new_key, "remove" = smazat."""
         current = config.load_config()

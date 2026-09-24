@@ -9,6 +9,7 @@
 <style>
 :root {
   --fog: #EEF1F5; --paper: #FFFFFF; --ink: #1B2230; --ink-2: #4A5366; --muted: #7B8496;
+  --local: #0E9F6E;
   --line: #DCE1E9; --ultra: #3847F5; --ultra-soft: #E6E8FE; --voice: #F0405A; --sel: #E9EBFE;
   --display: "Bricolage Grotesque", "Segoe UI Variable Display", "Segoe UI", sans-serif;
   --body: "Onest", "Segoe UI Variable Text", "Segoe UI", sans-serif;
@@ -17,12 +18,12 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --fog: #12151C; --paper: #1A1F29; --ink: #E8EBF2; --ink-2: #B5BCCB; --muted: #7F889B;
-    --line: #2A3140; --ultra: #8490FF; --ultra-soft: #262C4F; --sel: #1F2440; color-scheme: dark;
+    --line: #2A3140; --ultra: #8490FF; --ultra-soft: #262C4F; --sel: #1F2440; --local: #5ED6A0; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --fog: #12151C; --paper: #1A1F29; --ink: #E8EBF2; --ink-2: #B5BCCB; --muted: #7F889B;
-  --line: #2A3140; --ultra: #8490FF; --ultra-soft: #262C4F; --sel: #1F2440; color-scheme: dark;
+  --line: #2A3140; --ultra: #8490FF; --ultra-soft: #262C4F; --sel: #1F2440; --local: #5ED6A0; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
@@ -55,6 +56,17 @@ aside { padding: 18px 14px 14px 16px; display: flex; flex-direction: column; gap
 .search input { width: 100%; padding: 7px 10px 7px 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); outline: none; }
 .search input:focus, .field:focus { border-color: var(--ultra); box-shadow: 0 0 0 3px var(--ultra-soft); }
 .group h2 { margin: 0 0 4px 8px; font: 500 12px/1 var(--body); color: var(--muted); }
+.engine { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.eng { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 2px; border-radius: 9px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.eng button { --c: var(--ultra); display: grid; grid-template-columns: auto 1fr; column-gap: 6px; align-items: center; text-align: left; border: 0; background: none; padding: 6px 8px; border-radius: 7px; cursor: pointer; color: var(--ink-2); font-size: 13px; line-height: 1.15; }
+.eng button[data-v="local"] { --c: var(--local); }
+.eng .i { grid-row: span 2; width: 15px; height: 15px; color: var(--muted); }
+.eng b { font-weight: 600; } .eng small { font-size: 11px; color: var(--muted); }
+.eng button[aria-pressed="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1.5px var(--c), 0 1px 2px rgb(0 0 0 / .08); }
+.eng button[aria-pressed="true"] .i, .eng button[aria-pressed="true"] small { color: var(--c); }
+.eng button:disabled { cursor: default; opacity: .5; }
+.eng-d { margin: 6px 4px 0; font-size: 11.5px; line-height: 1.35; color: var(--muted); }
+.eng-d .link { font-size: 11.5px; }
 .nav { display: flex; flex-direction: column; gap: 1px; }
 .nav button { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 4px 8px; border: 0; border-radius: 6px; background: none; cursor: pointer; text-align: left; color: var(--ink-2); }
 .nav button:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
@@ -224,6 +236,15 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
     <button data-view="stats" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg><span data-i18n="nav.stats">Statistiky</span></button>
     <button data-view="settings" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span data-i18n="nav.settings">Nastavení</span></button>
   </nav>
+
+  <div class="engine group">
+    <h2 data-i18n="eng.h">Přepis</h2>
+    <div class="eng" role="group" data-i18n-aria="eng.h" aria-label="Přepis">
+      <button type="button" data-v="cloud" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg><b data-i18n="eng.cloud">Cloud</b><small data-i18n="eng.fast">fast</small></button>
+      <button type="button" data-v="local" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="12" r="5"/><path d="M9 12a1.6 1.6 0 1 1 1.6-1.6"/><path d="M2 18h16a3 3 0 0 0 3-3v-2"/><path d="m19.5 13-1.2-4M21 13l1.6-3.6"/></svg><b data-i18n="eng.local">Local</b><small data-i18n="eng.slow">slow</small></button>
+    </div>
+    <div class="eng-d" id="eng-d" aria-live="polite"></div>
+  </div>
 
   <div id="side-history">
     <label class="search">
@@ -435,6 +456,28 @@ function showView(v) {
   if (v === "stats") loadStats();
   if (v === "settings") return loadSettings();
 }
+/* ---------------- přepínač Cloud / Local (levý panel a nastavení) ---------------- */
+let engineState = null;
+function renderEngine(e) {
+  engineState = e;
+  const local = e.offline || !e.has_key;
+  document.querySelectorAll(".eng button").forEach((b) => b.setAttribute("aria-pressed", (b.dataset.v === "local") === local));
+  document.querySelector('.eng button[data-v="cloud"]').disabled = !e.has_key;
+  const d = $("eng-d");
+  if (!e.has_key) { d.innerHTML = esc(t("eng.noKey")) + ' <button type="button" class="link" id="eng-key">' + esc(t("eng.addKey")) + "</button>"; $("eng-key").onclick = () => showView("settings"); }
+  else d.textContent = t(local ? "eng.localD" : "eng.cloudD");
+  if ($("offline")) $("offline").checked = e.offline;
+}
+async function refreshEngine() {
+  const e = await api().engine();
+  if (JSON.stringify(e) !== JSON.stringify(engineState)) renderEngine(e);
+}
+document.querySelector(".eng").addEventListener("click", async (ev) => {
+  const b = ev.target.closest("button");
+  if (!b || b.disabled || b.getAttribute("aria-pressed") === "true") return;
+  renderEngine(await api().set_offline(b.dataset.v === "local"));
+});
+
 // Z menu ikony „Aktualizovat…“: nastavení, sekce Aktualizace s přehledem změn.
 async function showUpdates() {
   await showView("settings");
@@ -689,6 +732,7 @@ async function loadSettings() {
   $("groq").placeholder = state.settings.has_key ? t("set.groq.saved") : "gsk_…";
   $("groq-remove").hidden = !state.settings.has_key;
   $("offline").checked = c.offline;
+  refreshEngine();
   $("offline-row").hidden = !state.settings.has_key;
   $("hist-days").innerHTML = state.settings.history_days.map((d) => `<option value="${d}" ${c.history_days === d ? "selected" : ""}>${d ? t("set.days", { n: d }) : t("set.forever")}</option>`).join("");
   $("titles").checked = c.store_titles;
@@ -707,6 +751,9 @@ function setDirty(dirty, savedAt) {
   m.className = "msg" + (dirty ? " dirty" : "");
   m.textContent = dirty ? t("set.dirty") : savedAt ? t("set.savedAt", { time: savedAt }) : t("set.allSaved");
 }
+// Přepínač offline platí hned (jako v levém panelu), neoznačuje nastavení jako neuložené.
+$("offline").addEventListener("change", async (e) => { e.stopPropagation(); renderEngine(await api().set_offline($("offline").checked)); });
+$("offline").addEventListener("input", (e) => e.stopPropagation());
 $("settings").addEventListener("input", () => setDirty(true));
 $("settings").addEventListener("change", () => setDirty(true));
 function chosenHotkey() { return $("hotkey").value === "__custom" ? $("custom").value.trim().toLowerCase() : $("hotkey").value; }
@@ -743,7 +790,7 @@ $("save").onclick = async () => {
   const hotkeys = chosenHotkey() ? [chosenHotkey()] : [];
   const cfg = {
     hotkeys, mode: $("mode").dataset.v, language: $("language").value || null, model: $("model").value,
-    initial_prompt: $("prompt").value.trim(), history_days: +$("hist-days").value, store_titles: $("titles").checked, check_updates: $("check-updates").checked, offline: $("offline").checked,
+    initial_prompt: $("prompt").value.trim(), history_days: +$("hist-days").value, store_titles: $("titles").checked, check_updates: $("check-updates").checked,
     duck_audio: $("duck").checked, duck_level: +$("duck-level").value / 100,
     overlay: $("overlay").checked, sounds: $("sounds").checked, trailing_space: $("trailing").checked, history: $("hist").checked,
     ui_language: $("ui-language").value,
@@ -783,12 +830,15 @@ async function checkPending() {
   else if (state.view === "history") loadHistory();
   else if (state.view === "stats") loadStats();
 }
-window.addEventListener("focus", () => window.pywebview && checkPending());
+window.addEventListener("focus", () => window.pywebview && (checkPending(), refreshEngine()));
+// Přepnutí v indikátoru nebo v menu ikony se v okně ukáže do pár sekund.
+setInterval(() => { if (window.pywebview && !document.hidden && engineState) refreshEngine(); }, 2000);
 async function initLang() {
   state.settings = await api().get_settings();
   setLang(state.settings.lang);
   state.periods = await api().periods();
   applyI18n();
+  renderEngine(await api().engine());
 }
 window.addEventListener("pywebviewready", async () => {
   await initLang();

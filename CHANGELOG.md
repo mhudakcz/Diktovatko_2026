@@ -2,6 +2,12 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.12.1 – 2026-09-24
+
+- Okno: přepínač **Cloud · fast / Local · slow** hned v levém panelu, vidět ve všech sekcích. Platí okamžitě a ukáže i přepnutí z indikátoru nebo menu ikony. Bez klíče nabídne jeho vložení.
+- Nastavení: přepínač *Přepisovat offline* platí hned, už není potřeba klikat na Uložit.
+- Web (CZ, EN, DE): v sekci „Offline, nebo online“ ukázka přepínače **Cloud · fast / Local · slow** z indikátoru, na kterou jde kliknout. Úvod a varování už neradí mazat klíč, ale přepnout na Local · slow.
+
 ## 0.12.0 – 2026-09-24
 
 - Aktualizace: před instalací je v Nastavení → Aktualizace přehled změn ze **všech** verzí od té nainstalované, rozdělený po verzích. Položka „Aktualizovat na verzi…“ v menu ikony otevře tenhle přehled, instaluje se až tlačítkem. Oznámení říká, kolik verzí vyšlo.

@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.12.0**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.12.1**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
@@ -59,7 +59,7 @@ Každý si vytváří **vlastní** bezplatný klíč. V repozitáři žádný kl
 
 Bez klíče se přepisuje offline. Při prvním použití se stáhne model Whisper (~1,6 GB).
 
-S klíčem jde mezi Groq a offline přepínat bez mazání klíče: kliknutím na štítek **Cloud · fast** / **Local · slow** v indikátoru během diktování (platí hned pro běžící nahrávku), v menu ikony (*Přepisovat offline*) nebo v Nastavení. V `config.json` je to volba `offline`.
+S klíčem jde mezi Groq a offline přepínat bez mazání klíče: kliknutím na štítek **Cloud · fast** / **Local · slow** v indikátoru během diktování (platí hned pro běžící nahrávku), v okně vlevo pod menu (*Přepis: Cloud / Local*), v menu ikony (*Přepisovat offline*) nebo v Nastavení. Vždy platí hned, bez ukládání. V `config.json` je to volba `offline`.
 
 ## Aktualizace
 
