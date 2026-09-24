@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.8.1**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.8.2**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 

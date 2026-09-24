@@ -60,6 +60,8 @@ p { margin: 0; }
 .rail li.on a { background: var(--sun); border-color: var(--sun); transform: scale(1.35); }
 .rail a span { position: absolute; right: 30px; top: 50%; translate: 0 -50%; padding: 5px 10px; border-radius: 8px; background: var(--night); color: #fff; font: 500 13px var(--body); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; border: 1px solid rgb(185 179 255 / .25); }
 .rail li.on a span, .rail a:hover span, .rail a:focus-visible span { opacity: 1; }
+.badge { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px; padding: 8px 16px 8px 10px; border-radius: 999px; background: var(--sun); color: #16133A; font: 700 15px/1.2 var(--display); letter-spacing: -0.01em; animation: fade .6s both; box-shadow: 0 10px 30px -12px rgb(255 210 63 / .6); }
+.badge i { width: 24px; height: 24px; border-radius: 50%; background: #16133A; color: var(--sun); display: grid; place-items: center; font-style: normal; font-size: 13px; }
 /* bez poplatků, klíč, offline/online */
 .keysec { background: var(--card); }
 .free { margin-top: 18px; font-size: 16px; color: var(--lilac); animation: fade .8s .6s both; }
@@ -335,6 +337,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
     </div>
     <div class="hero-in">
       <div>
+        <span class="badge"><i>✓</i>0 Kč měsíčně. Bez předplatného, napořád.</span>
         <h1><span class="l"><span>Mluvte.</span></span><span class="l"><span>Píše se to samo.</span></span></h1>
         <p class="lede">Podržíte klávesu, řeknete, co potřebujete, a pustíte. Text se objeví tam, kde máte kurzor: ve Slacku, e-mailu, Jiře i v chatu s AI. <b>Bezplatná alternativa k Wispr Flow, česky, pro Windows i Mac.</b></p>
         <div class="cta">
@@ -505,7 +508,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
 <footer class="bigfoot">
   <div class="wrap">
     <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
-    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.8.1</a> vytvořil Michal Hudák. Licence MIT.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.8.2</a> vytvořil Michal Hudák. Licence MIT.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
   </div>
 </footer>
 

@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.8.2 – 2026-09-24
+
+- Web: výrazný štítek „0 Kč měsíčně. Bez předplatného, napořád.“ hned nad nadpisem na první obrazovce (CZ, EN, DE).
+
 ## 0.8.1 – 2026-09-24
 
 - Web (CZ, EN, DE): zdůraznění, že jde o alternativu bez měsíčních poplatků (řádek v úvodu a sekce „0 Kč měsíčně“).
