@@ -3,7 +3,8 @@
 - docs/zmeny.html, docs/en/zmeny.html, docs/de/zmeny.html: všechny verze (vzhled převzatý z návodu),
 - sekce „Co je nového“ se třemi posledními verzemi na úvodních stránkách (mezi značkami novinky:start/end).
 
-Při nové verzi stačí přidat záznam nahoru do docs/changes.json (cs, en, de) a spustit:
+Do docs/changes.json patří jen změny v aplikaci (ne web ani návod). Při nové verzi
+stačí přidat záznam nahoru (cs, en, de) a spustit:
     .venv\\Scripts\\python tools\\build_changes.py
 """
 
@@ -21,17 +22,17 @@ MONTHS = {
 }
 TXT = {
     "cs": dict(title="Historie změn Diktovátka", desc="Co a kdy v Diktovátku přibylo, verze po verzi.", h1="Historie změn",
-               lede="Co a kdy v Diktovátku přibylo, od nejnovější verze. Aplikace se aktualizuje sama a před aktualizací vám změny ukáže.",
+               lede="Co a kdy v aplikaci Diktovátko přibylo, od nejnovější verze. Aplikace se aktualizuje sama a před aktualizací vám změny ukáže.",
                ver="Verze", latest="nejnovější", toc="Verze", home="Zpět na úvod", guide="Návod",
-               h2="Co je nového", intro="Diktovátko se vyvíjí průběžně. Tohle přibylo naposledy.", more="Celá historie změn", rail="Novinky"),
+               h2="Co je nového", intro="Diktovátko se vyvíjí průběžně. Tohle v aplikaci přibylo naposledy.", more="Celá historie změn", rail="Novinky"),
     "en": dict(title="Diktovátko changelog", desc="What was added to Diktovátko and when, version by version.", h1="Changelog",
-               lede="What was added to Diktovátko and when, newest first. The app updates itself and shows you the changes before it does.",
+               lede="What was added to the Diktovátko app and when, newest first. The app updates itself and shows you the changes before it does.",
                ver="Version", latest="latest", toc="Versions", home="Back to home", guide="Guide",
-               h2="What's new", intro="Diktovátko keeps evolving. Here is what arrived most recently.", more="Full changelog", rail="What's new"),
+               h2="What's new", intro="Diktovátko keeps evolving. Here is what arrived in the app most recently.", more="Full changelog", rail="What's new"),
     "de": dict(title="Diktovátko – Änderungsverlauf", desc="Was in Diktovátko wann dazukam, Version für Version.", h1="Änderungsverlauf",
-               lede="Was in Diktovátko wann dazukam, die neueste Version zuerst. Die App aktualisiert sich selbst und zeigt Ihnen die Änderungen vorher an.",
+               lede="Was in der App Diktovátko wann dazukam, die neueste Version zuerst. Die App aktualisiert sich selbst und zeigt Ihnen die Änderungen vorher an.",
                ver="Version", latest="neueste", toc="Versionen", home="Zurück zur Startseite", guide="Anleitung",
-               h2="Neuigkeiten", intro="Diktovátko wird laufend weiterentwickelt. Das kam zuletzt dazu.", more="Vollständiger Änderungsverlauf", rail="Neuigkeiten"),
+               h2="Neuigkeiten", intro="Diktovátko wird laufend weiterentwickelt. Das kam zuletzt in der App dazu.", more="Vollständiger Änderungsverlauf", rail="Neuigkeiten"),
 }
 PAGE_CSS = """
 .layout.clog { grid-template-columns: 200px 1fr; }

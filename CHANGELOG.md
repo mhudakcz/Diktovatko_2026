@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.12.6 – 2026-09-25
+
+- Web: novinky a historie změn na webu ukazují jen změny v aplikaci, ne úpravy webu a návodu.
+
 ## 0.12.5 – 2026-09-25
 
 - Web: kroužící světlo v kartách Offline/Online, Co je nového, Jak pomoct, instalace a v bloku s cenou je o polovinu slabší a dvakrát pomalejší. Panel s přepínačem a sekce Instalace zůstaly beze změny.
