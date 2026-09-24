@@ -83,9 +83,24 @@ table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 14px 0;
 th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
 th { font-weight: 600; color: var(--muted); font-size: 13.5px; }
 
+.tldr { margin-top: 28px; padding: 20px 22px; border-radius: 14px; background: var(--paper); border: 1px solid var(--line); }
+.tldr-h { font-size: 20px; margin-bottom: 8px; }
+.tldr ul { margin: 0; padding-left: 20px; }
+.tldr li { margin-bottom: 5px; }
+.quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; margin-top: 14px; }
+.quick a { display: flex; flex-direction: column; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); text-decoration: none; color: var(--ink); line-height: 1.3; }
+.quick a:hover { border-color: var(--ultra); }
+.quick a span { font-size: 13.5px; color: var(--muted); margin-top: 3px; }
+.dl { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 4px; }
+.dl a { display: inline-flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 11px; background: var(--ink); color: var(--fog); text-decoration: none; font-weight: 600; }
+.dl a.alt { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+.dl svg { width: 18px; height: 18px; }
+body.is-mac .dl .win-btn { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+body.is-mac .dl .mac-btn { background: var(--ink); color: var(--fog); border: 0; }
 .mac { display: none; }
 body.is-mac .mac { display: revert; }
 body.is-mac .win { display: none; }
+body.is-mac .quick a.mac { display: flex; }
 
 @media (max-width: 860px) {
   .layout { grid-template-columns: 1fr; gap: 0; padding-top: 24px; }
@@ -128,6 +143,28 @@ body.is-mac .win { display: none; }
     <p class="lede">Od instalace po první nadiktovanou větu. Nepotřebujete žádné programátorské znalosti, stačí postupovat bod po bodu.</p>
     <p class="meta">Nahoře si přepněte, jestli máte <b>Windows</b> nebo <b>Mac</b>. Návod se podle toho upraví.</p>
 
+    <div class="tldr">
+      <h2 class="tldr-h">Ve zkratce</h2>
+      <ul>
+        <li><b>Co to je:</b> podržíte klávesu, mluvíte, pustíte a text se vloží tam, kde máte kurzor. Zdarma, česky, v jakékoli aplikaci.</li>
+        <li><b>Instalace:</b> Python z python.org, pak <span class="win"><code>install.bat</code> a <code>start.bat</code></span><span class="mac"><code>install.command</code> a <code>start.command</code></span>. Zhruba 10 minut.</li>
+        <li class="mac"><b>Mac navíc:</b> povolit Terminálu Mikrofon, Zpřístupnění a Sledování vstupu. U klávesy 🌐 nastavit „Nedělat nic“.</li>
+        <li><b>Rychlý přepis:</b> každý si zdarma vytvoří <b>vlastní</b> Groq klíč a vloží ho do Nastavení. Bez klíče přepis funguje offline, jen pomaleji.</li>
+        <li><b>Zkratka:</b> <span class="win">pravý Ctrl, Ctrl + Win</span><span class="mac">Fn / 🌐, pravý ⌘</span> nebo vlastní. Mění se v Nastavení.</li>
+        <li><b>Historie a statistiky:</b> vše se ukládá jen do vašeho počítače, jde to hledat, kopírovat a exportovat.</li>
+      </ul>
+    </div>
+
+    <nav class="quick" aria-label="Rozcestník">
+      <a href="#stazeni"><b>Instalace</b><span>stažení a spuštění</span></a>
+      <a href="#spusteni" class="mac"><b>Oprávnění na Macu</b><span>mikrofon, klávesnice, Fn</span></a>
+      <a href="#spusteni" class="win"><b>První spuštění</b><span>kde najdu ikonu</span></a>
+      <a href="#groq"><b>Groq klíč</b><span>rychlý přepis zdarma</span></a>
+      <a href="#diktovani"><b>Jak diktovat</b><span>postup a tipy</span></a>
+      <a href="#nastaveni"><b>Nastavení</b><span>zkratka, jazyk, slovník</span></a>
+      <a href="#problemy"><b>Nefunguje to?</b><span>řešení problémů</span></a>
+    </nav>
+
     <div class="warn mac">
       <p><b>Mac verze je nová.</b> Ladíme ji. Když vám něco nebude fungovat, dejte vědět přes <a href="https://github.com/mhudakcz/Diktovatko_2026/issues">GitHub Issues</a>.</p>
     </div>
@@ -163,11 +200,35 @@ body.is-mac .win { display: none; }
     <section id="stazeni">
       <h2><span class="n">3</span>Stažení a instalace Diktovátka</h2>
       <ol class="steps">
-        <li><div>Stáhněte <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip">Diktovátko jako ZIP</a>.</div></li>
+        <li><div>Stáhněte Diktovátko. Pro Windows i Mac je to stejný ZIP soubor:
+          <div class="dl">
+            <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip" class="win-btn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.4 4.6v7H3zM11.4 4.4 21 3v8.6h-9.6zM3 12.4h7.4v7L3 18.4zM11.4 12.4H21V21l-9.6-1.4z"/></svg>Stáhnout pro Windows</a>
+            <a href="https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip" class="alt mac-btn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>Stáhnout pro Mac</a>
+          </div></div></li>
         <li><div>Rozbalte ho do složky, kde ho necháte natrvalo, třeba <span class="path">Dokumenty/Diktovatko</span>. Ze složky Stažené soubory ho později nemazejte.</div></li>
         <li class="win"><div>Ve složce dvakrát klikněte na <code>install.bat</code>. Otevře se černé okno a začnou se stahovat potřebné součásti, trvá to 1–3 minuty. Na konci uvidíte „Hotovo“.</div></li>
-        <li class="mac"><div>Ve složce klikněte na <code>install.command</code> <b>pravým tlačítkem</b> (nebo s klávesou Control) a zvolte <b>Otevřít</b>. V dotazu znovu potvrďte <b>Otevřít</b>. Mac se ptá, protože soubor nepochází z App Store. Pak se otevře Terminál a začne instalace, trvá to 1–3 minuty.</div></li>
+        <li class="mac"><div>Ve složce dvakrát klikněte na <code>install.command</code>. Otevře se Terminál (okno s textem) a začne instalace, trvá to 1–3 minuty. Na konci uvidíte „Hotovo“ a okno můžete zavřít.</div></li>
       </ol>
+      <div class="mac">
+        <h3>Když Mac soubor odmítne otevřít</h3>
+        <p>Mac může napsat, že soubor <i>nelze otevřít, protože pochází od neidentifikovaného vývojáře</i> nebo že <i>nebyl ověřen</i>. Důvod je, že Diktovátko není z App Store. Postupujte takto:</p>
+        <ol class="steps">
+          <li><div>V dialogu klikněte na <b>Hotovo</b> nebo <b>OK</b>, ne na „Přesunout do koše“.</div></li>
+          <li><div>Otevřete <span class="path">Nastavení systému → Soukromí a zabezpečení</span> a sjeďte úplně dolů k části <b>Zabezpečení</b>.</div></li>
+          <li><div>U hlášky o <code>install.command</code> klikněte na <b>Přesto otevřít</b> a potvrďte heslem nebo Touch ID.</div></li>
+          <li><div>Znovu dvakrát klikněte na <code>install.command</code> a v dotazu zvolte <b>Otevřít</b>.</div></li>
+        </ol>
+        <p>Na starším macOS (12–14) stačí místo toho kliknout na soubor <b>pravým tlačítkem</b> (nebo s klávesou Control), zvolit <b>Otevřít</b> a v dotazu znovu <b>Otevřít</b>. Stejně postupujte i u <code>start.command</code>, pokud se Mac zeptá.</p>
+        <div class="note">
+          <p><b>Záložní postup přes Terminál</b>, když nic z toho nepomůže:</p>
+          <ol>
+            <li>Otevřete aplikaci <b>Terminál</b> (<kbd>⌘</kbd>+<kbd>mezerník</kbd>, napište „Terminál“, Enter).</li>
+            <li>Napište <code>bash</code> a mezeru, ale Enter zatím nemačkejte.</li>
+            <li>Do okna Terminálu přetáhněte myší soubor <code>install.command</code>, doplní se jeho cesta.</li>
+            <li>Stiskněte <kbd>Enter</kbd>. Stejně jde spustit i <code>start.command</code>.</li>
+          </ol>
+        </div>
+      </div>
       <div class="note win"><p>Pokud Windows zobrazí modré okno <b>Systém Windows ochránil váš počítač</b>, klikněte na <b>Další informace</b> a potom na <b>Přesto spustit</b>.</p></div>
     </section>
 
@@ -179,24 +240,54 @@ body.is-mac .win { display: none; }
         <li><div>Krátké pípnutí znamená, že je Diktovátko připravené.</div></li>
       </ol>
       <ol class="steps mac">
-        <li><div>Klikněte na <code>start.command</code> pravým tlačítkem a zvolte <b>Otevřít</b> (napoprvé, potom už stačí dvojklik).</div></li>
-        <li><div>Nahoře v liště vpravo se objeví ikona mikrofonu.</div></li>
-        <li><div>Mac se zeptá na několik oprávnění. Bez nich Diktovátko nemůže fungovat, postup je hned níže.</div></li>
+        <li><div>Dvakrát klikněte na <code>start.command</code>. Otevře se na chvíli Terminál s hláškou „Diktovátko běží“. To okno můžete zavřít, Diktovátko poběží dál.</div></li>
+        <li><div>Nahoře v liště vpravo (u hodin, Wi-Fi a baterie) se objeví ikona mikrofonu.</div></li>
+        <li><div>Mac se zeptá na přístup k <b>mikrofonu</b> a ke <b>Zpřístupnění</b>. Obojí povolte. Pak podle návodu níže zapněte všechna oprávnění a Diktovátko jednou restartujte.</div></li>
       </ol>
 
       <div class="mac">
+        <h3>Nevidíte ikonu v liště?</h3>
+        <p>Na MacBoocích s výřezem (notch) se ikony, které se do lišty nevejdou, schovají za výřez. Zkuste zavřít některé jiné aplikace v liště, nebo podržte <kbd>⌘</kbd> a přetáhněte méně důležité ikony z lišty pryč. Diktovátko přitom funguje, i když ikonu nevidíte: zkratka i indikátor fungují dál.</p>
+
         <h3>Oprávnění na Macu</h3>
-        <p>Otevřete <span class="path">Nastavení systému → Soukromí a zabezpečení</span> a u každé položky níže zapněte přepínač u aplikace <b>Terminál</b> (případně <b>Python</b>, pokud se objeví):</p>
+        <p>macOS chrání mikrofon a klávesnici, proto je potřeba Diktovátku přístup povolit ručně. Oprávnění dostane aplikace, přes kterou Diktovátko spouštíte, tedy <b>Terminál</b>.</p>
         <table>
-          <tr><th>Položka</th><th>K čemu je potřeba</th></tr>
-          <tr><td><b>Mikrofon</b></td><td>nahrávání hlasu</td></tr>
-          <tr><td><b>Zpřístupnění</b></td><td>vložení textu na místo kurzoru a sledování zkratky</td></tr>
-          <tr><td><b>Sledování vstupu</b></td><td>rozpoznání, že držíte zkratku</td></tr>
-          <tr><td><b>Nahrávání obrazovky</b> (nepovinné)</td><td>jen pro názvy oken v historii. Bez něj se uloží jen název aplikace.</td></tr>
+          <tr><th>Položka</th><th>K čemu je potřeba</th><th>Nutné?</th></tr>
+          <tr><td><b>Mikrofon</b></td><td>nahrávání hlasu</td><td>ano</td></tr>
+          <tr><td><b>Zpřístupnění</b></td><td>vložení textu na místo kurzoru</td><td>ano</td></tr>
+          <tr><td><b>Sledování vstupu</b></td><td>rozpoznání, že držíte zkratku</td><td>ano</td></tr>
+          <tr><td><b>Nahrávání obrazovky</b></td><td>názvy oken v historii (bez něj se uloží jen název aplikace)</td><td>ne</td></tr>
         </table>
-        <p>Po povolení Diktovátko ukončete (ikona v liště → <b>Ukončit</b>) a spusťte znovu přes <code>start.command</code>.</p>
+        <ol class="steps">
+          <li><div>Otevřete <span class="path"> → Nastavení systému → Soukromí a zabezpečení</span>. Na macOS 12 Monterey je to <span class="path"> → Předvolby systému → Zabezpečení a soukromí → Soukromí</span>.</div></li>
+          <li><div>Vpravo klikněte na <b>Mikrofon</b> a zapněte přepínač u <b>Terminálu</b>.</div></li>
+          <li><div>Vraťte se zpět, klikněte na <b>Zpřístupnění</b> a zapněte <b>Terminál</b>. Když v seznamu není, klikněte dole na <b>+</b>, v okně vyberte <span class="path">Aplikace → Utility → Terminál</span> a klikněte na <b>Otevřít</b>.</div></li>
+          <li><div>Stejně zapněte <b>Terminál</b> v části <b>Sledování vstupu</b>.</div></li>
+          <li><div>Chcete-li v historii vidět názvy oken, zapněte <b>Terminál</b> i v <b>Nahrávání obrazovky</b>. Nepovinné.</div></li>
+          <li><div>Když se Mac zeptá, zda Terminál ukončit a znovu otevřít, zvolte <b>Ukončit a znovu otevřít</b>.</div></li>
+          <li><div>Diktovátko restartujte: ikona v liště → <b>Ukončit</b> a znovu dvakrát klikněte na <code>start.command</code>.</div></li>
+        </ol>
+        <div class="note"><p><b>Automatické spouštění po přihlášení</b> (volba v nastavení) spouští Diktovátko bez Terminálu, přímo přes Python. Po prvním přihlášení se proto Mac zeptá na oprávnění znovu, tentokrát pro <b>Python</b>. Povolte je stejně jako u Terminálu. Když Python v seznamu chybí, přidejte ho přes <b>+</b>: stiskněte <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>, vložte cestu <code>/Library/Frameworks/Python.framework/Versions</code>, otevřete složku s nejvyšším číslem verze, pak <code>bin</code>, a vyberte soubor <code>python3</code>.</p></div>
+
         <h3>Klávesa Fn (🌐)</h3>
-        <p>Diktovátko na Macu ve výchozím nastavení reaguje na <kbd>Fn</kbd>, stejně jako Wispr Flow. Aby se po stisku neotevíral výběr emoji, otevřete <span class="path">Nastavení systému → Klávesnice</span> a u volby <b>Stisknutím klávesy 🌐</b> vyberte <b>Nedělat nic</b>.</p>
+        <p>Diktovátko na Macu ve výchozím nastavení reaguje na <kbd>Fn</kbd> (na novějších klávesnicích s ikonou 🌐 vlevo dole), stejně jako Wispr Flow. macOS ale Fn používá i sám pro sebe, proto to jednou nastavte:</p>
+        <ol class="steps">
+          <li><div>Otevřete <span class="path"> → Nastavení systému → Klávesnice</span>.</div></li>
+          <li><div>U volby pro klávesu <b>🌐</b> (stisknutí klávesy Glóbus/Fn) vyberte <b>Nedělat nic</b>.</div></li>
+          <li><div>Nepoužíváte-li diktování od Applu, vypněte ho níže v části <b>Diktování</b>, ať se se zkratkou nepere.</div></li>
+        </ol>
+        <p>Pokud Fn používat nechcete, zvolte v nastavení Diktovátka jinou zkratku, třeba <b>pravý ⌘ Cmd</b>.</p>
+
+        <h3>Který mikrofon se používá</h3>
+        <p>Diktovátko nahrává z mikrofonu, který je vybraný v <span class="path"> → Nastavení systému → Zvuk → Vstup</span>. Když máte připojená sluchátka s mikrofonem nebo externí mikrofon, vyberte ho tam.</p>
+
+        <h3>Kontrola, že vše funguje</h3>
+        <ol class="steps">
+          <li><div>Otevřete třeba aplikaci <b>Poznámky</b> a klikněte do nové poznámky.</div></li>
+          <li><div>Podržte <kbd>Fn</kbd> (nebo zvolenou zkratku). Mělo by ťuknout a dole na obrazovce se objeví tmavá pilulka se sloupečky.</div></li>
+          <li><div>Řekněte „Ahoj, tohle je zkouška diktování.“ a klávesu pusťte. Do sekundy až dvou se text objeví v poznámce.</div></li>
+        </ol>
+        <p>Když se pilulka neobjeví, chybí oprávnění Sledování vstupu. Když se objeví, ale text se nevloží, chybí Zpřístupnění. Více najdete v <a href="#problemy">řešení problémů</a>.</p>
       </div>
     </section>
 
@@ -294,6 +385,15 @@ body.is-mac .win { display: none; }
         <p>Whisper si občas z ticha vymyslí větu typu „Titulky vytvořil…“. Diktovátko nejčastější z nich zachytí a zahodí. Když narazíte na novou, dejte vědět a doplníme ji.</p></div></details>
       <details class="mac"><summary>Po stisku Fn se otevře výběr emoji nebo diktování Apple</summary><div>
         <p><span class="path">Nastavení systému → Klávesnice</span> → <b>Stisknutím klávesy 🌐</b> nastavte na <b>Nedělat nic</b>. Případně v Diktovátku zvolte jinou zkratku, třeba pravý ⌘.</p></div></details>
+      <details class="mac"><summary>Pilulka se neobjeví, i když mám vše povolené</summary><div>
+        <p>macOS někdy oprávnění uplatní až po úplném restartu aplikace. Ukončete Diktovátko (ikona → <b>Ukončit</b>), ukončete i Terminál (<kbd>⌘</kbd>+<kbd>Q</kbd>) a spusťte znovu <code>start.command</code>.</p>
+        <p>Pomáhá i v seznamu oprávnění Terminál <b>vypnout a znovu zapnout</b>, případně ho odebrat tlačítkem <b>−</b> a přidat znovu přes <b>+</b>.</p></div></details>
+      <details class="mac"><summary>Po diktování zůstal zvuk počítače ztišený</summary><div>
+        <p>Na Macu Diktovátko během nahrávání ztiší celý zvuk a potom ho vrátí. Pokud aplikace spadla uprostřed nahrávání, hlasitost se nevrátila. Zvyšte ji klávesou nebo v Ovládacím centru. Když vám ztišování nevyhovuje, vypněte v nastavení <b>Ztlumit ostatní zvuky</b>.</p></div></details>
+      <details class="mac"><summary>V historii je jen název aplikace, ne okno nebo konverzace</summary><div>
+        <p>macOS názvy oken ukáže jen s oprávněním <b>Nahrávání obrazovky</b> (viz <a href="#spusteni">krok 4</a>). Diktovátko obrazovku nenahrává, oprávnění potřebuje jen ke čtení názvů oken.</p></div></details>
+      <details class="mac"><summary>Instalace skončí chybou u „pip“ nebo „certificate“</summary><div>
+        <p>Spusťte ve složce <span class="path">Aplikace → Python 3.x</span> soubor <b>Install Certificates.command</b> a potom znovu <code>install.command</code>. Pomůže i instalace nejnovějšího Pythonu z python.org.</p></div></details>
       <details class="win"><summary>Po Ctrl + Win se otevře nabídka Start</summary><div>
         <p>Diktovátko to blokuje, ale na některých počítačích se to přesto stane. Použijte raději pravý Ctrl nebo Ctrl + Alt + mezerník.</p></div></details>
     </section>
@@ -308,6 +408,7 @@ body.is-mac .win { display: none; }
       </ol>
       <h3>Odinstalace</h3>
       <p>V nastavení vypněte <b>Spouštět po přihlášení</b>, Diktovátko ukončete a smažte celou jeho složku. Tím zmizí i historie a klíč. Python můžete ponechat, nebo odinstalovat běžným způsobem.</p>
+      <p class="mac">Na Macu pak v <span class="path">Soukromí a zabezpečení</span> můžete u Terminálu (a Pythonu) vypnout oprávnění, která jste kvůli Diktovátku zapnuli. Soubor automatického spouštění je <code>~/Library/LaunchAgents/cz.diktovatko.plist</code> a vypnutím volby v nastavení se smaže sám.</p>
     </section>
   </article>
 </div>

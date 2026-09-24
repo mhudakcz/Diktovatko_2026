@@ -4,7 +4,11 @@
 
 Bezplatná open-source alternativa k [Wispr Flow](https://wisprflow.ai) pro **Windows a Mac**. Funguje v jakékoli aplikaci, třeba ve Slacku, Outlooku, prohlížeči, Teams, Jiře nebo v chatu s AI. Umí česky i dalších 90+ jazyků.
 
-**[Web projektu](https://mhudakcz.github.io/Diktovatko_2026/)** · **[Návod krok za krokem](https://mhudakcz.github.io/Diktovatko_2026/navod.html)**
+**[Web projektu](https://mhudakcz.github.io/Diktovatko_2026/)** · **[Návod krok za krokem](https://mhudakcz.github.io/Diktovatko_2026/navod.html)** · **[Stáhnout ZIP](https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip)** (Windows i Mac)
+
+> **Ve zkratce:** zdarma a open source, pro Windows i Mac, česky a v 90+ jazycích. Podržíte zkratku (pravý Ctrl, Ctrl + Win, na Macu Fn), mluvíte, pustíte a text se vloží na místo kurzoru. Přepisuje offline, nebo za sekundu přes vlastní bezplatný Groq klíč. Historie a statistiky se ukládají jen do vašeho počítače. Při 2 000 slovech denně ušetří kolem 12 hodin měsíčně.
+
+**Obsah:** [Proč diktovat](#proč-diktovat) · [Co umí](#co-umí) · [Instalace](#instalace) · [Groq klíč](#groq-klíč) · [Používání](#používání) · [Nastavení](#nastavení-configjson) · [Soukromí](#soukromí) · [Omezení](#omezení) · [Struktura](#struktura)
 
 ![Historie diktování](docs/img/history-light.png)
 
