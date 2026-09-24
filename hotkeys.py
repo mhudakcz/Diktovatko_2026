@@ -70,8 +70,12 @@ class HotkeyCore:
 
     def set_hotkeys(self, hotkeys):
         with self.lock:
-            self.hotkeys = [(h, parse(h)) for h in hotkeys if parse(h)]
-            self.active = None
+            new = [(h, parse(h)) for h in hotkeys if parse(h)]
+            if new != self.hotkeys:
+                # Držená zkratka se zruší jen při skutečné změně. Jinak by uložení nastavení
+                # během nahrávání (třeba přepnutí Cloud / Local) ztratilo puštění klávesy.
+                self.hotkeys = new
+                self.active = None
         self.start()
 
     def start(self):

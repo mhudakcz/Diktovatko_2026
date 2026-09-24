@@ -2,6 +2,11 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.11.1 – 2026-09-24
+
+- Oprava: po přepnutí Cloud / Local během nahrávání aplikace nepoznala puštění zkratky a nahrávala dál. Uložení nastavení teď drženou zkratku nezruší, pokud se zkratky nezměnily.
+- Štítek v indikátoru má piktogramy: blesk u **Cloud · fast**, šnek u **Local · slow**.
+
 ## 0.11.0 – 2026-09-24
 
 - Přepínání Cloud / Local bez mazání klíče: v indikátoru při diktování je vpravo štítek **Cloud · fast** (Groq) nebo **Local · slow** (v počítači). Kliknutím myší se přepne, a to hned pro nahrávku, která právě běží. Okno přitom nevezme fokus.

@@ -24,8 +24,8 @@ WHITE = (240, 243, 248)
 MUTED = (170, 178, 196)
 OFFLINE = (94, 214, 160)
 
-W, H = 260, 44  # logická velikost (při 100 % měřítku)
-BADGE_X0, BADGE_X1 = 166, 252  # štítek Groq / Offline (logické souřadnice)
+W, H = 280, 44  # logická velikost (při 100 % měřítku)
+BADGE_X0, BADGE_X1 = 166, 272  # štítek Cloud / Local (logické souřadnice)
 SS = 2  # supersampling kvůli vyhlazeným okrajům (2× stačí, 3× zbytečně zatěžovalo CPU)
 FRAME_MS = 42  # ~24 snímků za sekundu
 BOTTOM_MARGIN = 28
@@ -47,20 +47,49 @@ def _font(size):
     return _fonts[size]
 
 
+def _bolt(d, x, cy, s, col):
+    """Blesk (fast), 10 × 14 logických bodů, x = levý okraj."""
+    pts = [(6, 0), (0, 8), (4.5, 8), (3.5, 14), (10, 5.5), (5.5, 5.5), (6.5, 0)]
+    d.polygon([(x + px * s, cy - 7 * s + py * s) for px, py in pts], fill=col)
+
+
+def _snail(d, x, cy, s, col):
+    """Šnek (slow), 15 × 12 logických bodů, x = levý okraj."""
+    w = max(1, round(1.5 * s))
+    # tělo, hlavička a tykadla s tečkami
+    base = cy + 5 * s
+    d.rounded_rectangle((x, base - 2.4 * s, x + 13.5 * s, base + 0.4 * s), radius=1.4 * s, fill=col)
+    hx, hy, hr = x + 13 * s, base - 3.2 * s, 2 * s
+    d.ellipse((hx - hr, hy - hr, hx + hr, hy + hr), fill=col)
+    for tx in (11.6, 15):
+        d.line((hx, hy, x + tx * s, base - 8.6 * s), fill=col, width=w)
+        d.ellipse((x + tx * s - 0.9 * s, base - 9.5 * s, x + tx * s + 0.9 * s, base - 7.7 * s), fill=col)
+    # ulita se spirálou
+    cx, sy, r = x + 5.4 * s, cy - 0.6 * s, 5 * s
+    d.ellipse((cx - r, sy - r, cx + r, sy + r), outline=col, width=w)
+    r2 = 2.4 * s
+    d.arc((cx - r2, sy - r2, cx + r2, sy + r2), 90, 400, fill=col, width=w)
+
+
 def _badge(d, engine, clickable, s, cy):
-    """Štítek se způsobem přepisu: engine = "groq" (Cloud · fast) / "offline" (Local · slow)."""
+    """Štítek se způsobem přepisu: engine = "groq" (⚡ Cloud · fast) / "offline" (šnek Local · slow)."""
     col = ULTRA if engine == "groq" else OFFLINE
     x0, x1, bh = BADGE_X0 * s, BADGE_X1 * s, 13 * s
     fill = tuple(int(INK[k] * 0.78 + col[k] * 0.22) for k in range(3))
     d.rounded_rectangle((x0, cy - bh, x1, cy + bh), radius=bh, fill=fill,
                         outline=col if clickable else None, width=max(1, int(s)))
-    # "Cloud · fast" / "Local · slow": hlavní slovo bíle, rychlost tlumeně
+    # piktogram + "Cloud · fast" / "Local · slow": hlavní slovo bíle, rychlost v barvě štítku
     main, speed = ("Cloud", " · fast") if engine == "groq" else ("Local", " · slow")
+    icon, iw = (_bolt, 10) if engine == "groq" else (_snail, 15)
     f1, f2 = _font(int(12 * s)), _font(int(11 * s))
-    tw = d.textlength(main, font=f1) + d.textlength(speed, font=f2)
+    gap = 5 * s
+    tw = iw * s + gap + d.textlength(main, font=f1) + d.textlength(speed, font=f2)
     x = (x0 + x1 - tw) / 2
+    accent = col if clickable else MUTED
+    icon(d, x, cy, s, accent)
+    x += iw * s + gap
     d.text((x, cy), main, font=f1, fill=WHITE if clickable else MUTED, anchor="lm")
-    d.text((x + d.textlength(main, font=f1), cy), speed, font=f2, fill=col if clickable else MUTED, anchor="lm")
+    d.text((x + d.textlength(main, font=f1), cy), speed, font=f2, fill=accent, anchor="lm")
 
 
 def render_pill(state, t, levels, scale, message="", transparent=False, engine=None, clickable=False):
