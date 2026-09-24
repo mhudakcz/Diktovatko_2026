@@ -2,6 +2,12 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.12.2 – 2026-09-24
+
+- Jazyk aplikace jde přepnout hned vlevo dole v okně (CZ / EN / DE), platí okamžitě. V Nastavení je volba jazyka nahoře a také platí hned.
+- Glóbus vedle přepínače jazyka otevře web Diktovátka v jazyce aplikace. V Nastavení → Aktualizace je odkaz na celou historii změn.
+- Web (CZ, EN, DE): sekce „Co je nového“ se třemi posledními verzemi a stránka `zmeny.html` se všemi verzemi. Obojí se generuje z `docs/changes.json` skriptem `tools/build_changes.py`.
+
 ## 0.12.1 – 2026-09-24
 
 - Okno: přepínač **Cloud · fast / Local · slow** hned v levém panelu, vidět ve všech sekcích. Platí okamžitě a ukáže i přepnutí z indikátoru nebo menu ikony. Bez klíče nabídne jeho vložení.

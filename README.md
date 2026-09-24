@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.12.1**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.12.2**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
@@ -148,6 +148,7 @@ Na Macu použijte `.venv/bin/python`.
 | `history.py` | databáze historie, statistiky, export, mazání a promazávání |
 | `app_window.py`, `ui/app.html` | okno s historií, statistikami a nastavením (pywebview) |
 | `config.py` | načítání a ukládání nastavení |
+| `tools/build_changes.py` | z `docs/changes.json` vygeneruje historii změn na webu (`docs/zmeny.html` a sekce „Co je nového“) |
 | `updater.py` | kontrola a instalace aktualizací z GitHub Releases |
 | `i18n.py`, `ui/i18n.js` | překlady aplikace (cs, en, de) |
 | `docs/` | web projektu a návod (GitHub Pages), anglicky v `docs/en/`, německy v `docs/de/` |

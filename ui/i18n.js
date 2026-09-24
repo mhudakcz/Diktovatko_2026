@@ -69,7 +69,7 @@ const I18N = {
     "set.clear.t": "Smazat celou historii", "set.clear.d": "Nevratně smaže všechny uložené přepisy.", "set.clear.btn": "Smazat historii",
     "confirm.clear": "Opravdu nevratně smazat celou historii diktování?", "confirm.delete": "Smazat {records}?",
     "bar.delete": "Smazat", "toast.deleted": "Smazáno: {records}", "toast.exportFail": "Export se nepovedl. Není soubor otevřený v jiném programu?",
-    "set.upd.h": "Aktualizace", "set.upd.current": "Máte verzi {v}", "set.upd.available": "Je k dispozici verze {v}",
+    "toast.lang": "Jazyk aplikace změněn", "side.web": "Web Diktovátka", "set.upd.changes": "Celá historie změn na webu", "set.upd.h": "Aktualizace", "set.upd.current": "Máte verzi {v}", "set.upd.available": "Je k dispozici verze {v}",
     "set.upd.availableD": "Aktualizace stáhne novou verzi z GitHubu, nastavení, klíč i historie zůstanou. Diktovátko se pak samo restartuje.",
     "set.upd.uptodate": "Máte nejnovější verzi.", "set.upd.error": "Kontrola se nepovedla, zkuste to později.", "set.upd.checking": "Kontroluji…",
     "set.upd.installing": "Aktualizuji, Diktovátko se za chvíli restartuje…", "set.upd.dev": "Vývojová kopie z gitu, aktualizuje se přes git pull.",
@@ -146,7 +146,7 @@ const I18N = {
     "set.clear.t": "Delete all history", "set.clear.d": "Permanently deletes all saved transcripts.", "set.clear.btn": "Delete history",
     "confirm.clear": "Permanently delete your entire dictation history?", "confirm.delete": "Delete {records}?",
     "bar.delete": "Delete", "toast.deleted": "Deleted: {records}", "toast.exportFail": "Export failed. Is the file open in another program?",
-    "set.upd.h": "Updates", "set.upd.current": "You have version {v}", "set.upd.available": "Version {v} is available",
+    "toast.lang": "App language changed", "side.web": "Diktovátko website", "set.upd.changes": "Full changelog on the website", "set.upd.h": "Updates", "set.upd.current": "You have version {v}", "set.upd.available": "Version {v} is available",
     "set.upd.availableD": "The update downloads the new version from GitHub, your settings, key and history stay. Diktovátko then restarts itself.",
     "set.upd.uptodate": "You have the latest version.", "set.upd.error": "The check failed, try again later.", "set.upd.checking": "Checking…",
     "set.upd.installing": "Updating, Diktovátko will restart in a moment…", "set.upd.dev": "Development copy from git, update it with git pull.",
@@ -223,7 +223,7 @@ const I18N = {
     "set.clear.t": "Gesamten Verlauf löschen", "set.clear.d": "Löscht alle gespeicherten Transkripte endgültig.", "set.clear.btn": "Verlauf löschen",
     "confirm.clear": "Gesamten Diktatverlauf endgültig löschen?", "confirm.delete": "{records} löschen?",
     "bar.delete": "Löschen", "toast.deleted": "Gelöscht: {records}", "toast.exportFail": "Export fehlgeschlagen. Ist die Datei in einem anderen Programm geöffnet?",
-    "set.upd.h": "Aktualisierungen", "set.upd.current": "Sie haben Version {v}", "set.upd.available": "Version {v} ist verfügbar",
+    "toast.lang": "App-Sprache geändert", "side.web": "Diktovátko-Website", "set.upd.changes": "Vollständiger Änderungsverlauf auf der Website", "set.upd.h": "Aktualisierungen", "set.upd.current": "Sie haben Version {v}", "set.upd.available": "Version {v} ist verfügbar",
     "set.upd.availableD": "Die Aktualisierung lädt die neue Version von GitHub, Einstellungen, Schlüssel und Verlauf bleiben erhalten. Danach startet Diktovátko neu.",
     "set.upd.uptodate": "Sie haben die neueste Version.", "set.upd.error": "Die Prüfung ist fehlgeschlagen, versuchen Sie es später.", "set.upd.checking": "Wird geprüft…",
     "set.upd.installing": "Wird aktualisiert, Diktovátko startet gleich neu…", "set.upd.dev": "Entwicklungskopie aus git, Aktualisierung mit git pull.",
@@ -254,4 +254,5 @@ function applyI18n(root = document) {
   root.querySelectorAll("[data-i18n-html]").forEach((el) => (el.innerHTML = t(el.dataset.i18nHtml)));
   root.querySelectorAll("[data-i18n-ph]").forEach((el) => (el.placeholder = t(el.dataset.i18nPh)));
   root.querySelectorAll("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
+  root.querySelectorAll("[data-i18n-title]").forEach((el) => (el.title = t(el.dataset.i18nTitle)));
 }

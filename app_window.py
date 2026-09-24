@@ -22,7 +22,9 @@ APP_DIR = config.APP_DIR
 UI_REQUEST = APP_DIR / ".ui_request"
 WINDOW_TITLE = "Diktovátko"
 VIEWS = ("history", "stats", "settings", "updates")  # updates = nastavení, sekce Aktualizace
-URLS = {"groq_keys": "https://console.groq.com/keys", "releases": updater.RELEASES_URL}  # jediné adresy, které okno smí otevřít
+WEB_URL = "https://mhudakcz.github.io/Diktovatko_2026/"
+URLS = {"groq_keys": "https://console.groq.com/keys", "releases": updater.RELEASES_URL, "web": WEB_URL,
+        "changes": WEB_URL + "zmeny.html"}  # jediné adresy, které okno smí otevřít
 UI_LANGUAGES = [("cs", "Čeština"), ("en", "English"), ("de", "Deutsch")]  # každý ve svém jazyce
 
 _handler = logging.handlers.RotatingFileHandler(APP_DIR / "okno.log", maxBytes=500_000, backupCount=1, encoding="utf-8")
@@ -95,6 +97,14 @@ class Api:
         cfg = config.load_config()
         return {"offline": cfg["offline"], "has_key": bool(config.groq_key(cfg))}
 
+    def set_ui_language(self, lang):
+        """Jazyk okna, menu ikony a indikátoru – platí hned, bez tlačítka Uložit."""
+        cfg = config.load_config()
+        if lang in config.UI_LANGUAGES:
+            cfg["ui_language"] = lang
+            config.save_config(cfg)
+        return cfg["ui_language"]
+
     def set_offline(self, on):
         """Přepnout Cloud / Local hned, bez tlačítka Uložit (tray aplikace si změnu načte sama)."""
         cfg = config.load_config()
@@ -141,7 +151,10 @@ class Api:
         import webbrowser
 
         if name in URLS:
-            webbrowser.open(URLS[name])
+            url = URLS[name]
+            if url.startswith(WEB_URL) and _lang() in ("en", "de"):  # web v jazyce aplikace
+                url = WEB_URL + _lang() + "/" + url[len(WEB_URL):]
+            webbrowser.open(url)
 
     # --- přepínání sekcí z ikony v liště ---
     def pending_view(self):

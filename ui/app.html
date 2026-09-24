@@ -78,6 +78,14 @@ aside { padding: 18px 14px 14px 16px; display: flex; flex-direction: column; gap
 .app-name { display: flex; align-items: center; min-width: 0; }
 .app-name span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .foot { margin-top: auto; font-size: 12px; color: var(--muted); line-height: 1.45; }
+.uilang { margin-top: auto; display: flex; align-items: center; gap: 2px; padding-top: 10px; border-top: 1px solid var(--line); }
+.foot:not([hidden]) + .uilang { margin-top: 0; }
+.uilang .web { display: grid; place-items: center; padding: 4px; margin-right: 4px; }
+.uilang .web svg { width: 15px; height: 15px; color: var(--muted); }
+.uilang .web:hover svg { color: var(--ultra); }
+.uilang button { border: 0; background: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; color: var(--muted); font: 600 12px var(--body, inherit); }
+.uilang button:hover { color: var(--ink); }
+.uilang button[aria-pressed="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
 kbd { font: 600 12px var(--body); padding: 1px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--paper); color: var(--ink-2); }
 
 /* ---------- hlavní část ---------- */
@@ -265,6 +273,10 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
     </div>
   </div>
   <div class="foot" id="foot-history" data-i18n-html="side.foot">Klikem vyberete záznam, <kbd>Ctrl</kbd>+<kbd>A</kbd> vybere vše zobrazené, <kbd>Ctrl</kbd>+<kbd>C</kbd> zkopíruje text.</div>
+  <div class="uilang" role="group" data-i18n-aria="set.ui.h" aria-label="Jazyk aplikace">
+    <button type="button" class="web" id="open-web" data-i18n-title="side.web" title="Web Diktovátka" data-i18n-aria="side.web" aria-label="Web Diktovátka"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+    <button type="button" data-lang="cs" lang="cs" title="Čeština">CZ</button><button type="button" data-lang="en" lang="en" title="English">EN</button><button type="button" data-lang="de" lang="de" title="Deutsch">DE</button>
+  </div>
 </aside>
 
 <main id="main">
@@ -304,6 +316,14 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
   <div class="wrap" id="view-settings" hidden>
     <header><div><h1 data-i18n="set.title">Nastavení</h1><p class="summary" data-i18n="set.sub">Změny platí hned po uložení, aplikaci není potřeba restartovat.</p></div></header>
     <form class="settings" id="settings" onsubmit="return false">
+      <section class="card">
+        <h2 data-i18n="set.ui.h">Jazyk aplikace</h2>
+        <div class="row">
+          <div><div class="t" data-i18n="set.ui.t">Jazyk okna, menu a indikátoru</div><div class="d" data-i18n="set.ui.d"></div></div>
+          <select class="field" id="ui-language"></select>
+        </div>
+      </section>
+
       <section class="card">
         <h2 data-i18n="set.hotkey.h">Klávesová zkratka</h2>
         <p id="hotkey-p"></p>
@@ -363,14 +383,6 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
         <div class="row"><div><div class="t" id="autostart-t">Spouštět po přihlášení</div></div><label class="switch"><input type="checkbox" id="autostart"><span></span></label></div>
       </section>
 
-      <section class="card">
-        <h2 data-i18n="set.ui.h">Jazyk aplikace</h2>
-        <div class="row">
-          <div><div class="t" data-i18n="set.ui.t">Jazyk okna, menu a indikátoru</div><div class="d" data-i18n="set.ui.d"></div></div>
-          <select class="field" id="ui-language"></select>
-        </div>
-      </section>
-
       <section class="card" id="upd-card">
         <h2 data-i18n="set.upd.h">Aktualizace</h2>
         <div class="row">
@@ -378,6 +390,7 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
           <div class="inline"><button type="button" class="btn" id="upd-check" data-i18n="set.upd.check">Zkontrolovat</button><button type="button" class="btn primary" id="upd-install" data-i18n="set.upd.install" hidden>Aktualizovat teď</button></div>
         </div>
         <div class="row" id="upd-notes-row" hidden style="display:block"><div class="t" id="upd-notes-t"></div><div class="notes" id="upd-notes"></div></div>
+        <div class="row"><button type="button" class="link" id="upd-changes" data-i18n="set.upd.changes">Celá historie změn na webu</button></div>
         <div class="row"><div><div class="t" data-i18n="set.upd.auto">Automaticky kontrolovat aktualizace</div><div class="d" data-i18n="set.upd.autoD"></div></div><label class="switch"><input type="checkbox" id="check-updates"><span></span></label></div>
       </section>
 
@@ -754,6 +767,7 @@ function setDirty(dirty, savedAt) {
 // Přepínač offline platí hned (jako v levém panelu), neoznačuje nastavení jako neuložené.
 $("offline").addEventListener("change", async (e) => { e.stopPropagation(); renderEngine(await api().set_offline($("offline").checked)); });
 $("offline").addEventListener("input", (e) => e.stopPropagation());
+$("ui-language").addEventListener("change", (e) => { e.stopPropagation(); changeLang($("ui-language").value); });
 $("settings").addEventListener("input", () => setDirty(true));
 $("settings").addEventListener("change", () => setDirty(true));
 function chosenHotkey() { return $("hotkey").value === "__custom" ? $("custom").value.trim().toLowerCase() : $("hotkey").value; }
@@ -793,16 +807,13 @@ $("save").onclick = async () => {
     initial_prompt: $("prompt").value.trim(), history_days: +$("hist-days").value, store_titles: $("titles").checked, check_updates: $("check-updates").checked,
     duck_audio: $("duck").checked, duck_level: +$("duck-level").value / 100,
     overlay: $("overlay").checked, sounds: $("sounds").checked, trailing_space: $("trailing").checked, history: $("hist").checked,
-    ui_language: $("ui-language").value,
   };
-  const langChanged = cfg.ui_language !== state.settings.config.ui_language;
   let res;
   try { res = await api().save_settings(cfg, $("autostart").checked, state.keyAction, $("groq").value.trim()); }
   catch (e) { res = { ok: false, error: t("set.saveFail", { e }) }; }
   $("save").disabled = false;
   if (res.ok) {
     state.settings.config = { ...state.settings.config, ...cfg };
-    if (langChanged) await initLang();
     await loadSettings();
     setDirty(false, new Date().toLocaleTimeString(locale(), { hour: "2-digit", minute: "2-digit" }));
     toast(t("toast.saved"));
@@ -838,8 +849,20 @@ async function initLang() {
   setLang(state.settings.lang);
   state.periods = await api().periods();
   applyI18n();
+  document.querySelectorAll(".uilang button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === LANG));
   renderEngine(await api().engine());
 }
+// Jazyk aplikace platí hned (levý panel dole i Nastavení), okno se přeloží bez zavření.
+async function changeLang(lang) {
+  if (lang === LANG) return;
+  await api().set_ui_language(lang);
+  await initLang();
+  await showView(state.view);
+  toast(t("toast.lang"));
+}
+document.querySelector(".uilang").addEventListener("click", (e) => { const b = e.target.closest("button[data-lang]"); if (b) changeLang(b.dataset.lang); });
+$("open-web").onclick = () => api().open_url("web");
+$("upd-changes").onclick = () => api().open_url("changes");
 window.addEventListener("pywebviewready", async () => {
   await initLang();
   $("ver").textContent = state.settings.version ? "v" + state.settings.version : "";

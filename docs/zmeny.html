@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Historie změn Diktovátka</title>
+<meta name="description" content="Co a kdy v Diktovátku přibylo, verze po verzi.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23FF5A6E'/%3E%3Crect x='9' y='5' width='6' height='10' rx='3' fill='white'/%3E%3Cpath d='M7 12a5 5 0 0 0 10 0M12 17v2.5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --night: #1A1446; --night-2: #241C5C; --lilac: #B9B3FF; --lilac-2: #8F87E8; --sun: #FFD23F; --coral: #FF5A6E;
+  --fog: #F6F4FF; --paper: #FFFFFF; --ink: #16133A; --ink-2: #4C4870; --muted: #7A7699;
+  --line: #E2DEF7; --ultra: #D8304A; --ultra-soft: #EFEBFF; --voice: #FF5A6E; --warn-bg: #FFF3C4; --warn: #5E4600;
+  --display: "Unbounded", "Segoe UI", sans-serif; --body: "Onest", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fog: #110D30; --paper: #1C1650; --ink: #EDEBFF; --ink-2: #BDB8E6; --muted: #8E89B8;
+    --line: #2E2770; --ultra: #FF8A98; --ultra-soft: #241C5C; --warn-bg: #3A2F0A; --warn: #FFE08A; color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body { margin: 0; background: var(--fog); color: var(--ink); font: 16.5px/1.65 var(--body); -webkit-font-smoothing: antialiased; }
+a { color: var(--ultra); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--ultra); outline-offset: 3px; border-radius: 4px; }
+
+.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--fog) 90%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top-in { width: min(1120px, 100% - 32px); margin: 0 auto; display: flex; align-items: center; gap: 20px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 9px; font: 800 17px/1 var(--display); color: var(--ink); text-decoration: none; }
+.mark { width: 24px; height: 24px; border-radius: 50%; background: var(--voice); display: grid; place-items: center; }
+.mark svg { width: 12px; height: 12px; }
+.lang { margin-left: 10px; display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.lang a { padding: 5px 10px; border-radius: 8px; font: 600 13px var(--body); color: var(--ink-2); text-decoration: none; }
+.lang a[aria-current="page"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .1); }
+.os { margin-left: 10px; display: inline-flex; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.os button { border: 0; background: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; font: 500 14px var(--body); color: var(--ink-2); }
+.os button[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .1); }
+
+.layout { width: min(1120px, 100% - 32px); margin: 0 auto; display: grid; grid-template-columns: 230px 1fr; gap: 56px; padding: 40px 0 100px; }
+.toc { position: sticky; top: 90px; align-self: start; font-size: 14.5px; }
+.toc p { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+.toc ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; counter-reset: t; }
+.toc li { counter-increment: t; }
+.toc a { display: flex; gap: 10px; padding: 5px 8px; border-radius: 7px; color: var(--ink-2); text-decoration: none; }
+.toc a::before { content: counter(t); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 1.2em; }
+.toc a:hover, .toc a.on { background: var(--paper); color: var(--ink); }
+
+article { max-width: 720px; min-width: 0; }
+h1 { margin: 0; font: 800 clamp(34px, 5vw, 48px)/1.05 var(--display); letter-spacing: -0.03em; }
+.lede { margin: 14px 0 0; font-size: 19px; color: var(--ink-2); }
+.meta { margin: 18px 0 0; font-size: 14px; color: var(--muted); }
+section { margin-top: 56px; }
+h2 { margin: 0 0 12px; font: 800 28px/1.15 var(--display); letter-spacing: -0.02em; display: flex; gap: 12px; align-items: baseline; }
+h2 .n { color: var(--ultra); }
+h3 { margin: 28px 0 8px; font: 600 19px/1.3 var(--display); }
+p { margin: 0 0 14px; }
+ul { padding-left: 22px; margin: 0 0 14px; }
+li { margin-bottom: 6px; }
+
+.steps { list-style: none; padding: 0; margin: 18px 0; counter-reset: s; display: grid; gap: 14px; }
+.steps > li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 14px; margin: 0; }
+.steps > li::before { content: counter(s); width: 34px; height: 34px; border-radius: 50%; background: var(--ultra-soft); color: var(--ultra); display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+.steps > li > div { padding-top: 4px; }
+.steps b { font-weight: 600; }
+
+kbd { font: 600 0.82em var(--body); padding: 2px 7px; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; background: var(--paper); white-space: nowrap; }
+code { font: 500 0.88em "Cascadia Code", "SF Mono", Consolas, monospace; padding: 2px 6px; border-radius: 6px; background: var(--paper); border: 1px solid var(--line); }
+.path { font-weight: 600; }
+.note, .warn { padding: 14px 16px; border-radius: 12px; margin: 18px 0; font-size: 15.5px; }
+.note { background: var(--ultra-soft); }
+.warn { background: var(--warn-bg); color: var(--warn); }
+.note p:last-child, .warn p:last-child { margin: 0; }
+.shot { margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+.shot img { display: block; width: 100%; height: auto; }
+.faq details { border-top: 1px solid var(--line); padding: 12px 0; }
+.faq details:last-child { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+.faq summary::after { content: "+"; color: var(--muted); font-weight: 400; font-size: 20px; line-height: 1; }
+.faq details[open] summary::after { content: "–"; }
+.faq details > div { padding-top: 10px; color: var(--ink-2); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 14px 0; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 13.5px; }
+
+.tldr { margin-top: 28px; padding: 20px 22px; border-radius: 14px; background: var(--paper); border: 1px solid var(--line); }
+.tldr-h { font-size: 20px; margin-bottom: 8px; }
+.tldr ul { margin: 0; padding-left: 20px; }
+.tldr li { margin-bottom: 5px; }
+.quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; margin-top: 14px; }
+.quick a { display: flex; flex-direction: column; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); text-decoration: none; color: var(--ink); line-height: 1.3; }
+.quick a:hover { border-color: var(--ultra); }
+.quick a span { font-size: 13.5px; color: var(--muted); margin-top: 3px; }
+.dl { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 4px; }
+.dl a { display: inline-flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 11px; background: var(--ink); color: var(--fog); text-decoration: none; font-weight: 600; }
+.dl a.alt { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+.dl svg { width: 18px; height: 18px; }
+body.is-mac .dl .win-btn { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+body.is-mac .dl .mac-btn { background: var(--ink); color: var(--fog); border: 0; }
+.mac { display: none; }
+body.is-mac .mac { display: revert; }
+body.is-mac .win { display: none; }
+body.is-mac .quick a.mac { display: flex; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; gap: 0; padding-top: 24px; }
+  .toc { display: none; }
+  .brand span:last-child { display: none; }
+  .top-in { gap: 10px; }
+  .lang a { padding: 5px 8px; }
+  .os { margin-left: 6px; }
+  .os button { padding: 6px 10px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ===== design varianty 2 (stejný jako hlavní stránka) ===== */
+.steps > li.mac, body.is-mac .steps > li.win { display: none; }
+body.is-mac .steps > li.mac { display: grid; }
+.progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 60; background: linear-gradient(90deg, var(--coral), var(--sun)); transform-origin: 0 50%; transform: scaleX(0); }
+.top { background: rgb(26 20 70 / .94); border-bottom: 1px solid rgb(185 179 255 / .18); }
+.top-in { height: 64px; }
+.brand { color: #fff; font: 700 16px/1 var(--display); }
+.mark { width: 28px; height: 28px; background: var(--coral); }
+.mark svg { width: 14px; height: 14px; }
+.lang, .os { background: rgb(255 255 255 / .08); border-radius: 999px; }
+.lang a, .os button { color: var(--lilac); border-radius: 999px; }
+.lang a[aria-current="page"], .os button[aria-pressed="true"] { background: var(--sun); color: var(--night); box-shadow: none; }
+h1 { font: 900 clamp(32px, 5.4vw, 58px)/1.02 var(--display); letter-spacing: -0.04em; }
+h2 { font: 900 clamp(22px, 2.6vw, 30px)/1.15 var(--display); letter-spacing: -0.035em; }
+h2 .n { color: var(--coral); }
+h3 { font: 700 18px/1.3 var(--display); letter-spacing: -0.02em; }
+.lede { font-size: 19px; }
+.toc a.on { background: var(--night); color: #fff; }
+.toc a.on::before { color: var(--sun); }
+.tldr { background: var(--night); border-color: var(--night); color: #EDEBFF; }
+.tldr-h { color: #fff; }
+.tldr b { color: #fff; }
+.tldr code { background: rgb(255 255 255 / .1); border-color: transparent; color: #fff; }
+.tldr li::marker { color: var(--sun); }
+.quick a { border-radius: 16px; transition: border-color .2s, transform .2s; }
+.quick a:hover { border-color: var(--coral); transform: translateY(-2px); }
+.quick a b { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+.steps > li::before { background: var(--sun); color: var(--night); font-family: var(--display); }
+.note { background: var(--ultra-soft); border-left: 4px solid var(--lilac-2); }
+.warn { border-left: 4px solid var(--sun); }
+.dl a { border-radius: 999px; background: var(--sun); color: var(--night); }
+.dl a.alt, body.is-mac .dl .win-btn { background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); }
+body.is-mac .dl .mac-btn { background: var(--sun); color: var(--night); }
+.shot { border-radius: 16px; box-shadow: 0 30px 60px -34px rgb(26 20 70 / .5); }
+.faq summary::after { color: var(--coral); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tldr { background: var(--paper); border-color: var(--line); } }
+
+/* tlačítko na kafe v horní liště, vždy vidět */
+a.coffee { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 999px; background: var(--sun); color: #16133A !important; font: 700 14px/1 var(--display); text-decoration: none; white-space: nowrap; box-shadow: 0 6px 18px -8px rgb(255 210 63 / .9); transition: transform .2s; }
+a.coffee:hover { transform: translateY(-1px) rotate(-2deg); color: #16133A; }
+a.coffee .cup { font-size: 16px; line-height: 1; }
+@media (max-width: 420px) { a.coffee .txt { display: none; } a.coffee { padding: 6px 11px; } a.coffee .cup { font-size: 20px; } }
+.layout.clog { grid-template-columns: 200px 1fr; }
+.clog .toc a::before { content: none; }
+.rel { padding: 26px 0; border-top: 1px solid var(--line); scroll-margin-top: 90px; }
+.rel:first-of-type { border-top: 0; }
+.rel h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 0 0 10px; font: 700 22px/1.2 var(--display); letter-spacing: -0.02em; }
+.rel time { font: 500 14px var(--body); color: var(--muted); letter-spacing: 0; }
+.rel .new { font: 700 12px/1 var(--body); padding: 5px 9px; border-radius: 999px; background: var(--sun); color: var(--night); letter-spacing: 0; }
+.rel ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); }
+.clog-links { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 18px 0 8px; font-weight: 600; }
+@media (max-width: 860px) { .layout.clog { grid-template-columns: 1fr; } .clog .toc { display: none; } }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="top-in">
+    <a class="brand" href="./"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="8" y="2" width="8" height="13" rx="4" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></span><span>Diktovátko</span></a>
+    <a class="coffee keep" href="https://ko-fi.com/michalhudak" target="_blank" rel="noopener" title="Podpořit Diktovátko na Ko-fi"><span class="cup" aria-hidden="true">☕</span><span class="txt">Podpořit</span></a>
+    <div class="lang" aria-label="Jazyk / Language">
+      <a href="zmeny.html" hreflang="cs" lang="cs" aria-current="page">CZ</a>
+      <a href="en/zmeny.html" hreflang="en" lang="en">EN</a>
+      <a href="de/zmeny.html" hreflang="de" lang="de">DE</a>
+    </div>
+  </div>
+</div>
+
+<div class="layout clog">
+  <nav class="toc" aria-label="Verze">
+    <p>Verze</p>
+    <ol><li><a href="#v0-12-2">0.12.2</a></li><li><a href="#v0-12-1">0.12.1</a></li><li><a href="#v0-12-0">0.12.0</a></li><li><a href="#v0-11-1">0.11.1</a></li><li><a href="#v0-11-0">0.11.0</a></li><li><a href="#v0-10-2">0.10.2</a></li><li><a href="#v0-10-1">0.10.1</a></li><li><a href="#v0-10-0">0.10.0</a></li><li><a href="#v0-9-1">0.9.1</a></li><li><a href="#v0-9-0">0.9.0</a></li><li><a href="#v0-8-0">0.8.0</a></li><li><a href="#v0-7-0">0.7.0</a></li><li><a href="#v0-6-0">0.6.0</a></li><li><a href="#v0-5-0">0.5.0</a></li><li><a href="#v0-4-0">0.4.0</a></li><li><a href="#v0-3-0">0.3.0</a></li><li><a href="#v0-2-0">0.2.0</a></li><li><a href="#v0-1-0">0.1.0</a></li></ol>
+  </nav>
+
+  <article>
+    <h1>Historie změn</h1>
+    <p class="lede">Co a kdy v Diktovátku přibylo, od nejnovější verze. Aplikace se aktualizuje sama a před aktualizací vám změny ukáže.</p>
+    <p class="clog-links"><a href="./">Zpět na úvod</a><a href="navod.html">Návod</a><a href="https://github.com/mhudakcz/Diktovatko_2026/releases">GitHub Releases</a></p>
+    <section class="rel" id="v0-12-2">
+      <h2>Verze 0.12.2 <time datetime="2026-09-24">24. září 2026</time> <span class="new">nejnovější</span></h2>
+      <ul><li>Jazyk aplikace (čeština, angličtina, němčina) jde přepnout hned vlevo dole v okně, platí okamžitě. V Nastavení je volba jazyka nově nahoře.</li><li>Na webu je historie změn: novinky na úvodní stránce a samostatná stránka se všemi verzemi.</li></ul>
+    </section>
+    <section class="rel" id="v0-12-1">
+      <h2>Verze 0.12.1 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Přepínač Cloud · fast / Local · slow je i v okně vlevo pod menu a v Nastavení platí hned, bez ukládání.</li><li>Na webu je ukázka přepínače, na kterou jde kliknout.</li></ul>
+    </section>
+    <section class="rel" id="v0-12-0">
+      <h2>Verze 0.12.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Před aktualizací uvidíte přehled změn ze všech verzí od té vaší, i když jich pár přeskočíte.</li><li>Indikátor je napůl průhledný a jde myší přetáhnout kamkoli na obrazovku. Dvojklik ho vrátí dole doprostřed.</li></ul>
+    </section>
+    <section class="rel" id="v0-11-1">
+      <h2>Verze 0.11.1 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Oprava: po přepnutí Cloud / Local během nahrávání aplikace nepoznala puštění zkratky.</li><li>Štítek v indikátoru má piktogramy: blesk pro fast, šnek pro slow.</li></ul>
+    </section>
+    <section class="rel" id="v0-11-0">
+      <h2>Verze 0.11.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Přepínání mezi cloudem a přepisem v počítači bez mazání klíče: kliknutím na štítek v indikátoru, i během nahrávání. Také v menu ikony a v Nastavení.</li></ul>
+    </section>
+    <section class="rel" id="v0-10-2">
+      <h2>Verze 0.10.2 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Návod doporučuje zapnout u Groq Zero Data Retention a přesněji popisuje, co se s nahrávkou u Groq děje.</li></ul>
+    </section>
+    <section class="rel" id="v0-10-1">
+      <h2>Verze 0.10.1 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Kontrola nové verze běží jednou za 2 hodiny.</li></ul>
+    </section>
+    <section class="rel" id="v0-10-0">
+      <h2>Verze 0.10.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Automatické aktualizace: Diktovátko samo zjistí novou verzi a po kliknutí se aktualizuje. Nastavení, klíč i historie zůstanou.</li></ul>
+    </section>
+    <section class="rel" id="v0-9-1">
+      <h2>Verze 0.9.1 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Možnost podpořit projekt přes Ko-fi, na webu i v menu ikony.</li></ul>
+    </section>
+    <section class="rel" id="v0-9-0">
+      <h2>Verze 0.9.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Bezpečnostní audit: klíč Groq v trezoru hesel systému, log bez nadiktovaného textu, text se nevloží do jiného okna, mazání historie.</li><li>Spolehlivější zkratky a srozumitelné chybové hlášky.</li></ul>
+    </section>
+    <section class="rel" id="v0-8-0">
+      <h2>Verze 0.8.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Aplikace, web i návod v češtině, angličtině a němčině.</li></ul>
+    </section>
+    <section class="rel" id="v0-7-0">
+      <h2>Verze 0.7.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Nový web s ukázkou diktování při rolování. Číslo verze v aplikaci a přehled změn.</li></ul>
+    </section>
+    <section class="rel" id="v0-6-0">
+      <h2>Verze 0.6.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Výchozí zkratka Ctrl + Win, na Macu Ctrl + ⌘.</li></ul>
+    </section>
+    <section class="rel" id="v0-5-0">
+      <h2>Verze 0.5.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Podrobnější návod pro Mac: oprávnění krok za krokem a řešení problémů.</li></ul>
+    </section>
+    <section class="rel" id="v0-4-0">
+      <h2>Verze 0.4.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Verze pro Mac a návod pro laiky, včetně vytvoření vlastního Groq klíče.</li></ul>
+    </section>
+    <section class="rel" id="v0-3-0">
+      <h2>Verze 0.3.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Jedno okno s historií, statistikami a nastavením. Statistiky ušetřeného času.</li></ul>
+    </section>
+    <section class="rel" id="v0-2-0">
+      <h2>Verze 0.2.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>Web projektu na GitHub Pages.</li></ul>
+    </section>
+    <section class="rel" id="v0-1-0">
+      <h2>Verze 0.1.0 <time datetime="2026-09-24">24. září 2026</time></h2>
+      <ul><li>První verze: podržíte klávesu, mluvíte a text se vloží tam, kde je kurzor. Přepis v počítači nebo přes Groq, lokální historie.</li></ul>
+    </section>
+  </article>
+</div>
+
+<script>
+(() => {
+  const links = [...document.querySelectorAll(".toc a")];
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) links.forEach((a) => a.classList.toggle("on", a.getAttribute("href") === "#" + en.target.id)); });
+  }, { rootMargin: "-30% 0px -60% 0px" });
+  document.querySelectorAll(".rel").forEach((s) => io.observe(s));
+  const bar = document.createElement("div"); bar.className = "progress"; bar.setAttribute("aria-hidden", "true");
+  document.body.prepend(bar);
+  const upd = () => { const d = document.documentElement; bar.style.transform = `scaleX(${d.scrollTop / Math.max(1, d.scrollHeight - innerHeight)})`; };
+  addEventListener("scroll", upd, { passive: true }); addEventListener("resize", upd); upd();
+})();
+</script>
+</body>
+</html>

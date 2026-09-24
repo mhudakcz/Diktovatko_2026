@@ -168,7 +168,7 @@ p { margin: 0; }
 .lang { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgb(255 255 255 / .08); margin-left: 8px; }
 .top nav .lang a { padding: 4px 10px; border-radius: 999px; font: 600 12px var(--body); color: var(--lilac); text-decoration: none; }
 .top nav .lang a:hover { color: #fff; }
-.top nav .lang a[aria-current="page"] { background: var(--sun); color: var(--ink); }
+.top nav .lang a[aria-current="page"] { background: var(--sun); color: #16133A; }
 
 .hero-in { position: relative; z-index: 2; display: grid; grid-template-columns: 1.25fr .75fr; gap: 40px; align-items: center; padding: 64px 0 120px; }
 h1 { font-weight: 900; font-size: clamp(44px, 7vw, 104px); line-height: .98; letter-spacing: -0.04em; }
@@ -182,7 +182,7 @@ h1 .l:nth-child(2) span { animation-delay: .12s; color: var(--lilac); }
 .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; animation: fade .8s .5s both; }
 .btn { display: inline-flex; align-items: center; gap: 10px; padding: 15px 22px; border-radius: 999px; font-weight: 600; text-decoration: none; transition: transform .2s, background .2s; }
 .btn svg { width: 19px; height: 19px; }
-.btn.solid { background: var(--sun); color: var(--ink); }
+.btn.solid { background: var(--sun); color: #16133A; }
 .btn.line { border: 1.5px solid rgb(255 255 255 / .35); color: #fff; }
 .btn:hover { transform: translateY(-2px); }
 
@@ -194,7 +194,7 @@ h1 .l:nth-child(2) span { animation-delay: .12s; color: var(--lilac); }
 .ring:nth-child(4) { animation-delay: 2.7s; }
 @keyframes ripple { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(2.9); opacity: 0; } }
 .mic-zone.speaking .ring { border-color: var(--coral); animation-duration: 1.6s; }
-.mic { position: relative; z-index: 1; width: 34%; aspect-ratio: 1; border-radius: 50%; border: 0; background: var(--sun); color: var(--ink); display: grid; place-items: center; cursor: pointer; box-shadow: 0 24px 60px -20px rgb(255 210 63 / .55); transition: transform .2s, background .2s; }
+.mic { position: relative; z-index: 1; width: 34%; aspect-ratio: 1; border-radius: 50%; border: 0; background: var(--sun); color: #16133A; display: grid; place-items: center; cursor: pointer; box-shadow: 0 24px 60px -20px rgb(255 210 63 / .55); transition: transform .2s, background .2s; }
 .mic:hover { transform: scale(1.05); }
 .mic svg { width: 38%; height: 38%; }
 .mic-zone.speaking .mic { background: var(--coral); color: #fff; }
@@ -214,7 +214,7 @@ h1 .l:nth-child(2) span { animation-delay: .12s; color: var(--lilac); }
 .beat { display: grid; grid-template-columns: 56px 1fr; gap: 18px; opacity: .3; transition: opacity .35s; }
 .beat.on { opacity: 1; }
 .beat .n { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font: 700 20px var(--display); border: 2px solid var(--lilac-2); transition: background .3s, border-color .3s, color .3s; }
-.beat.on .n { background: var(--sun); border-color: var(--sun); color: var(--ink); }
+.beat.on .n { background: var(--sun); border-color: var(--sun); color: #16133A; }
 .beat h3 { font: 700 clamp(20px, 2vw, 26px)/1.2 var(--display); letter-spacing: -0.02em; }
 .beat p { margin-top: 6px; color: var(--lilac); }
 .device { position: relative; }
@@ -551,6 +551,30 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
       <p class="req reveal">For the fastest transcription, create your <b>own</b> free key at <a href="https://console.groq.com/keys">console.groq.com</a> and paste it into Settings in the app (<a href="navod.html#groq">how to do it</a>). Without a key, transcription runs offline.</p>
     </div>
   </section>
+  <!-- novinky:start – generuje tools/build_changes.py z docs/changes.json -->
+  <section class="block" id="novinky">
+    <style>
+.news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+.news { padding: 26px 26px 24px; border-radius: 22px; background: var(--card); border: 1px solid var(--line); }
+.news h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font: 700 20px/1.2 var(--display); letter-spacing: -0.02em; }
+.news time { font: 500 13px var(--body); color: var(--muted); letter-spacing: 0; }
+.news .new { font: 700 11px/1 var(--body); padding: 4px 8px; border-radius: 999px; background: var(--sun); color: #16133A; letter-spacing: 0; }
+.news ul { margin: 12px 0 0; padding-left: 18px; display: grid; gap: 6px; color: var(--ink-2); font-size: 15px; }
+.news-more { display: inline-block; margin-top: 28px; font-weight: 700; }
+@media (max-width: 900px) { .news-grid { grid-template-columns: 1fr; } }
+</style>
+    <div class="wrap">
+      <h2 class="reveal">What's new</h2>
+      <p class="intro reveal" style="--d:.1s">Diktovátko keeps evolving. Here is what arrived most recently.</p>
+      <div class="news-grid">
+        <div class="news reveal" style="--d:0.0s"><h3>0.12.2 <time datetime="2026-09-24">24 September 2026</time> <span class="new">latest</span></h3><ul><li>The app language (Czech, English, German) can be switched right at the bottom left of the window and applies at once. In Settings, the language option is now at the top.</li><li>The website has a changelog: what&#x27;s new on the home page and a separate page with every version.</li></ul></div>
+        <div class="news reveal" style="--d:0.1s"><h3>0.12.1 <time datetime="2026-09-24">24 September 2026</time></h3><ul><li>The Cloud · fast / Local · slow switch is also on the left of the window, and in Settings it applies at once, no saving needed.</li><li>The website shows a clickable demo of the switch.</li></ul></div>
+        <div class="news reveal" style="--d:0.2s"><h3>0.12.0 <time datetime="2026-09-24">24 September 2026</time></h3><ul><li>Before updating, you see what changed in every version since yours, even if you skipped a few.</li><li>The indicator is semi-transparent and can be dragged anywhere on the screen. Double-click puts it back at the bottom centre.</li></ul></div>
+      </div>
+      <a class="news-more reveal" href="zmeny.html">Full changelog</a>
+    </div>
+  </section>
+  <!-- novinky:end -->
   <section class="block support" id="podpora">
     <div class="wrap support-grid">
       <div>
@@ -567,7 +591,7 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
 <footer class="bigfoot">
   <div class="wrap">
     <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
-    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">version 0.12.1</a> by Michal Hudák. MIT licence.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+    <div class="foot-row"><span>Diktovátko <a href="zmeny.html">version 0.12.2</a> by Michal Hudák. MIT licence.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
   </div>
 </footer>
 
@@ -665,7 +689,7 @@ a.coffee .cup { font-size: 16px; line-height: 1; }
   }
 
   /* ---------- page position rail ---------- */
-  const SECTIONS = [["top", "Intro"], ["ukazka", "Demo"], ["uspora", "Time saved"], ["historie", "History"], ["funkce", "Features"], ["cena", "Price"], ["klic", "Fast mode"], ["soukromi", "Privacy"], ["instalace", "Install"], ["podpora", "Support"]];
+  const SECTIONS = [["top", "Intro"], ["ukazka", "Demo"], ["uspora", "Time saved"], ["historie", "History"], ["funkce", "Features"], ["cena", "Price"], ["klic", "Fast mode"], ["soukromi", "Privacy"], ["instalace", "Install"], ["novinky", "What's new"], ["podpora", "Support"]];
   document.querySelector(".hero").id = "top";
   const dotsEl = document.getElementById("rail-dots"), railFill = document.getElementById("rail-fill"), pct = document.getElementById("pct");
   dotsEl.innerHTML = SECTIONS.map(([id, label]) => `<li><a href="#${id}"><span>${label}</span></a></li>`).join("");
