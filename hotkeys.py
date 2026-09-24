@@ -10,8 +10,8 @@ import threading
 
 # Nabídka zkratek ve Windows – vybrané tak, aby nepřekážely psaní ani běžným zkratkám.
 PRESETS = [
+    ("ctrl+windows", "Ctrl + Win"),
     ("right ctrl", "Pravý Ctrl"),
-    ("ctrl+windows", "Ctrl + Win (jako Wispr Flow)"),
     ("ctrl+alt+space", "Ctrl + Alt + mezerník"),
     ("ctrl+shift+space", "Ctrl + Shift + mezerník"),
     ("menu", "Klávesa Menu (vedle pravého Ctrl)"),

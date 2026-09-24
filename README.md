@@ -6,7 +6,7 @@ Bezplatná open-source alternativa k [Wispr Flow](https://wisprflow.ai) pro **Wi
 
 **[Web projektu](https://mhudakcz.github.io/Diktovatko_2026/)** · **[Návod krok za krokem](https://mhudakcz.github.io/Diktovatko_2026/navod.html)** · **[Stáhnout ZIP](https://github.com/mhudakcz/Diktovatko_2026/archive/refs/heads/main.zip)** (Windows i Mac)
 
-> **Ve zkratce:** zdarma a open source, pro Windows i Mac, česky a v 90+ jazycích. Podržíte zkratku (pravý Ctrl, Ctrl + Win, na Macu Fn), mluvíte, pustíte a text se vloží na místo kurzoru. Přepisuje offline, nebo za sekundu přes vlastní bezplatný Groq klíč. Historie a statistiky se ukládají jen do vašeho počítače. Při 2 000 slovech denně ušetří kolem 12 hodin měsíčně.
+> **Ve zkratce:** zdarma a open source, pro Windows i Mac, česky a v 90+ jazycích. Podržíte zkratku (výchozí Ctrl + Win, na Macu Ctrl + ⌘), mluvíte, pustíte a text se vloží na místo kurzoru. Přepisuje offline, nebo za sekundu přes vlastní bezplatný Groq klíč. Historie a statistiky se ukládají jen do vašeho počítače. Při 2 000 slovech denně ušetří kolem 12 hodin měsíčně.
 
 **Obsah:** [Proč diktovat](#proč-diktovat) · [Co umí](#co-umí) · [Instalace](#instalace) · [Groq klíč](#groq-klíč) · [Používání](#používání) · [Nastavení](#nastavení-configjson) · [Soukromí](#soukromí) · [Omezení](#omezení) · [Struktura](#struktura)
 
@@ -19,7 +19,7 @@ Mluvíme kolem 150 slov za minutu, na klávesnici většina lidí zvládne asi 4
 ## Co umí
 
 - **Diktování kamkoliv.** Podržíte zkratku, mluvíte, pustíte a přepis se vloží do aktivního pole. Schránka se potom vrátí do původního stavu.
-- **Zkratka podle vás.** Windows: pravý Ctrl, Ctrl + Win (jako Wispr Flow), Ctrl + Alt + mezerník a další. Mac: Fn / 🌐, pravý ⌘, pravý ⌥ a další. Jde nastavit i vlastní. Když během držení stisknete jinou klávesu (Ctrl+C), nahrávání se zruší, takže běžné zkratky dál fungují.
+- **Zkratka podle vás.** Windows: výchozí Ctrl + Win, dále pravý Ctrl, Ctrl + Alt + mezerník a další. Mac: výchozí Ctrl + ⌘, dále Fn / 🌐, pravý ⌘, pravý ⌥ a další. Jde nastavit i vlastní. Když během držení stisknete jinou klávesu (Ctrl+C), nahrávání se zruší, takže běžné zkratky dál fungují.
 - **Indikátor nahrávání.** Dole uprostřed obrazovky se objeví malá „pilulka“. Při nahrávání ukazuje hlasitost vašeho hlasu, při přepisu animaci. Nebere fokus, takže text jde tam, kam má.
 - **Ztlumení ostatních zvuků.** Spotify, videa a další aplikace se během nahrávání ztiší a potom vrátí zpátky.
 - **Historie.** Každý přepis se uloží lokálně i s časem, aplikací a názvem okna (konverzace, dokument, tiket). Jde v ní hledat, filtrovat podle období (dnes, 7/10/14/20/30/90 dní, tento či minulý měsíc, vlastní rozsah) a aplikací, kopírovat a exportovat do Markdownu nebo CSV.
@@ -43,7 +43,7 @@ Potřebujete [Python 3.11+](https://www.python.org/downloads/). Ve Windows při 
 | 2. | Spusťte `install.bat` | `install.command` (poprvé přes pravé tlačítko → Otevřít) |
 | 3. | Spusťte `start.bat`, ikona se objeví vedle hodin | `start.command`, ikona se objeví v horní liště |
 
-**Mac:** v *Nastavení systému → Soukromí a zabezpečení* povolte Terminálu **Mikrofon**, **Zpřístupnění** a **Sledování vstupu** (volitelně **Nahrávání obrazovky** pro názvy oken v historii). U klávesy Fn nastavte v *Klávesnice → Stisknutím klávesy 🌐* volbu **Nedělat nic**. Mac verze je nová, chyby prosím hlaste v [Issues](https://github.com/mhudakcz/Diktovatko_2026/issues).
+**Mac:** v *Nastavení systému → Soukromí a zabezpečení* povolte Terminálu **Mikrofon**, **Zpřístupnění** a **Sledování vstupu** (volitelně **Nahrávání obrazovky** pro názvy oken v historii). Pokud si zvolíte klávesu Fn, nastavte v *Klávesnice* u klávesy 🌐 volbu **Nedělat nic**. Mac verze je nová, chyby prosím hlaste v [Issues](https://github.com/mhudakcz/Diktovatko_2026/issues).
 
 ### Groq klíč
 
@@ -72,7 +72,7 @@ Nejjednodušší je nastavovat v okně aplikace (sekce *Nastavení*). Soubor se 
 
 | Klíč | Výchozí | Popis |
 |---|---|---|
-| `hotkeys` | `["right ctrl"]` (Mac `["fn"]`) | zkratka, např. `"ctrl+windows"`, `"ctrl+alt+space"`, `"right cmd"` |
+| `hotkeys` | `["ctrl+windows"]` (Mac `["ctrl+cmd"]`) | zkratka, např. `"right ctrl"`, `"ctrl+alt+space"`, na Macu `"fn"`, `"right cmd"` |
 | `mode` | `"hold"` | `"hold"` = drž a mluv, `"toggle"` = stisk start, další stisk stop |
 | `language` | `"cs"` | kód jazyka, nebo `null` pro automatickou detekci |
 | `model` | `"large-v3-turbo"` | lokální model, `small` je rychlejší, ale méně přesný |

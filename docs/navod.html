@@ -148,16 +148,16 @@ body.is-mac .quick a.mac { display: flex; }
       <ul>
         <li><b>Co to je:</b> podržíte klávesu, mluvíte, pustíte a text se vloží tam, kde máte kurzor. Zdarma, česky, v jakékoli aplikaci.</li>
         <li><b>Instalace:</b> Python z python.org, pak <span class="win"><code>install.bat</code> a <code>start.bat</code></span><span class="mac"><code>install.command</code> a <code>start.command</code></span>. Zhruba 10 minut.</li>
-        <li class="mac"><b>Mac navíc:</b> povolit Terminálu Mikrofon, Zpřístupnění a Sledování vstupu. U klávesy 🌐 nastavit „Nedělat nic“.</li>
+        <li class="mac"><b>Mac navíc:</b> povolit Terminálu Mikrofon, Zpřístupnění a Sledování vstupu.</li>
         <li><b>Rychlý přepis:</b> každý si zdarma vytvoří <b>vlastní</b> Groq klíč a vloží ho do Nastavení. Bez klíče přepis funguje offline, jen pomaleji.</li>
-        <li><b>Zkratka:</b> <span class="win">pravý Ctrl, Ctrl + Win</span><span class="mac">Fn / 🌐, pravý ⌘</span> nebo vlastní. Mění se v Nastavení.</li>
+        <li><b>Zkratka:</b> výchozí <span class="win">Ctrl + Win</span><span class="mac">Ctrl + ⌘ Cmd</span>, jde změnit v Nastavení.</li>
         <li><b>Historie a statistiky:</b> vše se ukládá jen do vašeho počítače, jde to hledat, kopírovat a exportovat.</li>
       </ul>
     </div>
 
     <nav class="quick" aria-label="Rozcestník">
       <a href="#stazeni"><b>Instalace</b><span>stažení a spuštění</span></a>
-      <a href="#spusteni" class="mac"><b>Oprávnění na Macu</b><span>mikrofon, klávesnice, Fn</span></a>
+      <a href="#spusteni" class="mac"><b>Oprávnění na Macu</b><span>mikrofon a klávesnice</span></a>
       <a href="#spusteni" class="win"><b>První spuštění</b><span>kde najdu ikonu</span></a>
       <a href="#groq"><b>Groq klíč</b><span>rychlý přepis zdarma</span></a>
       <a href="#diktovani"><b>Jak diktovat</b><span>postup a tipy</span></a>
@@ -269,14 +269,16 @@ body.is-mac .quick a.mac { display: flex; }
         </ol>
         <div class="note"><p><b>Automatické spouštění po přihlášení</b> (volba v nastavení) spouští Diktovátko bez Terminálu, přímo přes Python. Po prvním přihlášení se proto Mac zeptá na oprávnění znovu, tentokrát pro <b>Python</b>. Povolte je stejně jako u Terminálu. Když Python v seznamu chybí, přidejte ho přes <b>+</b>: stiskněte <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>, vložte cestu <code>/Library/Frameworks/Python.framework/Versions</code>, otevřete složku s nejvyšším číslem verze, pak <code>bin</code>, a vyberte soubor <code>python3</code>.</p></div>
 
-        <h3>Klávesa Fn (🌐)</h3>
-        <p>Diktovátko na Macu ve výchozím nastavení reaguje na <kbd>Fn</kbd> (na novějších klávesnicích s ikonou 🌐 vlevo dole), stejně jako Wispr Flow. macOS ale Fn používá i sám pro sebe, proto to jednou nastavte:</p>
+        <h3>Zkratka na Macu</h3>
+        <p>Výchozí zkratka je <kbd>Ctrl</kbd> + <kbd>⌘ Cmd</kbd>: podržte obě klávesy vlevo dole najednou. V nastavení Diktovátka můžete zvolit i pravý ⌘, pravý ⌥ nebo <kbd>Fn</kbd> (🌐).</p>
+        <h3>Když chcete používat klávesu Fn (🌐)</h3>
+        <p>macOS klávesu Fn (na novějších klávesnicích s ikonou 🌐 vlevo dole) používá i sám pro sebe. Pokud si ji zvolíte, jednou to nastavte:</p>
         <ol class="steps">
           <li><div>Otevřete <span class="path"> → Nastavení systému → Klávesnice</span>.</div></li>
           <li><div>U volby pro klávesu <b>🌐</b> (stisknutí klávesy Glóbus/Fn) vyberte <b>Nedělat nic</b>.</div></li>
           <li><div>Nepoužíváte-li diktování od Applu, vypněte ho níže v části <b>Diktování</b>, ať se se zkratkou nepere.</div></li>
         </ol>
-        <p>Pokud Fn používat nechcete, zvolte v nastavení Diktovátka jinou zkratku, třeba <b>pravý ⌘ Cmd</b>.</p>
+        
 
         <h3>Který mikrofon se používá</h3>
         <p>Diktovátko nahrává z mikrofonu, který je vybraný v <span class="path"> → Nastavení systému → Zvuk → Vstup</span>. Když máte připojená sluchátka s mikrofonem nebo externí mikrofon, vyberte ho tam.</p>
@@ -284,7 +286,7 @@ body.is-mac .quick a.mac { display: flex; }
         <h3>Kontrola, že vše funguje</h3>
         <ol class="steps">
           <li><div>Otevřete třeba aplikaci <b>Poznámky</b> a klikněte do nové poznámky.</div></li>
-          <li><div>Podržte <kbd>Fn</kbd> (nebo zvolenou zkratku). Mělo by ťuknout a dole na obrazovce se objeví tmavá pilulka se sloupečky.</div></li>
+          <li><div>Podržte <kbd>Ctrl</kbd> + <kbd>⌘</kbd> (nebo zvolenou zkratku). Mělo by ťuknout a dole na obrazovce se objeví tmavá pilulka se sloupečky.</div></li>
           <li><div>Řekněte „Ahoj, tohle je zkouška diktování.“ a klávesu pusťte. Do sekundy až dvou se text objeví v poznámce.</div></li>
         </ol>
         <p>Když se pilulka neobjeví, chybí oprávnění Sledování vstupu. Když se objeví, ale text se nevloží, chybí Zpřístupnění. Více najdete v <a href="#problemy">řešení problémů</a>.</p>
@@ -320,7 +322,7 @@ body.is-mac .quick a.mac { display: flex; }
       <h2><span class="n">6</span>Jak diktovat</h2>
       <ol class="steps">
         <li><div>Klikněte tam, kam chcete psát: do e-mailu, chatu, dokumentu, vyhledávání…</div></li>
-        <li><div>Podržte <kbd class="win">pravý Ctrl</kbd><kbd class="mac">Fn</kbd>. Zazní pípnutí a dole na obrazovce se objeví tmavá pilulka se sloupečky, které se hýbou podle vašeho hlasu. Hudba a videa se ztiší.</div></li>
+        <li><div>Podržte <span class="win"><kbd>Ctrl</kbd> + <kbd>Win</kbd></span><span class="mac"><kbd>Ctrl</kbd> + <kbd>⌘</kbd></span>. Zazní pípnutí a dole na obrazovce se objeví tmavá pilulka se sloupečky, které se hýbou podle vašeho hlasu. Hudba a videa se ztiší.</div></li>
         <li><div>Mluvte normálně, v celých větách. Čárky a tečky doplní přepis sám.</div></li>
         <li><div>Pusťte klávesu. Pilulka ukáže vlnu a za chvilku se text objeví na místě kurzoru.</div></li>
       </ol>
@@ -340,8 +342,8 @@ body.is-mac .quick a.mac { display: flex; }
       <table>
         <tr><th>Volba</th><th>Co dělá</th></tr>
         <tr><td><b>Zkratka pro diktování</b></td><td>
-          <span class="win">Pravý Ctrl, Ctrl + Win (jako Wispr Flow), Ctrl + Alt + mezerník a další. Volba <i>Vlastní…</i> umožní zadat jakoukoli kombinaci, třeba <code>ctrl+alt+d</code>.</span>
-          <span class="mac">Fn / 🌐 (jako Wispr Flow), pravý ⌘ Cmd, pravý ⌥ Option, Ctrl + Option a další. Volba <i>Vlastní…</i> umožní zadat jakoukoli kombinaci.</span></td></tr>
+          <span class="win">Výchozí Ctrl + Win, dále pravý Ctrl, Ctrl + Alt + mezerník a další. Volba <i>Vlastní…</i> umožní zadat jakoukoli kombinaci, třeba <code>ctrl+alt+d</code>.</span>
+          <span class="mac">Výchozí Ctrl + ⌘ Cmd, dále Fn / 🌐, pravý ⌘ Cmd, pravý ⌥ Option a další. Volba <i>Vlastní…</i> umožní zadat jakoukoli kombinaci.</span></td></tr>
         <tr><td><b>Způsob ovládání</b></td><td><i>Držet</i> nahrává, dokud klávesu držíte. <i>Přepínat</i>: první stisk spustí, druhý zastaví, hodí se na delší diktování.</td></tr>
         <tr><td><b>Jazyk</b></td><td>čeština, slovenština, angličtina a další, nebo automatické rozpoznání</td></tr>
         <tr><td><b>Groq API klíč</b></td><td>viz <a href="#groq">krok 5</a>. Prázdné pole znamená přepis offline.</td></tr>
@@ -371,7 +373,7 @@ body.is-mac .quick a.mac { display: flex; }
       <details><summary>Po stisku zkratky se nic neděje</summary><div>
         <p class="win">Zkontrolujte, že ikona Diktovátka je vedle hodin a je tmavá (ne šedá ani černo-červená). Šedá znamená, že se ještě načítá. Když ikona chybí, spusťte znovu <code>start.bat</code>.</p>
         <p class="mac">Téměř vždy jde o oprávnění. Zkontrolujte <b>Zpřístupnění</b> a <b>Sledování vstupu</b> v <span class="path">Nastavení systému → Soukromí a zabezpečení</span>, pak Diktovátko ukončete a spusťte znovu.</p>
-        <p>Zkuste v nastavení jinou zkratku. Některé klávesnice nemají pravý Ctrl nebo klávesu Menu.</p></div></details>
+        <p>Zkuste v nastavení jinou zkratku. Některé notebooky nemají pravý Ctrl nebo klávesu Menu.</p></div></details>
       <details><summary>Nahrává se, ale text se nevloží</summary><div>
         <p>Klikněte před diktováním opravdu do textového pole, ať v něm bliká kurzor.</p>
         <p class="win">Do oken spuštěných „jako správce“ (třeba některé instalátory) Windows vkládání nedovolí.</p>

@@ -273,7 +273,7 @@ textarea.field { width: 100%; min-height: 64px; resize: vertical; margin-top: 6p
       <section class="card">
         <h2>Klávesová zkratka</h2>
         <p>Když během držení zkratky stisknete jinou klávesu (třeba <span class="copy-key">Ctrl</span>+C), nahrávání se zruší, takže běžné zkratky dál fungují.</p>
-        <p class="mac-only" hidden>Na Macu u klávesy Fn nastavte v <b>Nastavení systému → Klávesnice</b> volbu „Stisknutím klávesy 🌐“ na <b>Nedělat nic</b>, jinak se místo diktování otevře výběr emoji.</p>
+        <p class="mac-only" hidden>Když zvolíte klávesu Fn, nastavte v <b>Nastavení systému → Klávesnice</b> u klávesy 🌐 volbu <b>Nedělat nic</b>, jinak se místo diktování otevře výběr emoji.</p>
         <div class="row">
           <div><div class="t">Zkratka pro diktování</div><div class="d" id="hotkey-caps"></div></div>
           <select class="field" id="hotkey"></select>
@@ -428,7 +428,7 @@ function renderList() {
   $("title").textContent = periodTitle();
   $("summary").textContent = n ? `${n} ${plural(n, "záznam", "záznamy", "záznamů")}, ${num(words)} ${plural(words, "slovo", "slova", "slov")}, nadiktováno za ${fmtDur(secs)}` : "";
   if (!n) {
-    const keys = (state.settings?.config.hotkeys || ["right ctrl"]).map(keyText).join(" nebo ");
+    const keys = (state.settings?.config.hotkeys || ["ctrl+windows"]).map(keyText).join(" nebo ");
     $("list").innerHTML = state.q || state.app
       ? `<div class="empty"><h2>Nic neodpovídá hledání</h2><p>Zkuste jiné slovo nebo delší období v levém panelu.</p></div>`
       : `<div class="empty"><h2>V tomhle období nic není</h2><p>Klikněte do libovolného textového pole, podržte <b>${esc(keys)}</b>, řekněte, co potřebujete, a klávesu pusťte. Přepis se vloží na místo kurzoru a objeví se tady.</p></div>`;
@@ -574,7 +574,7 @@ async function loadSettings() {
   const { config: c, presets, languages, models, autostart, platform } = state.settings;
   document.querySelectorAll(".mac-only").forEach((el) => (el.hidden = platform !== "macos"));
   document.querySelectorAll(".copy-key").forEach((el) => (el.textContent = platform === "macos" ? "⌘" : "Ctrl"));
-  const current = c.hotkeys[0] || "right ctrl";
+  const current = c.hotkeys[0] || presets[0][0];
   const isPreset = presets.some(([k]) => k === current);
   $("hotkey").innerHTML = presets.map(([k, label]) => `<option value="${esc(k)}" ${k === current ? "selected" : ""}>${esc(label)}</option>`).join("")
     + `<option value="__custom" ${isPreset ? "" : "selected"}>Vlastní…</option>`;

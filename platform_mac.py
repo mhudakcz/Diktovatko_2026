@@ -25,7 +25,8 @@ PASTE_HINT = "Cmd+V"
 
 # Nabídka zkratek na Macu – vybrané tak, aby nepřekážely psaní ani běžným zkratkám.
 PRESETS = [
-    ("fn", "Fn / 🌐 (jako Wispr Flow)"),
+    ("ctrl+cmd", "Ctrl + ⌘ Cmd"),
+    ("fn", "Fn / 🌐"),
     ("right cmd", "Pravý ⌘ Cmd"),
     ("right option", "Pravý ⌥ Option"),
     ("ctrl+option", "Ctrl + Option"),

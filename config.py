@@ -10,8 +10,8 @@ CONFIG_PATH = APP_DIR / "config.json"
 
 DEFAULT_CONFIG = {
     # Zapnuté klávesové zkratky (viz PRESETS v hotkeys.py a platform_mac.py),
-    # např. "right ctrl", "ctrl+windows", "f9", na Macu "fn", "right cmd"
-    "hotkeys": ["fn"] if sys.platform == "darwin" else ["right ctrl"],
+    # např. "ctrl+windows", "right ctrl", "f9", na Macu "ctrl+cmd", "fn", "right cmd"
+    "hotkeys": ["ctrl+cmd"] if sys.platform == "darwin" else ["ctrl+windows"],
     # "hold" = drž a mluv, "toggle" = stiskni pro start, znovu pro stop
     "mode": "hold",
     # Jazyk přepisu ("cs", "en", ...) nebo null pro automatickou detekci
