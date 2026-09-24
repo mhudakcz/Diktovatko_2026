@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.9.0**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.9.1**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
@@ -138,6 +138,12 @@ Na Macu použijte `.venv/bin/python`.
 | `config.py` | načítání a ukládání nastavení |
 | `i18n.py`, `ui/i18n.js` | překlady aplikace (cs, en, de) |
 | `docs/` | web projektu a návod (GitHub Pages), anglicky v `docs/en/`, německy v `docs/de/` |
+
+## Podpořit
+
+Diktovátko je a zůstane zdarma, bez předplatného a bez reklam. Pokud vám šetří čas, můžete přihodit na kafe: **[☕ Podpořit na Ko-fi](https://ko-fi.com/michalhudak)**. Příspěvky jdou na další vývoj (Mac verze, Android, nové funkce).
+
+Pomoct jde i zdarma: sdílejte Diktovátko s kolegy, hlaste chyby a nápady v [Issues](https://github.com/mhudakcz/Diktovatko_2026/issues) nebo dejte projektu hvězdičku.
 
 ## Licence
 

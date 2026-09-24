@@ -116,6 +116,21 @@ p { margin: 0; }
 .alert svg { width: 30px; height: 30px; }
 .alert h3 { font: 700 19px/1.3 var(--display); color: #2E2400; margin-bottom: 6px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .alert { background: #3A2F0A; color: #FFE8A3; } :root:not([data-theme="light"]) .alert h3 { color: #FFF3C4; } :root:not([data-theme="light"]) .mock-field span { background: #2A1F55; color: #fff; } }
+/* podpora */
+.support { background: var(--card); }
+.support-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 64px; align-items: center; }
+.kofi { display: inline-flex; align-items: center; gap: 12px; margin-top: 30px; padding: 17px 28px; border-radius: 999px; background: var(--sun); color: #16133A; font: 700 18px var(--display); text-decoration: none; box-shadow: 0 14px 34px -14px rgb(255 210 63 / .8); transition: transform .2s; }
+.kofi:hover { transform: translateY(-2px) rotate(-1deg); }
+.kofi span { font-size: 24px; }
+.kofi-note { margin-top: 14px; font-size: 14.5px; color: var(--muted); }
+.free-help { padding: 30px; border-radius: 24px; background: var(--paper); border: 1px solid var(--line); }
+.free-help h3 { font: 700 20px var(--display); letter-spacing: -0.02em; margin-bottom: 14px; }
+.free-help ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; color: var(--ink-2); }
+.free-help li { padding-left: 28px; position: relative; }
+.free-help li::before { content: "♥"; position: absolute; left: 0; color: var(--coral); }
+.free-help a { color: var(--coral); }
+@media (max-width: 900px) { .support-grid { grid-template-columns: 1fr; gap: 32px; } }
+
 @media (max-width: 900px) { .price-grid, .key-grid, .modes { grid-template-columns: 1fr; gap: 32px; } .mock { position: static; } .speed div { grid-template-columns: 1fr; gap: 6px; } }
 
 @media (max-width: 900px) { .rail { display: none; } .progress { height: 5px; } }
@@ -331,6 +346,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
         <a href="#uspora">Úspora času</a>
         <a href="#historie">Historie</a>
         <a href="#instalace">Instalace</a>
+        <a href="#podpora">Podpořit</a>
         <a href="navod.html" class="keep">Návod</a>
         <div class="lang" aria-label="Jazyk / Language"><a href="./" aria-current="page">CZ</a><a href="en/">EN</a><a href="de/">DE</a></div>
       </nav>
@@ -503,12 +519,23 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
       <p class="req reveal">Pro nejrychlejší přepis si zdarma vytvořte <b>vlastní</b> klíč na <a href="https://console.groq.com/keys">console.groq.com</a> a vložte ho v aplikaci do Nastavení (<a href="navod.html#groq">jak na to</a>). Bez klíče se přepisuje offline.</p>
     </div>
   </section>
+  <section class="block support" id="podpora">
+    <div class="wrap support-grid">
+      <div>
+        <h2 class="reveal">Šetří vám Diktovátko čas? Kupte mi kafe.</h2>
+        <p class="intro reveal" style="--d:.1s">Diktovátko dělám ve volném čase a zůstane zdarma, bez předplatného a bez reklam. Pokud vám pomáhá, můžete přihodit na kafe. Příspěvky jdou na čas na další vývoj: Mac verzi, Android a nové funkce.</p>
+        <a class="kofi reveal" href="https://ko-fi.com/michalhudak" target="_blank" rel="noopener"><span aria-hidden="true">☕</span>Podpořit na Ko-fi</a>
+        <p class="kofi-note">Otevře se Ko-fi v novém okně. Jde to jednorázově a bez registrace.</p>
+      </div>
+      <div class="free-help reveal" style="--d:.15s"><h3>Jak pomoct zdarma</h3><ul><li>Sdílejte Diktovátko s kolegy, kteří hodně píšou.</li><li>Nahlaste chybu nebo nápad na <a href="https://github.com/mhudakcz/Diktovatko_2026/issues">GitHubu</a>.</li><li>Dejte projektu hvězdičku na <a href="https://github.com/mhudakcz/Diktovatko_2026">GitHubu</a>, ať ho najdou další.</li></ul></div>
+    </div>
+  </section>
 </main>
 
 <footer class="bigfoot">
   <div class="wrap">
     <svg class="wordmark" viewBox="0 0 1000 170" aria-hidden="true"><text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs">Diktovátko</text></svg>
-    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.9.0</a> vytvořil Michal Hudák. Licence MIT.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
+    <div class="foot-row"><span>Diktovátko <a href="https://github.com/mhudakcz/Diktovatko_2026/blob/main/CHANGELOG.md">verze 0.9.1</a> vytvořil Michal Hudák. Licence MIT.</span><a href="https://github.com/mhudakcz/Diktovatko_2026">github.com/mhudakcz/Diktovatko_2026</a></div>
   </div>
 </footer>
 
@@ -606,7 +633,7 @@ h2 { font-weight: 900; font-size: clamp(32px, 4.6vw, 62px); line-height: 1.02; l
   }
 
   /* ---------- ukazatel polohy na stránce ---------- */
-  const SECTIONS = [["top", "Úvod"], ["ukazka", "Ukázka"], ["uspora", "Úspora času"], ["historie", "Historie"], ["funkce", "Funkce"], ["cena", "Cena"], ["klic", "Rychlý přepis"], ["soukromi", "Soukromí"], ["instalace", "Instalace"]];
+  const SECTIONS = [["top", "Úvod"], ["ukazka", "Ukázka"], ["uspora", "Úspora času"], ["historie", "Historie"], ["funkce", "Funkce"], ["cena", "Cena"], ["klic", "Rychlý přepis"], ["soukromi", "Soukromí"], ["instalace", "Instalace"], ["podpora", "Podpořit"]];
   document.querySelector(".hero").id = "top";
   const dotsEl = document.getElementById("rail-dots"), railFill = document.getElementById("rail-fill"), pct = document.getElementById("pct");
   dotsEl.innerHTML = SECTIONS.map(([id, label]) => `<li><a href="#${id}"><span>${label}</span></a></li>`).join("");

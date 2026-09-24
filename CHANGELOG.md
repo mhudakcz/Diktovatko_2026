@@ -2,6 +2,11 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.9.1 – 2026-09-24
+
+- Možnost podpořit projekt: sekce „Podpořit“ s odkazem na Ko-fi na webu (CZ, EN, DE), odkaz v menu webu, položka „Podpořit projekt ☕“ v menu ikony aplikace a sekce v README.
+- Log u nahrávky bez řeči uvádí naměřenou hlasitost (špička a RMS), aby šlo poznat, jestli je problém v mikrofonu.
+
 ## 0.9.0 – 2026-09-24
 
 Bezpečnostní audit a revize kódu.

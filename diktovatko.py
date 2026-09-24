@@ -14,6 +14,7 @@ import sys
 import threading
 import time
 import wave
+import webbrowser
 from collections import deque
 from datetime import datetime
 
@@ -36,6 +37,7 @@ WINDOW_TITLE = "Diktovátko"
 SAMPLE_RATE = 16000
 MAX_RECORDING_SECONDS = 15 * 60  # zapomenuté nahrávání v režimu Přepínat se samo ukončí
 PRUNE_EVERY_SECONDS = 6 * 3600
+SUPPORT_URL = "https://ko-fi.com/michalhudak"
 
 # Log se rotuje (max. 3 × 1 MB) a nikdy neobsahuje nadiktovaný text, jen délky a časy.
 _handler = logging.handlers.RotatingFileHandler(LOG_PATH, maxBytes=1_000_000, backupCount=2, encoding="utf-8")
@@ -259,6 +261,7 @@ class App:
                 pystray.MenuItem(tr("menu.settings"), lambda: self.open_window("settings")),
                 pystray.MenuItem(tr("menu.export"), pystray.Menu(*export_items)),
                 pystray.Menu.SEPARATOR,
+                pystray.MenuItem(tr("menu.support"), lambda: webbrowser.open(SUPPORT_URL)),
                 pystray.MenuItem(tr("menu.log"), lambda: plat.open_path(LOG_PATH)),
                 pystray.MenuItem(tr("menu.quit"), self.quit),
             ),
@@ -379,7 +382,9 @@ class App:
                 log.info("Příliš krátká nahrávka (%.2fs), ignoruji", duration)
                 return
             if not has_speech(audio):
-                log.info("V nahrávce (%.1fs) není řeč, ignoruji", duration)
+                peak = float(np.abs(audio).max()) if len(audio) else 0.0
+                rms = float(np.sqrt(np.mean(audio**2))) if len(audio) else 0.0
+                log.info("V nahrávce (%.1fs) není řeč, ignoruji (špička %.3f, RMS %.4f)", duration, peak, rms)
                 return
             t0 = time.time()
             text = self.transcriber.transcribe(audio)
