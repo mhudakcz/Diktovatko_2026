@@ -451,8 +451,16 @@ a.coffee:hover { transform: translateY(-1px) rotate(-2deg); color: #16133A; }
 a.coffee .cup { font-size: 16px; line-height: 1; }
 @media (max-width: 359px) { a.coffee .txt { display: none; } a.coffee { padding: 7px 10px; } }
 </style>
-<!-- Google Analytics až po souhlasu návštěvníka, viz analytics.js -->
-<script src="analytics.js" defer></script>
+<!-- DOČASNĚ kvůli ověření značky v Google Analytics: měření napevno, bez lišty. Po ověření vrátit analytics.js. -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BMP38THJWD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BMP38THJWD');
+</script>
 </head>
 <body>
 <div class="progress" id="progress" aria-hidden="true"></div>
