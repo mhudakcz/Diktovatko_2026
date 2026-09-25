@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.13.2 – 2026-09-25
+
+- Web (CZ, EN, DE): Google Analytics (G-BMP38THJWD) jen se souhlasem návštěvníka. Lišta Povolit / Nepovolit, bez souhlasu se gtag.js vůbec nenačte. Volbu jde změnit odkazem Nastavení cookies v patičce, odvolání smaže cookies _ga. Aplikace nic neměří.
+
 ## 0.13.1 – 2026-09-25
 
 - Web (CZ, EN, DE): ukázka s mikrofonem vypisuje text průběžně, jak zní řeč (podle slov, která hlas hlásí, jinak podle tempa), rychlejší řeč. Na konci počet slov, čas a srovnání s psaním na klávesnici. Bez hlasu v prohlížeči proběhne ukázka potichu.
