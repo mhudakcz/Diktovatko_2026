@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.13.3 – 2026-09-26
+
+- Oprava pro Mac: pravidla CSP okna blokovala `new Function`, kterým pywebview tvoří most mezi oknem a aplikací. Na macOS (WebKit) se tak API nevytvořilo, okno nenačetlo nastavení a nešlo nic uložit. CSP teď povoluje `'unsafe-eval'` (okno dál načítá jen lokální soubory a nesmí se připojit k internetu).
+
 ## 0.13.2 – 2026-09-25
 
 - Web (CZ, EN, DE): Google Analytics (G-BMP38THJWD) jen se souhlasem návštěvníka. Lišta Povolit / Nepovolit, bez souhlasu se gtag.js vůbec nenačte. Volbu jde změnit odkazem Nastavení cookies v patičce, odvolání smaže cookies _ga. Aplikace nic neměří.

@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Diktovátko</title>
 <!-- Okno nic nenačítá z internetu (písma jsou systémová) a skripty smí jen místní. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<!-- 'unsafe-eval' potřebuje pywebview: most okna s aplikací (webview/js/api.js) tvoří funkce přes new Function.
+     Bez něj se na macOS (WebKit) API nevytvoří a okno nenačte ani neuloží nastavení. Okno načítá jen lokální soubory. -->
 <style>
 :root {
   --fog: #EEF1F5; --paper: #FFFFFF; --ink: #1B2230; --ink-2: #4A5366; --muted: #7B8496;
