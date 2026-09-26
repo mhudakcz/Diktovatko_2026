@@ -865,6 +865,24 @@ async function changeLang(lang) {
 document.querySelector(".uilang").addEventListener("click", (e) => { const b = e.target.closest("button[data-lang]"); if (b) changeLang(b.dataset.lang); });
 $("open-web").onclick = () => api().open_url("web");
 $("upd-changes").onclick = () => api().open_url("changes");
+// Když se okno do pár sekund nespojí s aplikací, ukážeme hlášku místo prázdných seznamů.
+setTimeout(() => {
+  if (window.pywebview?.api?.get_settings) return;
+  const l = (navigator.language || "cs").slice(0, 2);
+  const M = {
+    cs: ["Okno se nespojilo s aplikací", "Diktování funguje dál, jen tohle okno teď nenačte historii ani nastavení. Zkuste okno zavřít a otevřít znovu. Když to nepomůže, aktualizujte Diktovátko přes ikonu v liště → Aktualizovat, případně pošlete soubor okno.log ze složky Diktovátka."],
+    en: ["The window could not connect to the app", "Dictation keeps working, only this window can't load history or settings right now. Try closing and reopening it. If that doesn't help, update Diktovátko from the tray icon → Update, or send the okno.log file from the Diktovátko folder."],
+    de: ["Das Fenster konnte sich nicht mit der App verbinden", "Das Diktieren funktioniert weiter, nur dieses Fenster kann Verlauf und Einstellungen gerade nicht laden. Schließen und öffnen Sie es erneut. Hilft das nicht, aktualisieren Sie Diktovátko über das Symbol in der Leiste → Aktualisieren oder senden Sie die Datei okno.log aus dem Diktovátko-Ordner."],
+  }[l] || null;
+  const [h, p] = M || [ "Okno se nespojilo s aplikací", "Diktování funguje dál. Aktualizujte Diktovátko přes ikonu v liště → Aktualizovat, případně pošlete soubor okno.log." ];
+  const box = document.createElement("div");
+  box.setAttribute("role", "alert");
+  box.style.cssText = "position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:color-mix(in srgb, var(--paper) 88%, transparent)";
+  box.innerHTML = '<div style="max-width:460px;padding:24px 26px;border-radius:14px;background:var(--paper);border:1px solid var(--line);box-shadow:0 20px 50px -20px rgb(0 0 0 / .35)"><h2 style="margin:0 0 10px;font-size:18px"></h2><p style="margin:0;color:var(--ink-2);line-height:1.5"></p></div>';
+  box.querySelector("h2").textContent = h;
+  box.querySelector("p").textContent = p;
+  document.body.append(box);
+}, 6000);
 window.addEventListener("pywebviewready", async () => {
   await initLang();
   $("ver").textContent = state.settings.version ? "v" + state.settings.version : "";

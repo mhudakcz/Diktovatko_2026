@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.13.3**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.14.0**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
@@ -63,7 +63,7 @@ S klíčem jde mezi Groq a offline přepínat bez mazání klíče: kliknutím n
 
 ## Aktualizace
 
-Od verze 0.10.0 se Diktovátko aktualizuje samo. Jednou za 2 hodiny se podívá na [GitHub Releases](https://github.com/mhudakcz/Diktovatko_2026/releases), a když je k dispozici nová verze, zobrazí upozornění. Instaluje se po kliknutí na *Aktualizovat* v menu ikony nebo v *Nastavení → Aktualizace*: stáhne se ZIP dané verze, přepíší se jen soubory programu (nastavení, klíč, historie a `.venv` zůstanou), doinstalují se případné nové knihovny a aplikace se restartuje. Před instalací je v *Nastavení → Aktualizace* přehled změn ze všech verzí novějších než ta nainstalovaná (text z GitHub Releases), takže i kdo pár verzí přeskočí, vidí všechny novinky. Vývojová kopie z gitu (složka s `.git`) se takto nepřepisuje, aktualizuje se přes `git pull`.
+Od verze 0.10.0 se Diktovátko aktualizuje samo. Jednou za 2 hodiny se podívá na [GitHub Releases](https://github.com/mhudakcz/Diktovatko_2026/releases), a když je k dispozici nová verze, zobrazí upozornění. Instaluje se po kliknutí na *Aktualizovat* v menu ikony nebo v *Nastavení → Aktualizace*: stáhne se ZIP dané verze, přepíší se jen soubory programu (nastavení, klíč, historie a `.venv` zůstanou), doinstalují se případné nové knihovny a aplikace se restartuje. Před instalací je v *Nastavení → Aktualizace* přehled změn ze všech verzí novějších než ta nainstalovaná (text z GitHub Releases), takže i kdo pár verzí přeskočí, vidí všechny novinky. Od verze 0.14.0 se aktualizace z menu ikony potvrzuje systémovým okénkem s novinkami, takže nezávisí na okně aplikace. Před přepsáním se soubory programu zálohují do `.update_backup`. Když selže zápis nebo instalace knihoven, záloha se hned vrátí. Po restartu hlídač (`update.log`) čeká, až nová verze naběhne, a když spadne nebo se do 2 minut neohlásí, vrátí předchozí verzi a řekne to. Vývojová kopie z gitu (složka s `.git`) se takto nepřepisuje, aktualizuje se přes `git pull`.
 
 Starší verze (do 0.9.x) je potřeba jednou aktualizovat ručně: stáhnout nový ZIP, přepsat soubory a spustit `install.bat` / `install.command`.
 

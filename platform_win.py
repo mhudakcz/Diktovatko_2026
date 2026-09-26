@@ -198,6 +198,14 @@ def audio_ducker(level):
     return AudioDucker(level)
 
 
+def ask(title, text, yes, no):
+    """Systémové okénko s otázkou (nezávislé na okně aplikace). Na Windows mají tlačítka popisky Ano / Ne."""
+    import ctypes
+
+    # MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_TOPMOST
+    return ctypes.windll.user32.MessageBoxW(0, text, title, 0x4 | 0x20 | 0x10000 | 0x40000) == 6
+
+
 def overlay(level_source, engine_source, on_toggle, position=None, on_moved=None):
     from overlay import Overlay
 

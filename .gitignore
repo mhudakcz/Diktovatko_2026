@@ -16,3 +16,6 @@ exporty/
 .ducked.json
 .update.json
 .update_request
+.update_backup/
+.update_ok
+update.log

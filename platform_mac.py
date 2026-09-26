@@ -310,6 +310,19 @@ def audio_ducker(level):
 
 
 # --- indikátor nahrávání -----------------------------------------------------------------
+def ask(title, text, yes, no):
+    """Systémové okénko s otázkou (nezávislé na okně aplikace)."""
+    script = ["on run argv", "display dialog (item 1 of argv) with title (item 2 of argv) "
+              "buttons {item 3 of argv, item 4 of argv} default button 2 with icon note", "end run"]
+    args = ["osascript"] + [a for line in script for a in ("-e", line)] + [text, title, no, yes]
+    try:
+        r = subprocess.run(args, capture_output=True, text=True, timeout=600)
+    except Exception:
+        log.exception("Dialog nejde zobrazit")
+        return False
+    return r.returncode == 0 and r.stdout.strip().endswith(yes)
+
+
 def overlay(level_source, engine_source, on_toggle, position=None, on_moved=None):
     from overlay import ALPHA, OverlayState, W, H, BOTTOM_MARGIN, render_pill
 

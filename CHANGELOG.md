@@ -2,6 +2,13 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.14.0 – 2026-09-26
+
+- Aktualizace nezávislá na okně aplikace: „Aktualizovat na verzi…“ v menu ikony ukáže systémové okénko (Windows MessageBox, macOS dialog) s novinkami ze všech přeskočených verzí a potvrzením. Přehled v Nastavení zůstává.
+- Záloha a návrat: před přepsáním se soubory programu zálohují (`.update_backup`). Selže-li zápis nebo `pip install`, záloha se hned vrátí. Po restartu hlídač ze zálohy spustí novou verzi a čeká na její ohlášení (`.update_ok`). Když spadne nebo se do 120 s neohlásí, vrátí předchozí verzi, spustí ji a oznámí to. Průběh je v `update.log`.
+- Okno aplikace, které se do 6 s nespojí s aplikací, ukáže srozumitelnou hlášku místo prázdných seznamů.
+- Po úspěšné aktualizaci přijde oznámení „Diktovátko je aktualizované na verzi…“.
+
 ## 0.13.3 – 2026-09-26
 
 - Oprava pro Mac: pravidla CSP okna blokovala `new Function`, kterým pywebview tvoří most mezi oknem a aplikací. Na macOS (WebKit) se tak API nevytvořilo, okno nenačetlo nastavení a nešlo nic uložit. CSP teď povoluje `'unsafe-eval'` (okno dál načítá jen lokální soubory a nesmí se připojit k internetu).

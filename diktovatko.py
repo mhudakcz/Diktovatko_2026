@@ -262,7 +262,7 @@ class App:
                 ),
                 pystray.MenuItem(
                     lambda _: t("menu.update", v=self.update["version"]) if self.update else "",
-                    lambda: self.open_window("updates"),  # nejdřív přehled změn, instaluje se tam
+                    lambda: threading.Thread(target=self.confirm_update, daemon=True).start(),
                     visible=lambda _: bool(self.update),
                 ),
                 pystray.Menu.SEPARATOR,
@@ -593,6 +593,36 @@ class App:
         elif action == "install":
             threading.Thread(target=self.install_update, daemon=True).start()
 
+    def _update_notes(self, limit=1400):
+        """Novinky ze všech přeskočených verzí jako prostý text pro systémové okénko."""
+        parts = []
+        for c in self.update.get("changes") or [{"version": self.update["version"], "notes": self.update.get("notes", "")}]:
+            lines = []
+            for raw in (c.get("notes") or "").splitlines():
+                line = re.sub(r"\*\*|__|`", "", raw).strip()
+                if not line or line.startswith("#"):
+                    continue
+                lines.append("• " + line[2:] if line[:2] in ("- ", "* ") else line)
+            parts.append(c["version"] + "\n" + "\n".join(lines))
+        text = "\n\n".join(parts)
+        if len(text) > limit:
+            text = text[:limit].rsplit("\n", 1)[0] + "\n" + t("update.more", url=updater.RELEASES_URL)
+        return text
+
+    def confirm_update(self):
+        """Z menu ikony: systémové okénko s novinkami a potvrzením. Nepotřebuje okno aplikace,
+        takže aktualizace jde nainstalovat, i když je rozbité právě okno."""
+        if updater.is_dev_checkout():
+            self._notify(t("notify.dev"))
+            return
+        if not self.update:
+            self.check_update()
+            if not self.update:
+                return
+        text = t("update.ask.text", v=self.update["version"], cur=VERSION, notes=self._update_notes())
+        if plat.ask(t("update.ask.title"), text, t("update.ask.yes"), t("update.ask.later")):
+            self.install_update()
+
     def install_update(self):
         if updater.is_dev_checkout():
             self._notify(t("notify.dev"))
@@ -615,12 +645,15 @@ class App:
             self._notify(t("notify.update.fail"))
             return
         updater.write_state(latest=None, installed=version)
-        updater.restart()
+        updater.launch_guard(t("update.rollback.title"), t("update.rollback.text", v=version, cur=VERSION))
         self.quit()
 
     # --- běh ---------------------------------------------------------------
     def _init(self, icon):
         icon.visible = True
+        if "--after-update" in sys.argv:
+            updater.mark_started()  # hlídač aktualizace ví, že nová verze naběhla
+            self._notify(t("notify.updated", v=VERSION))
         self._prune()
         threading.Thread(target=self._watch_config, daemon=True).start()
         threading.Thread(target=self._update_loop, daemon=True).start()
