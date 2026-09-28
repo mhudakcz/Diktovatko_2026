@@ -2,6 +2,12 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.14.1 – 2026-09-29
+
+- Filtr ticha porovnává hlas s šumem místnosti (práh = menší z 0,012 a 4× šumu, nejméně 0,005), takže projde tišší mluvení a vzdálený mikrofon. Ticho a šum se dál zahazují.
+- Tichá nahrávka se před přepisem zesílí (až 12×).
+- Když je nahrávka delší než 1 s a přesto moc potichu, indikátor ukáže „Moc potichu, mluvte blíž k mikrofonu“ místo tichého zahození.
+
 ## 0.14.0 – 2026-09-26
 
 - Aktualizace nezávislá na okně aplikace: „Aktualizovat na verzi…“ v menu ikony ukáže systémové okénko (Windows MessageBox, macOS dialog) s novinkami ze všech přeskočených verzí a potvrzením. Přehled v Nastavení zůstává.

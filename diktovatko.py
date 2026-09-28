@@ -195,14 +195,28 @@ def split_audio(audio, max_seconds=600, search_seconds=60):
     return parts
 
 
-def has_speech(audio, threshold=0.012, min_voiced=0.25):
-    """Aspoň min_voiced sekund audia (po 50ms oknech) musí být hlasitější než práh."""
+def has_speech(audio, threshold=0.012, min_voiced=0.25, floor=0.005, ratio=4.0):
+    """Aspoň min_voiced sekund audia (po 50ms oknech) musí být výrazně nad šumem místnosti.
+
+    Práh je nižší z pevného (běžná hlasitost řeči) a relativního (ratio × šum místnosti,
+    nejméně floor), takže projde i tiché mluvení nebo vzdálený mikrofon, ale ne ticho a šum.
+    """
     win = SAMPLE_RATE // 20
     n = len(audio) // win
     if n == 0:
         return False
     rms = np.sqrt(np.mean(audio[: n * win].reshape(n, win) ** 2, axis=1))
-    return (rms > threshold).sum() * 0.05 >= min_voiced
+    noise = float(np.percentile(rms, 20))  # nejtišší pětina oken ≈ šum místnosti
+    limit = min(threshold, max(floor, noise * ratio))
+    return (rms > limit).sum() * 0.05 >= min_voiced
+
+
+def normalize(audio, target=0.5, max_gain=12.0):
+    """Tichou nahrávku zesílí (nejvýš max_gain×), aby jí přepis lépe rozuměl."""
+    peak = float(np.abs(audio).max()) if len(audio) else 0.0
+    if 0 < peak < target:
+        audio = audio * min(max_gain, target / peak)
+    return audio
 
 
 # Věty, které si Whisper vymýšlí z ticha (naučil se je z titulků a videí). Zahazujeme je,
@@ -402,9 +416,11 @@ class App:
                 peak = float(np.abs(audio).max()) if len(audio) else 0.0
                 rms = float(np.sqrt(np.mean(audio**2))) if len(audio) else 0.0
                 log.info("V nahrávce (%.1fs) není řeč, ignoruji (špička %.3f, RMS %.4f)", duration, peak, rms)
+                if duration >= 1.0:  # krátké ťuknutí na zkratku nehlásíme
+                    message = "overlay.quiet"
                 return
             t0 = time.time()
-            text = self.transcriber.transcribe(audio)
+            text = self.transcriber.transcribe(normalize(audio))
             log.info("Přepis %.1fs audia za %.1fs, %d znaků", duration, time.time() - t0, len(text))
             if not text or is_hallucination(text):
                 log.info("Prázdný přepis nebo typická halucinace Whisperu, nic nevkládám")
