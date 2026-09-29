@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.14.2 – 2026-09-29
+
+- Diagnostika nečekaného konce: log zapisuje spuštění (s PID), ukončení přes menu a konec aplikace, chyby ve vedlejších vláknech jdou do logu s podrobnostmi a tvrdý pád v C knihovnách (zvuk, Tk, ikona) zapíše `faulthandler` do `pad.log`.
+
 ## 0.14.1 – 2026-09-29
 
 - Filtr ticha porovnává hlas s šumem místnosti (práh = menší z 0,012 a 4× šumu, nejméně 0,005), takže projde tišší mluvení a vzdálený mikrofon. Ticho a šum se dál zahazují.

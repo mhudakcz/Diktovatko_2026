@@ -4,6 +4,7 @@ Podržíte klávesovou zkratku, mluvíte, pustíte ji a přepsaný text
 se vloží tam, kde máte kurzor.
 """
 
+import faulthandler
 import io
 import logging
 import logging.handlers
@@ -49,6 +50,14 @@ logging.basicConfig(level=logging.INFO, handlers=[_handler])
 if sys.platform != "win32":
     os.chmod(LOG_PATH, 0o600)
 log = logging.getLogger("diktovatko")
+
+# Diagnostika nečekaného konce: tvrdý pád v C knihovnách (zvuk, Tk, ikona) zapíše faulthandler
+# do pad.log i s místem v kódu, chyby v jiných vláknech jdou do běžného logu.
+CRASH_LOG = APP_DIR / "pad.log"
+_crash_file = open(CRASH_LOG, "a", encoding="utf-8")
+faulthandler.enable(_crash_file, all_threads=True)
+threading.excepthook = lambda a: log.error("Chyba ve vlákně %s", a.thread.name if a.thread else "?",
+                                           exc_info=(a.exc_type, a.exc_value, a.exc_traceback))
 
 
 def make_icon(color):
@@ -703,6 +712,7 @@ class App:
         plat.open_path(history.EXPORT_DIR)
 
     def quit(self):
+        log.info("Ukončuji Diktovátko")
         self.ducker.restore_now()
         self.hotkeys.stop()
         self.icon.stop()
@@ -715,8 +725,10 @@ if __name__ == "__main__":
     if "--after-update" in sys.argv:
         time.sleep(3)  # předchozí instance se po aktualizaci ještě ukončuje
     plat.init_process()
+    log.info("Spouštím Diktovátko %s (PID %d)", VERSION, os.getpid())
     try:
         App().run()
     except Exception:
         log.exception("Neočekávaná chyba")
         sys.exit(1)
+    log.info("Diktovátko skončilo")

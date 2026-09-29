@@ -41,7 +41,7 @@ GUARD_TIMEOUT = 120  # sekund na to, aby nová verze naběhla
 # Tyhle soubory a složky patří uživateli, aktualizace na ně nesahá.
 PROTECTED = ("config.json", "config.tmp", "history.db", ".venv/", "exporty/", ".git/", ".claude/", ".ui_request",
              ".ducked.json", ".update.json", ".update_request", ".update_backup/", ".update_ok")
-PROTECTED_PREFIXES = ("diktovatko.log", "okno.log", "update.log", "history.db")
+PROTECTED_PREFIXES = ("diktovatko.log", "okno.log", "update.log", "pad.log", "history.db")
 SKIP_DIRS = {".venv", ".git", ".claude", "exporty", ".update_backup", "__pycache__"}
 
 
