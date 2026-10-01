@@ -6,6 +6,7 @@ okno nesmí umět spustit soubor, otevřít libovolnou adresu ani zapsat mimo sl
 
 import logging
 import logging.handlers
+import sys
 
 import pyperclip
 import webview
@@ -20,6 +21,8 @@ from version import VERSION
 
 APP_DIR = config.APP_DIR
 UI_REQUEST = APP_DIR / ".ui_request"
+ICON_ICO = APP_DIR / "ui" / "icon.ico"  # vytváří tools/make_icon.py
+ICON_PNG = APP_DIR / "ui" / "icon.png"
 WINDOW_TITLE = "Diktovátko"
 VIEWS = ("history", "stats", "settings", "updates")  # updates = nastavení, sekce Aktualizace
 WEB_URL = "https://mhudakcz.github.io/Diktovatko_2026/"
@@ -175,7 +178,29 @@ class Api:
         return view if view in VIEWS else None
 
 
+def _set_app_identity():
+    """Vlastní ikona okna místo ikony Pythonu (Windows: lišta okna i hlavní panel, Mac: Dock)."""
+    if sys.platform == "win32":
+        try:
+            import ctypes
+
+            # Bez vlastního ID by Windows okno slučoval s ostatními okny Pythonu a ukázal jeho ikonu.
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("MageXo.Diktovatko.Okno")
+        except Exception:
+            log.exception("ID aplikace pro hlavní panel nejde nastavit")
+    elif sys.platform == "darwin":
+        try:
+            from AppKit import NSApplication, NSImage
+
+            image = NSImage.alloc().initWithContentsOfFile_(str(ICON_PNG))
+            if image:
+                NSApplication.sharedApplication().setApplicationIconImage_(image)
+        except Exception:
+            log.exception("Ikonu v Docku nejde nastavit")
+
+
 if __name__ == "__main__":
+    _set_app_identity()
     webview.create_window(
         WINDOW_TITLE,
         url=str(APP_DIR / "ui" / "app.html"),
@@ -185,4 +210,4 @@ if __name__ == "__main__":
         min_size=(760, 520),
         background_color="#EEF1F5",
     )
-    webview.start()
+    webview.start(icon=str(ICON_ICO) if sys.platform == "win32" else None)

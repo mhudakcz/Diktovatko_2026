@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.17.1 – 2026-10-01
+
+- Vlastní ikona okna (korálové kolečko s mikrofonem jako logo webu) místo ikony Pythonu: `ui/icon.ico` (16–256 px) předaná pywebview a vlastní AppUserModelID, aby Windows okno neslučoval s ostatními okny Pythonu. Na Macu ikona v Docku z `ui/icon.png` (netestováno). Ikonu vytváří `tools/make_icon.py`.
+
 ## 0.17.0 – 2026-10-01
 
 - macOS: adresa stránky v historii. Chrome, Edge, Brave, Vivaldi, Arc a Safari přes AppleScript (`URL of active tab` / `URL of front document`, osascript s časovým limitem 3 s), Firefox přes Accessibility API (pole `urlbar-input`). Poprvé se macOS zeptá na oprávnění Automatizace, bez něj se adresa jen neuloží.
