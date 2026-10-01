@@ -259,6 +259,7 @@ class App:
         self._stopping = False
         self.stream = None
         self.window_proc = None
+        self.conversation = {}  # název konverzace v cílovém okně (zjišťuje se na pozadí)
         self.lock = threading.RLock()
         self._ensure_extras()
         self.hotkeys = plat.hotkey_manager(self.on_hotkey_press, self.on_hotkey_release, self.on_hotkey_interrupt)
@@ -363,6 +364,7 @@ class App:
             self.started_at = datetime.now()
             try:
                 self.target = plat.foreground_window()
+                self._read_conversation(self.target[0])
                 self.target_id = plat.foreground_id()
             except Exception:
                 log.exception("Nepodařilo se zjistit aktivní okno")
@@ -414,6 +416,18 @@ class App:
             self.set_state("idle")
         log.info("Nahrávání zrušeno – během držení zkratky byla stisknuta jiná klávesa")
 
+    def _read_conversation(self, app):
+        """Na pozadí zjistí název konverzace (aplikace Claude), dokud je okno ještě aktivní."""
+        self.conversation = {"app": app}
+        if not self.cfg["store_titles"]:
+            return
+        box = self.conversation
+
+        def work():
+            box["name"] = plat.conversation(app)
+
+        threading.Thread(target=work, daemon=True).start()
+
     def _process(self, audio, started_at, target, target_id):
         message = None
         try:
@@ -440,6 +454,9 @@ class App:
             if self.cfg["history"]:
                 engine = "groq" if self.transcriber.uses_groq() else self.cfg["model"]
                 title = target[1] if self.cfg["store_titles"] else ""
+                conv = self.conversation.get("name") if self.conversation.get("app") == target[0] else None
+                if title and conv and conv not in title:
+                    title = f"{title} – {conv}"
                 history.save(started_at, text, target[0], title, duration, engine)
         except GroqError as e:
             log.warning("Groq: %s", e)

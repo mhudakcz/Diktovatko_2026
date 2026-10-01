@@ -2,11 +2,15 @@
 
 import ctypes
 import ctypes.wintypes as wt
+import logging
 import os
+import re
 import sys
 import threading
 import time
 from pathlib import Path
+
+log = logging.getLogger("diktovatko")
 
 NAME = "windows"
 PASTE_HINT = "Ctrl+V"
@@ -132,6 +136,44 @@ def foreground_window():
             app = Path(path.value).name
         kernel32.CloseHandle(handle)
     return app, title
+
+
+# Aplikace, ve kterých titulek okna neříká, kde přesně píšete. Název konverzace přečteme přes
+# UI Automation (zpřístupnění Windows) z popisku tlačítka v záhlaví – obsah zpráv se nečte.
+_CONVERSATION = {
+    "claude.exe": re.compile(r"^(.+?), rename (?:session|chat|conversation)$", re.I),
+}
+
+
+def conversation(app, hwnd=None):
+    """Název otevřené konverzace v aktivním okně (např. v aplikaci Claude), jinak None."""
+    pattern = _CONVERSATION.get((app or "").lower())
+    if not pattern:
+        return None
+    try:
+        import comtypes
+        import comtypes.client
+
+        try:
+            comtypes.CoInitializeEx()
+        except OSError:
+            pass  # vlákno už COM má
+        comtypes.client.GetModule("UIAutomationCore.dll")
+        from comtypes.gen import UIAutomationClient as U
+
+        uia = comtypes.client.CreateObject(U.CUIAutomation, interface=U.IUIAutomation)
+        root = uia.ElementFromHandle(hwnd or ctypes.windll.user32.GetForegroundWindow())
+        buttons = uia.CreatePropertyCondition(U.UIA_ControlTypePropertyId, U.UIA_ButtonControlTypeId)
+        for _ in range(2):  # první dotaz v Chromiu teprve zapne zpřístupnění
+            found = root.FindAll(U.TreeScope_Descendants, buttons)
+            for i in range(found.Length):
+                m = pattern.match((found.GetElement(i).CurrentName or "").strip())
+                if m:
+                    return m.group(1).strip()[:150]
+            time.sleep(0.4)
+    except Exception:
+        log.debug("Název konverzace nejde přečíst", exc_info=True)
+    return None
 
 
 def open_path(path):

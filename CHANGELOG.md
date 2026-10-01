@@ -2,6 +2,11 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.15.0 – 2026-10-01
+
+- Název konverzace v historii: u aplikace Claude (titulek okna je vždy jen „Claude“) se při začátku nahrávání na pozadí přečte přes UI Automation název otevřené konverzace z popisku tlačítka „…, rename session“ v záhlaví a uloží se k titulku okna („Claude – název“). Čtou se jen popisky tlačítek, ne obsah zpráv, a jen se zapnutým Ukládat názvy oken. Jen Windows.
+- Slack desktop svůj strom zpřístupnění nenabízí, vlákno ve Slacku proto přečíst nejde (kanál a DM jsou v titulku okna jako dřív).
+
 ## 0.14.2 – 2026-09-29
 
 - Diagnostika nečekaného konce: log zapisuje spuštění (s PID), ukončení přes menu a konec aplikace, chyby ve vedlejších vláknech jdou do logu s podrobnostmi a tvrdý pád v C knihovnách (zvuk, Tk, ikona) zapíše `faulthandler` do `pad.log`.

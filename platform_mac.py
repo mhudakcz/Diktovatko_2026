@@ -165,6 +165,11 @@ def foreground_window():
     return name, title
 
 
+def conversation(app):
+    """Na Macu zatím nečteme (Windows čte název konverzace přes UI Automation)."""
+    return None
+
+
 def open_path(path):
     subprocess.Popen(["open", str(path)])
 
