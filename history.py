@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS dictations (
     window_title TEXT,           -- titulek okna (záložka, konverzace, dokument)
     audio_seconds REAL,
     engine TEXT,
-    words INTEGER                -- počet slov, ať statistiky nemusí text znovu počítat
+    words INTEGER,               -- počet slov, ať statistiky nemusí text znovu počítat
+    url TEXT                     -- adresa stránky v prohlížeči (bez parametrů), jinak NULL
 );
 CREATE INDEX IF NOT EXISTS idx_dictations_ts ON dictations(ts);
 """
@@ -48,6 +49,8 @@ def _init(con):
     cols = {r[1] for r in con.execute("PRAGMA table_info(dictations)")}
     if "words" not in cols:  # starší databáze bez sloupce words
         con.execute("ALTER TABLE dictations ADD COLUMN words INTEGER")
+    if "url" not in cols:  # starší databáze bez adresy stránky
+        con.execute("ALTER TABLE dictations ADD COLUMN url TEXT")
     todo = con.execute("SELECT id, text FROM dictations WHERE words IS NULL").fetchall()
     con.executemany("UPDATE dictations SET words = ? WHERE id = ?", [(_words(t), i) for i, t in todo])
     con.commit()
@@ -74,12 +77,20 @@ def _words(text):
     return len(text.split())
 
 
-def save(ts, text, app, window_title, audio_seconds, engine):
+def save(ts, text, app, window_title, audio_seconds, engine, url=None):
     with connect() as con:
         con.execute(
-            "INSERT INTO dictations (ts, text, app, window_title, audio_seconds, engine, words) VALUES (?,?,?,?,?,?,?)",
-            (ts.isoformat(timespec="seconds"), text, app, window_title, round(audio_seconds, 1), engine, _words(text)),
+            "INSERT INTO dictations (ts, text, app, window_title, audio_seconds, engine, words, url) VALUES (?,?,?,?,?,?,?,?)",
+            (ts.isoformat(timespec="seconds"), text, app, window_title, round(audio_seconds, 1), engine, _words(text), url),
         )
+
+
+def get_url(entry_id):
+    """Adresa stránky u záznamu, jen http(s)."""
+    with connect() as con:
+        row = con.execute("SELECT url FROM dictations WHERE id = ?", (int(entry_id),)).fetchone()
+    url = row[0] if row else None
+    return url if url and url.lower().startswith(("http://", "https://")) else None
 
 
 def delete(ids):
@@ -147,8 +158,8 @@ def _query(cols, date_from, date_to, search=None, order="ASC", limit=None):
     params = [date_from.isoformat(), (date_to + timedelta(days=1)).isoformat()]
     if search:
         # instr + fold: hledání bez ohledu na velikost písmen i u diakritiky, bez zástupných znaků LIKE
-        sql += " AND (instr(fold(text), ?) > 0 OR instr(fold(window_title), ?) > 0)"
-        params += [search.casefold()] * 2
+        sql += " AND (instr(fold(text), ?) > 0 OR instr(fold(window_title), ?) > 0 OR instr(fold(url), ?) > 0)"
+        params += [search.casefold()] * 3
     sql += f" ORDER BY ts {order}"
     if limit:
         sql += f" LIMIT {int(limit)}"
@@ -156,13 +167,13 @@ def _query(cols, date_from, date_to, search=None, order="ASC", limit=None):
 
 
 def fetch(date_from, date_to, search=None):
-    sql, params = _query("ts, app, window_title, text", date_from, date_to, search)
+    sql, params = _query("ts, app, window_title, text, url", date_from, date_to, search)
     with connect() as con:
         return con.execute(sql, params).fetchall()
 
 
 def fetch_dicts(date_from, date_to, search=None):
-    sql, params = _query("id, ts, app, window_title, text, audio_seconds", date_from, date_to, search, "DESC", MAX_ENTRIES)
+    sql, params = _query("id, ts, app, window_title, text, audio_seconds, url", date_from, date_to, search, "DESC", MAX_ENTRIES)
     with connect() as con:
         con.row_factory = sqlite3.Row
         return [dict(r) for r in con.execute(sql, params)]
@@ -255,12 +266,12 @@ def export(date_from, date_to, fmt="md", search=None, lang=None):
             "",
         ]
         current_day = None
-        for ts, app, title, text in rows:
+        for ts, app, title, text, url in rows:
             day, clock = ts[:10], ts[11:16]
             if day != current_day:
                 lines += ["", f"## {day}", ""]
                 current_day = day
-            lines.append(f"- **{clock}** · `{app}` · {title}")
+            lines.append(f"- **{clock}** · `{app}` · {title}" + (f" · <{url}>" if url else ""))
             lines.append(f"  > {text}")
         out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return out, len(rows)

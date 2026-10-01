@@ -2,6 +2,12 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.16.0 – 2026-10-01
+
+- Adresa stránky v historii: u prohlížečů (Chrome, Edge, Brave, Opera, Vivaldi, Firefox) se při začátku nahrávání přes UI Automation přečte adresní řádek (jen ten, ne obsah stránky) a uloží se do nového sloupce `url`, bez parametrů za `?` (mohou v nich být tokeny). Jen se zapnutým Ukládat názvy oken, jen Windows.
+- Okno Historie: u záznamu odkaz ↗ s doménou, otevře stránku v prohlížeči. Hledání prohledává i adresy, Kopírovat s časem a oknem přidá adresu.
+- Export: CSV má sloupec adresa, Markdown odkaz za názvem okna.
+
 ## 0.15.0 – 2026-10-01
 
 - Název konverzace v historii: u aplikace Claude (titulek okna je vždy jen „Claude“) se při začátku nahrávání na pozadí přečte přes UI Automation název otevřené konverzace z popisku tlačítka „…, rename session“ v záhlaví a uloží se k titulku okna („Claude – název“). Čtou se jen popisky tlačítek, ne obsah zpráv, a jen se zapnutým Ukládat názvy oken. Jen Windows.

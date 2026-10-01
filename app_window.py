@@ -147,6 +147,15 @@ class Api:
             updater.REQUEST_FILE.write_text(action, encoding="utf-8")
         return True
 
+    def open_entry(self, entry_id):
+        """Otevře v prohlížeči stránku, na které se diktovalo (adresa z historie, jen http/https)."""
+        import webbrowser
+
+        url = history.get_url(entry_id)
+        if url:
+            webbrowser.open(url)
+        return bool(url)
+
     def open_url(self, name):
         import webbrowser
 

@@ -176,6 +176,56 @@ def conversation(app, hwnd=None):
     return None
 
 
+_BROWSERS = {"chrome.exe", "msedge.exe", "brave.exe", "opera.exe", "vivaldi.exe", "firefox.exe"}
+_URL_RE = re.compile(r"^(?:https?://)?[\w.-]+\.[a-z]{2,}(?::\d+)?(?:[/#].*)?$", re.I)
+
+
+def _clean_url(value):
+    """Adresa z adresního řádku: doplní https://, zahodí parametry za ? (mohou v nich být tokeny)."""
+    value = (value or "").strip()
+    if not value or " " in value or not _URL_RE.match(value):
+        return None
+    if not value.lower().startswith(("http://", "https://")):
+        value = "https://" + value
+    base, _, frag = value.partition("#")
+    base = base.split("?", 1)[0]
+    if frag and "=" not in frag:  # kotva typu #inbox/… pomáhá (Gmail), kotvy s parametry zahodíme
+        base += "#" + frag
+    return base[:500]
+
+
+def page_url(app, hwnd=None):
+    """Adresa stránky v aktivním okně prohlížeče (jen adresní řádek, ne obsah stránky), jinak None."""
+    app = (app or "").lower()
+    if app not in _BROWSERS:
+        return None
+    try:
+        import comtypes
+        import comtypes.client
+
+        try:
+            comtypes.CoInitializeEx()
+        except OSError:
+            pass
+        comtypes.client.GetModule("UIAutomationCore.dll")
+        from comtypes.gen import UIAutomationClient as U
+
+        uia = comtypes.client.CreateObject(U.CUIAutomation, interface=U.IUIAutomation)
+        root = uia.ElementFromHandle(hwnd or ctypes.windll.user32.GetForegroundWindow())
+        if app == "firefox.exe":
+            cond = uia.CreatePropertyCondition(U.UIA_AutomationIdPropertyId, "urlbar-input")
+        else:  # v Chromiu je adresní řádek první editační pole v okně (před obsahem stránky)
+            cond = uia.CreatePropertyCondition(U.UIA_ControlTypePropertyId, U.UIA_EditControlTypeId)
+        el = root.FindFirst(U.TreeScope_Descendants, cond)
+        if not el:
+            return None
+        vp = el.GetCurrentPattern(U.UIA_ValuePatternId).QueryInterface(U.IUIAutomationValuePattern)
+        return _clean_url(vp.CurrentValue)
+    except Exception:
+        log.debug("Adresu stránky nejde přečíst", exc_info=True)
+    return None
+
+
 def open_path(path):
     os.startfile(path)
 

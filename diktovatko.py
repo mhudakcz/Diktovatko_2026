@@ -417,7 +417,7 @@ class App:
         log.info("Nahrávání zrušeno – během držení zkratky byla stisknuta jiná klávesa")
 
     def _read_conversation(self, app):
-        """Na pozadí zjistí název konverzace (aplikace Claude), dokud je okno ještě aktivní."""
+        """Na pozadí zjistí název konverzace (aplikace Claude) a adresu stránky (prohlížeč), dokud je okno aktivní."""
         self.conversation = {"app": app}
         if not self.cfg["store_titles"]:
             return
@@ -425,6 +425,7 @@ class App:
 
         def work():
             box["name"] = plat.conversation(app)
+            box["url"] = plat.page_url(app)
 
         threading.Thread(target=work, daemon=True).start()
 
@@ -457,7 +458,8 @@ class App:
                 conv = self.conversation.get("name") if self.conversation.get("app") == target[0] else None
                 if title and conv and conv not in title:
                     title = f"{title} – {conv}"
-                history.save(started_at, text, target[0], title, duration, engine)
+                url = self.conversation.get("url") if self.cfg["store_titles"] and self.conversation.get("app") == target[0] else None
+                history.save(started_at, text, target[0], title, duration, engine, url)
         except GroqError as e:
             log.warning("Groq: %s", e)
             message = e.message_key

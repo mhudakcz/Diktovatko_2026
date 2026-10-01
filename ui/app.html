@@ -135,6 +135,8 @@ header h1 { margin: 0; font: 700 24px/1.1 var(--display); letter-spacing: -0.02e
 .where { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .copy1 { opacity: 0; margin-left: 6px; width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); display: grid; place-items: center; cursor: pointer; color: var(--ink-2); }
 .copy1 svg { width: 13px; height: 13px; }
+.meta .url { margin-left: 8px; border: 0; background: none; padding: 0; font: inherit; font-size: 12px; color: var(--ultra); cursor: pointer; max-width: 46%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.meta .url:hover { text-decoration: underline; }
 .entry:hover .copy1, .copy1:focus-visible { opacity: 1; }
 .copy1:hover { color: var(--ultra); border-color: var(--ultra); }
 mark { background: color-mix(in srgb, var(--ultra) 22%, transparent); color: inherit; border-radius: 3px; padding: 0 1px; }
@@ -524,6 +526,11 @@ function renderApps() {
     `<button aria-pressed="${state.app === null}" data-a=""><span class="app-name"><span>${t("side.allApps")}</span></span><span class="n">${state.rows.length}</span></button>` +
     apps.map(([a, n]) => `<button aria-pressed="${state.app === a}" data-a="${esc(a || "")}"><span class="app-name"><span class="app-dot" style="background:${appColor(a)}"></span><span>${esc(appLabel(a))}</span></span><span class="n">${n}</span></button>`).join("");
 }
+// Krátký popisek adresy: doména a začátek cesty (celá adresa je v nápovědě).
+function urlLabel(u) {
+  try { const x = new URL(u); const p = (x.pathname + x.hash).replace(/\/$/, ""); return x.hostname.replace(/^www\./, "") + (p.length > 32 ? p.slice(0, 31) + "…" : p); }
+  catch (e) { return u.slice(0, 40); }
+}
 function renderList() {
   state.shown = state.rows.filter((r) => state.app === null || r.app === state.app);
   const secs = state.shown.reduce((s, r) => s + (r.audio_seconds || 0), 0);
@@ -548,7 +555,7 @@ function renderList() {
       html += `<li class="entry" data-id="${r.id}" aria-selected="${state.selected.has(r.id)}" style="--c:${appColor(r.app)}">
         <span class="time">${r.ts.slice(11, 16)}</span><span class="node"></span>
         <div class="body"><p class="text">${highlight(r.text)}</p>
-          <div class="meta"><span class="chip">${esc(appLabel(r.app))}</span><span class="where" title="${esc(r.window_title)}">${highlight(cleanTitle(r.window_title))}</span></div>
+          <div class="meta"><span class="chip">${esc(appLabel(r.app))}</span><span class="where" title="${esc(r.window_title)}">${highlight(cleanTitle(r.window_title))}</span>${r.url ? `<button type="button" class="url" title="${esc(t("entry.open"))}: ${esc(r.url)}">↗ ${highlight(urlLabel(r.url))}</button>` : ""}</div>
         </div>
         <button class="copy1" title="${t("copy.one")}" aria-label="${t("copy.one")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
       </li>`;
@@ -570,7 +577,7 @@ function selectedRows() { return [...state.shown].reverse().filter((r) => state.
 async function copyRows(rows, withMeta) {
   if (!rows.length) return;
   const out = withMeta
-    ? rows.map((r) => `[${r.ts.replace("T", " ").slice(0, 16)}] ${appLabel(r.app)}: ${cleanTitle(r.window_title)}\n${r.text}`).join("\n\n")
+    ? rows.map((r) => `[${r.ts.replace("T", " ").slice(0, 16)}] ${appLabel(r.app)}: ${cleanTitle(r.window_title)}${r.url ? "\n" + r.url : ""}\n${r.text}`).join("\n\n")
     : rows.map((r) => r.text).join("\n");
   await api().copy(out);
   toast(rows.length === 1 ? t("toast.copied") : t("toast.copiedN", { records: tp("record", rows.length) }));
@@ -593,6 +600,7 @@ $("list").addEventListener("click", (e) => {
   const li = e.target.closest(".entry"); if (!li) return;
   const id = +li.dataset.id;
   if (e.target.closest(".copy1")) { copyRows(state.shown.filter((r) => r.id === id), false); return; }
+  if (e.target.closest(".url")) { api().open_entry(id); return; }
   if (String(window.getSelection())) return;
   state.selected.has(id) ? state.selected.delete(id) : state.selected.add(id);
   li.setAttribute("aria-selected", state.selected.has(id));

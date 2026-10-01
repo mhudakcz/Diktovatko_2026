@@ -165,6 +165,11 @@ def foreground_window():
     return name, title
 
 
+def page_url(app, hwnd=None):
+    """Na Macu zatím nečteme."""
+    return None
+
+
 def conversation(app):
     """Na Macu zatím nečteme (Windows čte název konverzace přes UI Automation)."""
     return None
