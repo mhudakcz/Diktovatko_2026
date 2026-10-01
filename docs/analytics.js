@@ -1,7 +1,8 @@
 /* Google Analytics jen se souhlasem návštěvníka.
    Dokud návštěvník nepovolí, gtag.js se vůbec nenačte a nic se neposílá.
-   Volba se pamatuje v localStorage ("diktovatko-consent": "yes" / "no"),
-   odkaz s atributem data-consent (v patičce) lištu otevře znovu. */
+   Souhlas se pamatuje natrvalo (rok) v localStorage i v cookie, aby přežil smazání jednoho z nich.
+   Odmítnutí platí jen do zavření prohlížeče (sessionStorage): při další návštěvě se web zeptá znovu.
+   Odkaz s atributem data-consent (v patičce) lištu otevře kdykoli znovu. */
 (() => {
   const ID = "G-BMP38THJWD", KEY = "diktovatko-consent";
   const T = {
@@ -10,8 +11,25 @@
     de: { text: "Diese Website nutzt Google Analytics, damit ich weiß, wie viele Menschen sie besuchen und was sie interessiert. Die App Diktovátko selbst verfolgt nichts dergleichen.", yes: "Erlauben", no: "Ablehnen", settings: "Cookie-Einstellungen" },
   };
   const t = T[(document.documentElement.lang || "cs").slice(0, 2)] || T.cs;
-  const get = () => { try { return localStorage.getItem(KEY); } catch (e) { return null; } };
-  const set = (v) => { try { localStorage.setItem(KEY, v); } catch (e) {} };
+  const COOKIE = KEY + "=yes";
+  const cookieOpts = "; path=/; SameSite=Lax" + (location.protocol === "https:" ? "; Secure" : "");
+  const safe = (fn) => { try { return fn(); } catch (e) { return null; } };
+  const get = () => {
+    if (safe(() => localStorage.getItem(KEY)) === "yes" || document.cookie.split("; ").includes(COOKIE)) return "yes";
+    if (safe(() => sessionStorage.getItem(KEY)) === "no") return "no";
+    return null;
+  };
+  const set = (v) => {
+    if (v === "yes") {
+      safe(() => localStorage.setItem(KEY, "yes"));
+      safe(() => sessionStorage.removeItem(KEY));
+      document.cookie = COOKIE + "; Max-Age=31536000" + cookieOpts;
+    } else {
+      safe(() => localStorage.removeItem(KEY));
+      safe(() => sessionStorage.setItem(KEY, "no"));
+      document.cookie = KEY + "=; Max-Age=0" + cookieOpts;
+    }
+  };
 
   let loaded = false;
   function load() {
