@@ -10,6 +10,8 @@ import threading
 import time
 from pathlib import Path
 
+from urls import clean_url
+
 log = logging.getLogger("diktovatko")
 
 NAME = "windows"
@@ -177,23 +179,6 @@ def conversation(app, hwnd=None):
 
 
 _BROWSERS = {"chrome.exe", "msedge.exe", "brave.exe", "opera.exe", "vivaldi.exe", "firefox.exe"}
-_URL_RE = re.compile(r"^(?:https?://)?[\w.-]+\.[a-z]{2,}(?::\d+)?(?:[/#].*)?$", re.I)
-
-
-def _clean_url(value):
-    """Adresa z adresního řádku: doplní https://, zahodí parametry za ? (mohou v nich být tokeny)."""
-    value = (value or "").strip()
-    if not value or " " in value or not _URL_RE.match(value):
-        return None
-    if not value.lower().startswith(("http://", "https://")):
-        value = "https://" + value
-    base, _, frag = value.partition("#")
-    base = base.split("?", 1)[0]
-    if frag and "=" not in frag:  # kotva typu #inbox/… pomáhá (Gmail), kotvy s parametry zahodíme
-        base += "#" + frag
-    return base[:500]
-
-
 def page_url(app, hwnd=None):
     """Adresa stránky v aktivním okně prohlížeče (jen adresní řádek, ne obsah stránky), jinak None."""
     app = (app or "").lower()
@@ -220,7 +205,7 @@ def page_url(app, hwnd=None):
         if not el:
             return None
         vp = el.GetCurrentPattern(U.UIA_ValuePatternId).QueryInterface(U.IUIAutomationValuePattern)
-        return _clean_url(vp.CurrentValue)
+        return clean_url(vp.CurrentValue)
     except Exception:
         log.debug("Adresu stránky nejde přečíst", exc_info=True)
     return None

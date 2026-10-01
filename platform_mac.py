@@ -4,12 +4,14 @@ Potřebná oprávnění (Nastavení systému → Soukromí a zabezpečení):
 - Mikrofon – nahrávání,
 - Zpřístupnění (Accessibility) – sledování zkratky a vložení textu (Cmd+V),
 - Sledování vstupu (Input Monitoring) – sledování zkratky,
-- Nahrávání obrazovky – jen pro názvy oken v historii (bez něj se uloží jen aplikace).
+- Nahrávání obrazovky – jen pro názvy oken v historii (bez něj se uloží jen aplikace),
+- Automatizace (dotaz při prvním diktování do prohlížeče) – jen pro adresu stránky v historii.
 """
 
 import logging
 import plistlib
 import queue
+import re
 import subprocess
 import sys
 import threading
@@ -17,6 +19,7 @@ import time
 from pathlib import Path
 
 from hotkeys import HotkeyCore
+from urls import clean_url
 
 log = logging.getLogger("diktovatko")
 STATE_FILE = Path(__file__).resolve().parent / ".ducked.json"
@@ -165,13 +168,123 @@ def foreground_window():
     return name, title
 
 
+# --- kde přesně píšete: adresa stránky a název konverzace -----------------------------------
+# Prohlížeče s AppleScriptem prozradí adresu aktivní karty. Při prvním použití se macOS zeptá,
+# jestli smí Python (Terminál) ovládat daný prohlížeč – bez povolení se adresa jen neuloží.
+_URL_SCRIPTS = {
+    "Google Chrome": 'tell application "Google Chrome" to get URL of active tab of front window',
+    "Microsoft Edge": 'tell application "Microsoft Edge" to get URL of active tab of front window',
+    "Brave Browser": 'tell application "Brave Browser" to get URL of active tab of front window',
+    "Vivaldi": 'tell application "Vivaldi" to get URL of active tab of front window',
+    "Arc": 'tell application "Arc" to get URL of active tab of front window',
+    "Safari": 'tell application "Safari" to get URL of front document',
+}
+# Aplikace, kde titulek okna neříká, kde píšete: název konverzace je v popisku tlačítka v záhlaví.
+_CONVERSATION = {
+    "Claude": re.compile(r"^(.+?), rename (?:session|chat|conversation)$", re.I),
+}
+_AX_MAX_NODES = 5000
+_AX_MAX_SECONDS = 1.5
+
+
+def _front_pid(app):
+    from AppKit import NSWorkspace
+
+    front = NSWorkspace.sharedWorkspace().frontmostApplication()
+    if front is None or (front.localizedName() or "") != app:
+        return None
+    return front.processIdentifier()
+
+
+def _ax(el, attr):
+    from ApplicationServices import AXUIElementCopyAttributeValue
+
+    err, value = AXUIElementCopyAttributeValue(el, attr, None)
+    return value if err == 0 else None
+
+
+def _ax_walk(app_el, match):
+    """Projde strom zpřístupnění aktivního okna (s limitem) a vrátí první výsledek match(prvek)."""
+    win = _ax(app_el, "AXFocusedWindow") or (list(_ax(app_el, "AXWindows") or []) or [None])[0]
+    if win is None:
+        return None
+    todo, seen, end = [win], 0, time.time() + _AX_MAX_SECONDS
+    while todo and seen < _AX_MAX_NODES and time.time() < end:
+        el = todo.pop(0)
+        seen += 1
+        found = match(el)
+        if found:
+            return found
+        todo.extend(list(_ax(el, "AXChildren") or []))
+    return None
+
+
+def _app_element(pid):
+    from ApplicationServices import AXUIElementCreateApplication, AXUIElementSetAttributeValue
+
+    el = AXUIElementCreateApplication(pid)
+    # Electron (Claude, Slack…) zpřístupní obsah okna jen na požádání – oficiální přepínač Electronu.
+    try:
+        AXUIElementSetAttributeValue(el, "AXManualAccessibility", True)
+    except Exception:
+        pass
+    return el
+
+
 def page_url(app, hwnd=None):
-    """Na Macu zatím nečteme."""
+    """Adresa stránky v aktivním okně prohlížeče (jen adresa, ne obsah stránky), jinak None."""
+    try:
+        script = _URL_SCRIPTS.get(app)
+        if script:
+            r = subprocess.run(["osascript", "-e", script], capture_output=True, text=True, timeout=3)
+            if r.returncode != 0:
+                log.info("Adresu z %s nejde přečíst (%s)", app, r.stderr.strip()[:120])
+                return None
+            return clean_url(r.stdout)
+        if app == "Firefox":
+            pid = _front_pid(app)
+            if pid is None:
+                return None
+
+            def match(el):
+                if _ax(el, "AXRole") in ("AXTextField", "AXComboBox") and "urlbar-input" in (_ax(el, "AXIdentifier"), _ax(el, "AXDOMIdentifier")):
+                    return clean_url(_ax(el, "AXValue")) or "?"
+                return None
+
+            found = _ax_walk(_app_element(pid), match)
+            return None if found == "?" else found
+    except Exception:
+        log.debug("Adresu stránky nejde přečíst", exc_info=True)
     return None
 
 
 def conversation(app):
-    """Na Macu zatím nečteme (Windows čte název konverzace přes UI Automation)."""
+    """Název otevřené konverzace v aktivním okně (např. v aplikaci Claude), jinak None."""
+    pattern = _CONVERSATION.get(app)
+    if not pattern:
+        return None
+    try:
+        pid = _front_pid(app)
+        if pid is None:
+            return None
+        app_el = _app_element(pid)
+
+        def match(el):
+            if _ax(el, "AXRole") != "AXButton":
+                return None
+            for attr in ("AXDescription", "AXTitle", "AXHelp"):
+                m = pattern.match(str(_ax(el, attr) or "").strip())
+                if m:
+                    return m.group(1).strip()[:150]
+            return None
+
+        for _ in range(2):  # první dotaz v Electronu teprve zapne zpřístupnění
+            found = _ax_walk(app_el, match)
+            if found:
+                return found
+            time.sleep(0.4)
+    except Exception:
+        log.debug("Název konverzace nejde přečíst", exc_info=True)
     return None
 
 

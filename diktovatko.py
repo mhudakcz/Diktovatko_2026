@@ -424,8 +424,12 @@ class App:
         box = self.conversation
 
         def work():
-            box["name"] = plat.conversation(app)
-            box["url"] = plat.page_url(app)
+            # Jakákoli chyba tu jen znamená, že se k záznamu nic navíc neuloží.
+            try:
+                box["name"] = plat.conversation(app)
+                box["url"] = plat.page_url(app)
+            except Exception:
+                log.debug("Název konverzace ani adresu nejde zjistit", exc_info=True)
 
         threading.Thread(target=work, daemon=True).start()
 

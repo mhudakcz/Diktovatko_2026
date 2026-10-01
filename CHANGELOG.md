@@ -2,6 +2,14 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.17.0 – 2026-10-01
+
+- macOS: adresa stránky v historii. Chrome, Edge, Brave, Vivaldi, Arc a Safari přes AppleScript (`URL of active tab` / `URL of front document`, osascript s časovým limitem 3 s), Firefox přes Accessibility API (pole `urlbar-input`). Poprvé se macOS zeptá na oprávnění Automatizace, bez něj se adresa jen neuloží.
+- macOS: název konverzace v aplikaci Claude přes Accessibility API. Aplikaci se nastaví `AXManualAccessibility` (oficiální přepínač Electronu), strom okna se prochází s limitem 5000 prvků a 1,5 s a hledá se tlačítko „…, rename session“.
+- Společná úprava adres v `urls.py`. Zjišťování na pozadí je obalené tak, že jakákoli chyba jen znamená, že se k záznamu nic navíc neuloží.
+- `tools/mac_ax_probe.py`: průzkumný skript pro Mac (jen popisky tlačítek a nadpisů), abychom zjistili, jestli jde ve Slacku poznat vlákno.
+- Ověřeno na Windows s podvrženými knihovnami macOS (20 scénářů včetně chyb, limitů a nepovoleného přístupu). Na skutečném Macu zatím netestováno.
+
 ## 0.16.0 – 2026-10-01
 
 - Adresa stránky v historii: u prohlížečů (Chrome, Edge, Brave, Opera, Vivaldi, Firefox) se při začátku nahrávání přes UI Automation přečte adresní řádek (jen ten, ne obsah stránky) a uloží se do nového sloupce `url`, bez parametrů za `?` (mohou v nich být tokeny). Jen se zapnutým Ukládat názvy oken, jen Windows.
