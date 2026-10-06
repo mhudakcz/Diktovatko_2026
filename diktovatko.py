@@ -484,15 +484,22 @@ class App:
             log.info("Aktivní okno se během přepisu změnilo, text zůstává ve schránce")
             plat.set_clipboard(text)
             return False
-        previous = plat.get_clipboard()  # None = ve schránce nebyl text (obrázek, soubor) – neobnovujeme
+        # Celý obsah schránky (i obrázek, formátovaný text nebo soubory) si uložíme a po vložení vrátíme.
+        previous = plat.snapshot_clipboard()
         plat.set_clipboard(text)
-        seq = plat.clipboard_seq()
         plat.wait_modifiers_released()  # držený Win/Ctrl by z Ctrl+V udělal jinou zkratku
         plat.paste()
         # Pomalejší aplikace (Electron, vzdálená plocha) čtou schránku se zpožděním.
         time.sleep(0.8)
-        if previous is not None and plat.clipboard_seq() == seq:
-            plat.set_clipboard(previous, private=False)
+        if previous is None:
+            log.info("Původní schránku nešlo uložit (moc velká nebo obsazená), zůstává v ní přepis")
+        elif plat.get_clipboard() != text:
+            log.info("Schránka se mezitím změnila (nové kopírování), původní obsah nevracím")
+        else:
+            try:
+                plat.restore_clipboard(previous)
+            except Exception:
+                log.exception("Původní obsah schránky nejde vrátit")
         return True
 
     # --- zkratky (volá je jedno vlákno správce zkratek, v pořadí stisků) ----------------------

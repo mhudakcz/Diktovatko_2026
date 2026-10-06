@@ -2,6 +2,11 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.18.0 – 2026-10-06
+
+- Schránka se po vložení vrací celá: před vložením se uloží všechny formáty (Windows: blok paměti každého formátu, tedy text, HTML, RTF, obrázek CF_DIB, soubory CF_HDROP…; Mac: všechny položky a typy NSPasteboard), po 0,8 s se vrátí. Dřív jen prostý text a jen když se nezměnilo číslo změny schránky, které ale zvedají i jiné aplikace, takže se obnova často vynechala.
+- O vrácení se rozhoduje podle obsahu: když je ve schránce pořád nadiktovaný text, vrátí se původní obsah, jinak (nové kopírování) zůstane. Do logu se zapíše, když se obnova vynechá.
+
 ## 0.17.2 – 2026-10-01
 
 - Web: souhlas s měřením se pamatuje na rok v localStorage i v cookie (přežije smazání jednoho z nich), změny webu ho nemažou. Odmítnutí platí jen do zavření prohlížeče (sessionStorage), při další návštěvě se web zeptá znovu.

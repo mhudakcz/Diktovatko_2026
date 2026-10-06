@@ -58,6 +58,16 @@ _k32.GlobalUnlock.argtypes = (ctypes.c_void_p,)
 _u32.SetClipboardData.restype = ctypes.c_void_p
 _u32.SetClipboardData.argtypes = (ctypes.c_uint, ctypes.c_void_p)
 _u32.GetClipboardSequenceNumber.restype = wt.DWORD
+_u32.GetClipboardData.restype = ctypes.c_void_p
+_u32.GetClipboardData.argtypes = (ctypes.c_uint,)
+_u32.EnumClipboardFormats.restype = ctypes.c_uint
+_u32.EnumClipboardFormats.argtypes = (ctypes.c_uint,)
+_k32.GlobalSize.restype = ctypes.c_size_t
+_k32.GlobalSize.argtypes = (ctypes.c_void_p,)
+# Formáty, jejichž data nejsou blok paměti (GDI objekty, kreslení vlastníkem) – uložit nejdou.
+# Obrázek je ve schránce zároveň jako CF_DIB/CF_DIBV5, ze kterých si Windows bitmapu znovu vytvoří.
+_NOT_MEMORY = {2, 3, 9, 14, 0x80, 0x82, 0x83, 0x8E}
+_SNAPSHOT_LIMIT = 64 * 1024 * 1024
 
 
 def _open_clipboard():
@@ -107,6 +117,54 @@ def get_clipboard():
 
 def clipboard_seq():
     return _u32.GetClipboardSequenceNumber()
+
+
+def snapshot_clipboard():
+    """Celý obsah schránky ve všech formátech (text, formátovaný text, obrázek, soubory…).
+    Vrací seznam (formát, data), nebo None, když schránku nejde přečíst nebo je moc velká."""
+    if not _open_clipboard():
+        return None
+    try:
+        items, total, fmt = [], 0, 0
+        while True:
+            fmt = _u32.EnumClipboardFormats(fmt)
+            if not fmt:
+                break
+            if fmt in _NOT_MEMORY:
+                continue
+            h = _u32.GetClipboardData(fmt)
+            if not h:
+                continue
+            size = _k32.GlobalSize(h)
+            p = _k32.GlobalLock(h)
+            if not p:
+                continue
+            try:
+                items.append((fmt, ctypes.string_at(p, size)))
+            finally:
+                _k32.GlobalUnlock(h)
+            total += size
+            if total > _SNAPSHOT_LIMIT:
+                return None
+        return items
+    except Exception:
+        log.exception("Obsah schránky nejde uložit")
+        return None
+    finally:
+        _u32.CloseClipboard()
+
+
+def restore_clipboard(items):
+    """Vrátí obsah schránky uložený funkcí snapshot_clipboard."""
+    if not _open_clipboard():
+        return False
+    try:
+        _u32.EmptyClipboard()
+        for fmt, data in items:
+            _u32.SetClipboardData(fmt, _global(data))
+        return True
+    finally:
+        _u32.CloseClipboard()
 
 
 def wait_modifiers_released(timeout=1.0):

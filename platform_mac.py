@@ -118,6 +118,41 @@ def get_clipboard():
     return NSPasteboard.generalPasteboard().stringForType_(NSPasteboardTypeString)
 
 
+def snapshot_clipboard():
+    """Celý obsah schránky (všechny položky a typy) jako [(typ, data), …] po položkách, jinak None."""
+    try:
+        from AppKit import NSPasteboard
+
+        items = []
+        for item in NSPasteboard.generalPasteboard().pasteboardItems() or []:
+            entry = []
+            for t in item.types() or []:
+                data = item.dataForType_(t)
+                if data is not None:
+                    entry.append((str(t), bytes(data)))
+            items.append(entry)
+        return items
+    except Exception:
+        log.exception("Obsah schránky nejde uložit")
+        return None
+
+
+def restore_clipboard(items):
+    """Vrátí obsah schránky uložený funkcí snapshot_clipboard."""
+    from AppKit import NSPasteboard, NSPasteboardItem
+    from Foundation import NSData
+
+    pb = NSPasteboard.generalPasteboard()
+    pb.clearContents()
+    objs = []
+    for entry in items:
+        it = NSPasteboardItem.alloc().init()
+        for t, data in entry:
+            it.setData_forType_(NSData.dataWithBytes_length_(data, len(data)), t)
+        objs.append(it)
+    return bool(pb.writeObjects_(objs)) if objs else True
+
+
 def clipboard_seq():
     from AppKit import NSPasteboard
 
