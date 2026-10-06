@@ -2,6 +2,11 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.19.0 – 2026-10-06
+
+- Více obrazovek: indikátor se při každém zobrazení přesune na obrazovku s aktivním oknem (Windows: MonitorFromWindow a pracovní plocha bez hlavního panelu; Mac: NSScreen.mainScreen, netestováno).
+- Přetažená poloha se ukládá relativně k obrazovce (`overlay_pos` = [0..1, 0..1]) a platí na každé obrazovce. Starší uložení v pixelech se převede.
+
 ## 0.18.0 – 2026-10-06
 
 - Schránka se po vložení vrací celá: před vložením se uloží všechny formáty (Windows: blok paměti každého formátu, tedy text, HTML, RTF, obrázek CF_DIB, soubory CF_HDROP…; Mac: všechny položky a typy NSPasteboard), po 0,8 s se vrátí. Dřív jen prostý text a jen když se nezměnilo číslo změny schránky, které ale zvedají i jiné aplikace, takže se obnova často vynechala.

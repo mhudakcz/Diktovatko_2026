@@ -548,6 +548,12 @@ def overlay(level_source, engine_source, on_toggle, position=None, on_moved=None
                 ns.setSize_((W, H))
                 self.view.setImage_(ns)
                 if not self.visible:
+                    # Na obrazovku, kde je okno, do kterého píšete (mainScreen = obrazovka s klávesnicí).
+                    try:
+                        f = AppKit.NSScreen.mainScreen().visibleFrame()
+                        self.panel.setFrameOrigin_((f.origin.x + (f.size.width - W) / 2, f.origin.y + BOTTOM_MARGIN))
+                    except Exception:
+                        log.exception("Indikátor nejde přesunout na aktivní obrazovku")
                     self.panel.orderFrontRegardless()
                     self.visible = True
             except Exception:

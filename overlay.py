@@ -181,7 +181,9 @@ class Overlay(OverlayState):
     def __init__(self, level_source, engine_source=lambda: (None, False), on_toggle=None,
                  position=None, on_moved=None):
         super().__init__(level_source, engine_source, on_toggle)
-        self.position = position  # [x, y] levého horního rohu, None = dole uprostřed
+        # Poloha na obrazovce relativně [0..1, 0..1] (0 = vlevo/nahoře, 1 = vpravo/dole), None = dole uprostřed.
+        # Indikátor se vždy ukáže na obrazovce s aktivním oknem, na stejném relativním místě.
+        self.position = position
         self.on_moved = on_moved  # po přetažení: on_moved([x, y]), dvojklik: on_moved(None)
         self._drag = None
         self._ready = threading.Event()
@@ -206,6 +208,8 @@ class Overlay(OverlayState):
         self.scale = self.root.winfo_fpixels("1i") / 96
         self.w, self.h = int(W * self.scale), int(H * self.scale)
 
+        if self.position and max(abs(v) for v in self.position) > 1:  # starší uložení v pixelech
+            self.position = self._relative(*self.position)
         self._place(self.position)
 
         self.label = tk.Label(self.root, bg=key_hex, bd=0, highlightthickness=0)
@@ -237,25 +241,49 @@ class Overlay(OverlayState):
         return bool(engine and clickable and self.current() == "recording"
                     and BADGE_X0 <= x / self.scale <= BADGE_X1)
 
-    def _default_pos(self):
+    def _work_area(self, point=None):
+        """Pracovní plocha (bez hlavního panelu) obrazovky s aktivním oknem, nebo obrazovky s bodem point."""
         import ctypes
-        import ctypes.wintypes
+        import ctypes.wintypes as wt
 
-        work = ctypes.wintypes.RECT()
-        ctypes.windll.user32.SystemParametersInfoW(0x30, 0, ctypes.byref(work), 0)  # SPI_GETWORKAREA
-        return (work.left + work.right - self.w) // 2, work.bottom - self.h - int(BOTTOM_MARGIN * self.scale)
+        class MONITORINFO(ctypes.Structure):
+            _fields_ = [("cbSize", wt.DWORD), ("rcMonitor", wt.RECT), ("rcWork", wt.RECT), ("dwFlags", wt.DWORD)]
+
+        u = ctypes.windll.user32
+        u.MonitorFromWindow.restype = u.MonitorFromPoint.restype = ctypes.c_void_p
+        u.MonitorFromWindow.argtypes = (ctypes.c_void_p, wt.DWORD)
+        u.MonitorFromPoint.argtypes = (wt.POINT, wt.DWORD)
+        u.GetMonitorInfoW.argtypes = (ctypes.c_void_p, ctypes.c_void_p)
+        if point is not None:
+            mon = u.MonitorFromPoint(wt.POINT(int(point[0]), int(point[1])), 2)  # MONITOR_DEFAULTTONEAREST
+        else:
+            mon = u.MonitorFromWindow(u.GetForegroundWindow(), 2)
+        mi = MONITORINFO()
+        mi.cbSize = ctypes.sizeof(MONITORINFO)
+        if not mon or not u.GetMonitorInfoW(mon, ctypes.byref(mi)):
+            work = wt.RECT()
+            u.SystemParametersInfoW(0x30, 0, ctypes.byref(work), 0)  # SPI_GETWORKAREA hlavní obrazovky
+            return work.left, work.top, work.right, work.bottom
+        r = mi.rcWork
+        return r.left, r.top, r.right, r.bottom
+
+    def _relative(self, x, y):
+        """Poloha levého horního rohu v pixelech -> relativní poloha na obrazovce, kde indikátor leží."""
+        l, t, r, b = self._work_area((x + self.w // 2, y + self.h // 2))
+        fx = (x - l) / max(1, r - l - self.w)
+        fy = (y - t) / max(1, b - t - self.h)
+        return [round(min(1.0, max(0.0, fx)), 4), round(min(1.0, max(0.0, fy)), 4)]
 
     def _place(self, pos):
-        """Umístí okno na pos, nebo dole doprostřed, když pos chybí či je mimo všechny monitory."""
-        import ctypes
-
-        m = ctypes.windll.user32.GetSystemMetrics
-        vx, vy, vw, vh = m(76), m(77), m(78), m(79)  # virtuální plocha přes všechny monitory
-        if pos and vx <= pos[0] <= vx + vw - self.w // 2 and vy <= pos[1] <= vy + vh - self.h // 2:
-            x, y = pos
+        """Umístí indikátor na obrazovku s aktivním oknem: na relativní místo pos, nebo dole doprostřed."""
+        l, t, r, b = self._work_area()
+        if pos:
+            x = l + round(pos[0] * (r - l - self.w))
+            y = t + round(pos[1] * (b - t - self.h))
         else:
-            x, y = self._default_pos()
+            x, y = (l + r - self.w) // 2, b - self.h - int(BOTTOM_MARGIN * self.scale)
         self.root.geometry(f"{self.w}x{self.h}+{x}+{y}")
+        self.root.update_idletasks()  # posunout hned, ne až po zobrazení okna
 
     def _press(self, e):
         self._drag = {"x": e.x_root, "y": e.y_root, "wx": self.root.winfo_x(), "wy": self.root.winfo_y(),
@@ -277,7 +305,7 @@ class Overlay(OverlayState):
         if not d:
             return
         if d["moved"]:
-            self.position = [self.root.winfo_x(), self.root.winfo_y()]
+            self.position = self._relative(self.root.winfo_x(), self.root.winfo_y())
             if self.on_moved:
                 threading.Thread(target=self.on_moved, args=(self.position,), daemon=True).start()
         elif d["badge"] and self.on_toggle:
@@ -304,6 +332,11 @@ class Overlay(OverlayState):
         import ctypes
 
         if on != self.visible:
+            if on:
+                try:
+                    self._place(self.position)  # na obrazovku, kde zrovna pracujete
+                except Exception:
+                    log.exception("Indikátor nejde přesunout na aktivní obrazovku")
             # SW_SHOWNOACTIVATE = 4 – zobrazí okno, ale nevezme fokus
             ctypes.windll.user32.ShowWindow(self.hwnd, 4 if on else 0)
             if on:

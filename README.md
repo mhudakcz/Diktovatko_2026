@@ -1,6 +1,6 @@
 # Diktovátko
 
-**Verze 0.18.0**, viz [přehled změn](CHANGELOG.md).
+**Verze 0.19.0**, viz [přehled změn](CHANGELOG.md).
 
 **Podržte klávesu, mluvte, pusťte. Text se vloží tam, kde máte kurzor.**
 
@@ -98,7 +98,7 @@ Nejjednodušší je nastavovat v okně aplikace (sekce *Nastavení*). Soubor se 
 | `history` | `true` | ukládání historie |
 | `sounds` | `true` | pípnutí při startu a konci nahrávání |
 | `trailing_space` | `true` | mezera za vloženým textem |
-| `overlay_pos` | `null` | poloha indikátoru `[x, y]` po přetažení myší, `null` = dole uprostřed |
+| `overlay_pos` | `null` | poloha indikátoru po přetažení myší, relativně k obrazovce `[0..1, 0..1]`, `null` = dole uprostřed; indikátor se ukáže na obrazovce s aktivním oknem |
 | `offline` | `false` | přepisovat v počítači i s uloženým Groq klíčem |
 | `check_updates` | `true` | jednou za 2 hodiny zkontrolovat, jestli nevyšla nová verze |
 

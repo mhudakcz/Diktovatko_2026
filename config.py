@@ -48,7 +48,8 @@ DEFAULT_CONFIG = {
     "history_days": 0,
     # Plovoucí indikátor nahrávání dole uprostřed obrazovky
     "overlay": True,
-    # Poloha indikátoru [x, y] v pixelech (přetažením myší), null = dole uprostřed
+    # Poloha indikátoru relativně k obrazovce [0..1, 0..1] (přetažením myší), null = dole uprostřed.
+    # Indikátor se ukáže vždy na obrazovce s aktivním oknem. Starší uložení v pixelech se převede.
     "overlay_pos": None,
     # Během nahrávání ztlumit ostatní aplikace (Spotify, videa…) na tento podíl hlasitosti (0 = úplně)
     "duck_audio": True,
@@ -145,7 +146,7 @@ def validate(cfg):
     except (TypeError, ValueError):
         out["duck_level"] = d["duck_level"]
     pos = out["overlay_pos"]
-    if not (isinstance(pos, list) and len(pos) == 2 and all(isinstance(v, int) and abs(v) < 100000 for v in pos)):
+    if not (isinstance(pos, list) and len(pos) == 2 and all(isinstance(v, (int, float)) and not isinstance(v, bool) and abs(v) < 100000 for v in pos)):
         out["overlay_pos"] = None
     if out["history_days"] not in HISTORY_DAYS:
         out["history_days"] = d["history_days"]
