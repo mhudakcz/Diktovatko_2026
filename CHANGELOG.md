@@ -2,6 +2,11 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.20.0 – 2026-10-06
+
+- Indikátor má vlevo úchyt (2 × 3 tečky) pro přetažení; přetahovat jde dál kdekoli mimo štítek Cloud / Local. Sloupečků hlasitosti je kvůli místu 16.
+- Poloha po přetažení se pamatuje pro každou obrazovku zvlášť (`overlay_pos` = slovník podle polohy a rozměru obrazovky). Obrazovka bez uložené polohy = dole uprostřed, dvojklik smaže polohu jen dané obrazovky. Starší uložení se převede.
+
 ## 0.19.0 – 2026-10-06
 
 - Více obrazovek: indikátor se při každém zobrazení přesune na obrazovku s aktivním oknem (Windows: MonitorFromWindow a pracovní plocha bez hlavního panelu; Mac: NSScreen.mainScreen, netestováno).

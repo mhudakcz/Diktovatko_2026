@@ -48,8 +48,8 @@ DEFAULT_CONFIG = {
     "history_days": 0,
     # Plovoucí indikátor nahrávání dole uprostřed obrazovky
     "overlay": True,
-    # Poloha indikátoru relativně k obrazovce [0..1, 0..1] (přetažením myší), null = dole uprostřed.
-    # Indikátor se ukáže vždy na obrazovce s aktivním oknem. Starší uložení v pixelech se převede.
+    # Poloha indikátoru po přetažení, pro každou obrazovku zvlášť: {"obrazovka": [x, y]} relativně 0..1,
+    # null = všude dole uprostřed. Indikátor se ukáže vždy na obrazovce s aktivním oknem.
     "overlay_pos": None,
     # Během nahrávání ztlumit ostatní aplikace (Spotify, videa…) na tento podíl hlasitosti (0 = úplně)
     "duck_audio": True,
@@ -146,7 +146,15 @@ def validate(cfg):
     except (TypeError, ValueError):
         out["duck_level"] = d["duck_level"]
     pos = out["overlay_pos"]
-    if not (isinstance(pos, list) and len(pos) == 2 and all(isinstance(v, (int, float)) and not isinstance(v, bool) and abs(v) < 100000 for v in pos)):
+
+    def _xy(v, limit):
+        return isinstance(v, list) and len(v) == 2 and all(
+            isinstance(n, (int, float)) and not isinstance(n, bool) and abs(n) <= limit for n in v)
+
+    if isinstance(pos, dict):  # poloha pro každou obrazovku zvlášť
+        pos = {str(k)[:60]: v for k, v in list(pos.items())[:16] if _xy(v, 1)}
+        out["overlay_pos"] = pos or None
+    elif not _xy(pos, 100000):  # starší společná poloha [x, y]
         out["overlay_pos"] = None
     if out["history_days"] not in HISTORY_DAYS:
         out["history_days"] = d["history_days"]

@@ -27,6 +27,7 @@ OFFLINE = (94, 214, 160)
 
 W, H = 280, 44  # logická velikost (při 100 % měřítku)
 BADGE_X0, BADGE_X1 = 166, 272  # štítek Cloud / Local (logické souřadnice)
+GRIP_W = 8  # o kolik se obsah posune kvůli úchytu vlevo (logické body)
 SS = 2  # supersampling kvůli vyhlazeným okrajům (2× stačí, 3× zbytečně zatěžovalo CPU)
 FRAME_MS = 42  # ~24 snímků za sekundu
 BOTTOM_MARGIN = 28
@@ -95,9 +96,19 @@ def _badge(d, engine, clickable, s, cy):
     d.text((x + d.textlength(main, font=f1), cy), speed, font=f2, fill=accent, anchor="lm")
 
 
-def render_pill(state, t, levels, scale, message="", transparent=False, engine=None, clickable=False):
+def _grip(d, s, cy):
+    """Úchyt pro přetažení: 2 × 3 tečky u levého okraje."""
+    r = 1.3 * s
+    for gx in (10, 15):
+        for gy in (-5, 0, 5):
+            x, y = gx * s, cy + gy * s
+            d.ellipse((x - r, y - r, x + r, y + r), fill=MUTED)
+
+
+def render_pill(state, t, levels, scale, message="", transparent=False, engine=None, clickable=False, grip=False):
     """Vykreslí pilulku. t = sekundy od začátku stavu, levels = úrovně hlasitosti 0..1,
-    engine = štítek vpravo ("groq" / "offline" / None), clickable = štítek jde přepnout."""
+    engine = štítek vpravo ("groq" / "offline" / None), clickable = štítek jde přepnout,
+    grip = úchyt pro přetažení vlevo (jen kde jde indikátor přetáhnout)."""
     w, h = int(W * scale) * SS, int(H * scale) * SS
     if transparent:
         img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
@@ -112,15 +123,19 @@ def render_pill(state, t, levels, scale, message="", transparent=False, engine=N
     cy = h / 2
     font = _font(int(13 * s))
 
+    shift = GRIP_W if grip and state in ("recording", "transcribing") else 0
+    if shift:
+        _grip(d, s, cy)
     if state == "recording":
         # pulzující tečka
         pr = (4.5 + 1.2 * math.sin(t * 6)) * s
-        cx = 20 * s
+        cx = (20 + shift) * s
         d.ellipse((cx - pr, cy - pr, cx + pr, cy + pr), fill=VOICE)
         # sloupečky hlasitosti
-        levels = list(levels)[-18:]
-        levels = [0.0] * (18 - len(levels)) + levels
-        x0, bw, gap = 36 * s, 2.6 * s, 2.4 * s
+        nbars = 16 if shift else 18  # s úchytem je o kus méně místa
+        levels = list(levels)[-nbars:]
+        levels = [0.0] * (nbars - len(levels)) + levels
+        x0, bw, gap = (36 + shift) * s, 2.6 * s, 2.4 * s
         for i, lv in enumerate(levels):
             bh = (3 + min(1.0, lv) * 23) * s
             x = x0 + i * (bw + gap)
@@ -133,7 +148,7 @@ def render_pill(state, t, levels, scale, message="", transparent=False, engine=N
         # vlna, která běží zleva doprava
         n, bw, gap = (20 if engine else 24), 2.6 * s, 2.4 * s
         area = BADGE_X0 * s if engine else w
-        x0 = (area - (n * (bw + gap) - gap)) / 2
+        x0 = shift * s + (area - shift * s - (n * (bw + gap) - gap)) / 2
         for i in range(n):
             phase = (t * 2.2 - i / n) % 1.0
             amp = math.exp(-((phase - 0.5) ** 2) / 0.02)
@@ -181,10 +196,12 @@ class Overlay(OverlayState):
     def __init__(self, level_source, engine_source=lambda: (None, False), on_toggle=None,
                  position=None, on_moved=None):
         super().__init__(level_source, engine_source, on_toggle)
-        # Poloha na obrazovce relativně [0..1, 0..1] (0 = vlevo/nahoře, 1 = vpravo/dole), None = dole uprostřed.
-        # Indikátor se vždy ukáže na obrazovce s aktivním oknem, na stejném relativním místě.
-        self.position = position
-        self.on_moved = on_moved  # po přetažení: on_moved([x, y]), dvojklik: on_moved(None)
+        # Indikátor se vždy ukáže na obrazovce s aktivním oknem. Poloha se pamatuje pro každou obrazovku
+        # zvlášť: {"klíč obrazovky": [x, y]} relativně 0..1 (0 = vlevo/nahoře, 1 = vpravo/dole);
+        # obrazovka bez uložené polohy = dole uprostřed. "*" = starší společná poloha pro všechny obrazovky.
+        self.positions = dict(position) if isinstance(position, dict) else {}
+        self._legacy = position if isinstance(position, list) else None
+        self.on_moved = on_moved  # po přetažení i po dvojkliku: on_moved(slovník poloh nebo None)
         self._drag = None
         self._ready = threading.Event()
         threading.Thread(target=self._run, daemon=True).start()
@@ -208,9 +225,13 @@ class Overlay(OverlayState):
         self.scale = self.root.winfo_fpixels("1i") / 96
         self.w, self.h = int(W * self.scale), int(H * self.scale)
 
-        if self.position and max(abs(v) for v in self.position) > 1:  # starší uložení v pixelech
-            self.position = self._relative(*self.position)
-        self._place(self.position)
+        if self._legacy:  # starší uložení: v pixelech -> pro tu obrazovku, relativní -> pro všechny
+            if max(abs(v) for v in self._legacy) > 1:
+                x, y = self._legacy
+                self.positions[self._monitor((x + self.w // 2, y + self.h // 2))[1]] = self._relative(x, y)
+            else:
+                self.positions["*"] = self._legacy
+        self._place()
 
         self.label = tk.Label(self.root, bg=key_hex, bd=0, highlightthickness=0)
         self.label.pack()
@@ -243,6 +264,10 @@ class Overlay(OverlayState):
 
     def _work_area(self, point=None):
         """Pracovní plocha (bez hlavního panelu) obrazovky s aktivním oknem, nebo obrazovky s bodem point."""
+        return self._monitor(point)[0]
+
+    def _monitor(self, point=None):
+        """(pracovní plocha, klíč obrazovky) pro obrazovku s aktivním oknem nebo s bodem point."""
         import ctypes
         import ctypes.wintypes as wt
 
@@ -263,9 +288,10 @@ class Overlay(OverlayState):
         if not mon or not u.GetMonitorInfoW(mon, ctypes.byref(mi)):
             work = wt.RECT()
             u.SystemParametersInfoW(0x30, 0, ctypes.byref(work), 0)  # SPI_GETWORKAREA hlavní obrazovky
-            return work.left, work.top, work.right, work.bottom
-        r = mi.rcWork
-        return r.left, r.top, r.right, r.bottom
+            return (work.left, work.top, work.right, work.bottom), "main"
+        r, m = mi.rcWork, mi.rcMonitor
+        # Klíč = poloha a rozměr obrazovky; zůstane stejný, dokud se nezmění rozložení obrazovek.
+        return (r.left, r.top, r.right, r.bottom), f"{m.left},{m.top},{m.right - m.left}x{m.bottom - m.top}"
 
     def _relative(self, x, y):
         """Poloha levého horního rohu v pixelech -> relativní poloha na obrazovce, kde indikátor leží."""
@@ -274,9 +300,10 @@ class Overlay(OverlayState):
         fy = (y - t) / max(1, b - t - self.h)
         return [round(min(1.0, max(0.0, fx)), 4), round(min(1.0, max(0.0, fy)), 4)]
 
-    def _place(self, pos):
-        """Umístí indikátor na obrazovku s aktivním oknem: na relativní místo pos, nebo dole doprostřed."""
-        l, t, r, b = self._work_area()
+    def _place(self):
+        """Umístí indikátor na obrazovku s aktivním oknem: na uložené místo pro tu obrazovku, nebo dole doprostřed."""
+        (l, t, r, b), key = self._monitor()
+        pos = self.positions.get(key) or self.positions.get("*")
         if pos:
             x = l + round(pos[0] * (r - l - self.w))
             y = t + round(pos[1] * (b - t - self.h))
@@ -305,9 +332,10 @@ class Overlay(OverlayState):
         if not d:
             return
         if d["moved"]:
-            self.position = self._relative(self.root.winfo_x(), self.root.winfo_y())
-            if self.on_moved:
-                threading.Thread(target=self.on_moved, args=(self.position,), daemon=True).start()
+            x, y = self.root.winfo_x(), self.root.winfo_y()
+            key = self._monitor((x + self.w // 2, y + self.h // 2))[1]
+            self.positions[key] = self._relative(x, y)
+            self._save_positions()
         elif d["badge"] and self.on_toggle:
             threading.Thread(target=self.on_toggle, daemon=True).start()
         self._motion(e)
@@ -316,10 +344,15 @@ class Overlay(OverlayState):
         """Dvojklik mimo štítek vrátí indikátor dole doprostřed."""
         if self._on_badge(e.x):
             return
-        self.position = None
-        self._place(None)
+        x, y = self.root.winfo_x(), self.root.winfo_y()
+        self.positions.pop(self._monitor((x + self.w // 2, y + self.h // 2))[1], None)
+        self.positions.pop("*", None)
+        self._place()
+        self._save_positions()
+
+    def _save_positions(self):
         if self.on_moved:
-            threading.Thread(target=self.on_moved, args=(None,), daemon=True).start()
+            threading.Thread(target=self.on_moved, args=(dict(self.positions) or None,), daemon=True).start()
 
     def _motion(self, e):
         if self._drag and self._drag["moved"]:
@@ -334,7 +367,7 @@ class Overlay(OverlayState):
         if on != self.visible:
             if on:
                 try:
-                    self._place(self.position)  # na obrazovku, kde zrovna pracujete
+                    self._place()  # na obrazovku, kde zrovna pracujete
                 except Exception:
                     log.exception("Indikátor nejde přesunout na aktivní obrazovku")
             # SW_SHOWNOACTIVATE = 4 – zobrazí okno, ale nevezme fokus
@@ -351,7 +384,7 @@ class Overlay(OverlayState):
             else:
                 engine, clickable = self.engine_source()
                 img = render_pill(state, time.time() - self.since, self.level_source(), self.scale, self.message,
-                                  engine=engine, clickable=clickable)
+                                  engine=engine, clickable=clickable, grip=True)
                 self._photo = self._ImageTk.PhotoImage(img)
                 self.label.config(image=self._photo)
                 self._set_visible(True)
