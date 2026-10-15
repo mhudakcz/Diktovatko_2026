@@ -150,12 +150,15 @@ class Transcriber:
                 # Groq přijme soubor do 25 MB (~13 min WAV), delší nahrávku dělíme v tichém místě.
                 return " ".join(x for x in (self._groq(part) for part in split_audio(audio)) if x)
             except GroqError as e:
-                if e.message_key not in ("overlay.offline", "overlay.rate_limit") or not self._local_ready():
+                if e.message_key not in ("overlay.offline", "overlay.rate_limit"):
+                    raise
+                # Šnek v indikátoru hned, ještě před načítáním modelu (to trvá pár sekund).
+                if self.on_fallback:
+                    self.on_fallback()
+                if not self._local_ready():
                     raise
                 log.warning("Groq nedostupný (%s), přepisuji místním modelem", e)
                 self.fell_back = True
-                if self.on_fallback:
-                    self.on_fallback()
                 return self._local(audio)
         if self.model is None or self.model_name != self.cfg["model"]:
             self.load()  # např. klíč byl smazán během přepisu – model nahrajeme teď
@@ -193,7 +196,8 @@ class Transcriber:
         import httpx
 
         if self._http is None:  # jedno spojení pro všechna diktování (bez nového TLS handshaku)
-            self._http = httpx.Client(timeout=httpx.Timeout(60, connect=10))
+            # Navázání spojení do 3 s: bez internetu se to pozná hned a přepíše místní model.
+            self._http = httpx.Client(timeout=httpx.Timeout(60, connect=3))
         return self._http
 
     def _groq(self, audio):
@@ -220,8 +224,9 @@ class Transcriber:
                 )
             except httpx.HTTPError as e:
                 # Přerušené spojení (často po delší pauze) – zahodíme ho a zkusíme to ještě jednou s novým.
+                # Když nejde spojení ani navázat (ConnectError/ConnectTimeout), internet není – nový pokus nemá smysl.
                 self._reset_client()
-                if attempt == 1:
+                if attempt == 1 and not isinstance(e, (httpx.ConnectError, httpx.ConnectTimeout)):
                     log.info("Groq: %s, zkouším znovu s novým spojením", type(e).__name__)
                     time.sleep(0.5)
                     continue
