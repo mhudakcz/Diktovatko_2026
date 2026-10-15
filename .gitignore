@@ -19,5 +19,5 @@ exporty/
 .update_backup/
 .update_ok
 update.log
-pad.log
+pad.log*
 ax_probe.txt

@@ -2,6 +2,12 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.21.0 – 2026-10-15
+
+- Groq: při přerušeném spojení (ReadError, ConnectError… – typicky po delší pauze) se spojení zahodí a pokus se jednou zopakuje s novým; stejně tak u HTTP 5xx.
+- Záloha místním modelem: když Groq nejde ani napodruhé (výpadek, limit), přepíše nahrávku místní model, ale jen pokud je už stažený (`local_files_only`), nikdy se nezačne stahovat. Indikátor ukáže stav „Online nejde, přepisuji v počítači…“ se šnekem, po vložení zelenou informaci bez chybového zvuku. Historie uloží místní model jako motor.
+- `pad.log` se při startu přesune do `pad.log.1`, když je větší než 0,5 MB (ve Windows do něj padají i ošetřené chyby COM z čtení názvu konverzace).
+
 ## 0.20.0 – 2026-10-06
 
 - Indikátor má vlevo úchyt (2 × 3 tečky) pro přetažení; přetahovat jde dál kdekoli mimo štítek Cloud / Local. Sloupečků hlasitosti je kvůli místu 16.

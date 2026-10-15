@@ -54,6 +54,13 @@ log = logging.getLogger("diktovatko")
 # Diagnostika nečekaného konce: tvrdý pád v C knihovnách (zvuk, Tk, ikona) zapíše faulthandler
 # do pad.log i s místem v kódu, chyby v jiných vláknech jdou do běžného logu.
 CRASH_LOG = APP_DIR / "pad.log"
+# Ve Windows zachytí i ošetřené chyby COM (0x80010108 při čtení názvu konverzace), které nejsou pádem.
+# Aby soubor nerostl donekonečna, větší než 0,5 MB se při startu přesune do pad.log.1.
+try:
+    if CRASH_LOG.exists() and CRASH_LOG.stat().st_size > 512 * 1024:
+        os.replace(CRASH_LOG, CRASH_LOG.with_suffix(".log.1"))
+except OSError:
+    pass
 _crash_file = open(CRASH_LOG, "a", encoding="utf-8")
 faulthandler.enable(_crash_file, all_threads=True)
 threading.excepthook = lambda a: log.error("Chyba ve vlákně %s", a.thread.name if a.thread else "?",
@@ -105,6 +112,8 @@ class Transcriber:
         self.active_engine = None  # "groq" nebo název lokálního modelu, který je právě připravený
         self._http = None
         self._lock = threading.Lock()
+        self.fell_back = False  # poslední přepis místo Groq udělal místní model (Groq byl nedostupný)
+        self.on_fallback = None  # zavolá se, když se přepis přepne na místní model (indikátor to ukáže)
 
     def uses_groq(self):
         return not self.cfg["offline"] and bool(config.groq_key(self.cfg))
@@ -135,11 +144,41 @@ class Transcriber:
             log.info("Model načten")
 
     def transcribe(self, audio):
+        self.fell_back = False
         if self.uses_groq():
-            # Groq přijme soubor do 25 MB (~13 min WAV), delší nahrávku dělíme v tichém místě.
-            return " ".join(x for x in (self._groq(part) for part in split_audio(audio)) if x)
+            try:
+                # Groq přijme soubor do 25 MB (~13 min WAV), delší nahrávku dělíme v tichém místě.
+                return " ".join(x for x in (self._groq(part) for part in split_audio(audio)) if x)
+            except GroqError as e:
+                if e.message_key not in ("overlay.offline", "overlay.rate_limit") or not self._local_ready():
+                    raise
+                log.warning("Groq nedostupný (%s), přepisuji místním modelem", e)
+                self.fell_back = True
+                if self.on_fallback:
+                    self.on_fallback()
+                return self._local(audio)
         if self.model is None or self.model_name != self.cfg["model"]:
             self.load()  # např. klíč byl smazán během přepisu – model nahrajeme teď
+        return self._local(audio)
+
+    def _local_ready(self):
+        """Místní model je v paměti, nebo aspoň stažený v počítači (nikdy ho nezačneme stahovat jako zálohu)."""
+        with self._lock:
+            if self.model is not None and self.model_name == self.cfg["model"]:
+                return True
+            try:
+                from faster_whisper import WhisperModel
+
+                log.info("Načítám lokální model %s jako zálohu za Groq…", self.cfg["model"])
+                self.model = WhisperModel(self.cfg["model"], device="cpu", compute_type="int8",
+                                          cpu_threads=os.cpu_count() or 4, local_files_only=True)
+                self.model_name = self.cfg["model"]
+                return True
+            except Exception as e:
+                log.info("Místní model není stažený, záloha za Groq není k dispozici (%s)", type(e).__name__)
+                return False
+
+    def _local(self, audio):
         segments, _ = self.model.transcribe(
             audio,
             language=self.cfg["language"],
@@ -171,21 +210,43 @@ class Transcriber:
             data["language"] = self.cfg["language"]
         if self.cfg["initial_prompt"]:
             data["prompt"] = self.cfg["initial_prompt"]
-        try:
-            r = self._client().post(
-                "https://api.groq.com/openai/v1/audio/transcriptions",
-                headers={"Authorization": f"Bearer {config.groq_key(self.cfg)}"},
-                files={"file": ("audio.wav", buf.getvalue(), "audio/wav")},
-                data=data,
-            )
-        except httpx.HTTPError as e:
-            raise GroqError("overlay.offline", type(e).__name__) from e
+        for attempt in (1, 2):
+            try:
+                r = self._client().post(
+                    "https://api.groq.com/openai/v1/audio/transcriptions",
+                    headers={"Authorization": f"Bearer {config.groq_key(self.cfg)}"},
+                    files={"file": ("audio.wav", buf.getvalue(), "audio/wav")},
+                    data=data,
+                )
+            except httpx.HTTPError as e:
+                # Přerušené spojení (často po delší pauze) – zahodíme ho a zkusíme to ještě jednou s novým.
+                self._reset_client()
+                if attempt == 1:
+                    log.info("Groq: %s, zkouším znovu s novým spojením", type(e).__name__)
+                    time.sleep(0.5)
+                    continue
+                raise GroqError("overlay.offline", type(e).__name__) from e
+            if r.status_code >= 500 and attempt == 1:  # krátký výpadek na straně Groq
+                log.info("Groq: HTTP %s, zkouším znovu", r.status_code)
+                time.sleep(1)
+                continue
+            break
         if r.status_code in (401, 403):
             raise GroqError("overlay.bad_key", f"HTTP {r.status_code}")
         if r.status_code == 429:
             raise GroqError("overlay.rate_limit", "HTTP 429")
+        if r.status_code >= 500:
+            raise GroqError("overlay.offline", f"HTTP {r.status_code}")
         r.raise_for_status()
         return r.json()["text"].strip()
+
+    def _reset_client(self):
+        if self._http is not None:
+            try:
+                self._http.close()
+            except Exception:
+                pass
+            self._http = None
 
 
 def split_audio(audio, max_seconds=600, search_seconds=60):
@@ -248,6 +309,7 @@ class App:
         i18n.set_lang(self.cfg["ui_language"])
         self.config_mtime = config.CONFIG_PATH.stat().st_mtime
         self.transcriber = Transcriber(self.cfg)
+        self.transcriber.on_fallback = self._on_fallback
         self.state = "loading"
         self.chunks = []
         self.levels = deque(maxlen=40)
@@ -416,6 +478,11 @@ class App:
             self.set_state("idle")
         log.info("Nahrávání zrušeno – během držení zkratky byla stisknuta jiná klávesa")
 
+    def _on_fallback(self):
+        """Groq nejde, přepisuje místní model – indikátor ukáže šneka a vysvětlení."""
+        if self.overlay and self.cfg["overlay"]:
+            self.overlay.show("fallback", t("overlay.fallback_working"))
+
     def _read_conversation(self, app):
         """Na pozadí zjistí název konverzace (aplikace Claude) a adresu stránky (prohlížeč), dokud je okno aktivní."""
         self.conversation = {"app": app}
@@ -456,8 +523,10 @@ class App:
             pasted = self.paste(text + (" " if self.cfg["trailing_space"] else ""), target_id)
             if not pasted:
                 message = "overlay.copied"
+            elif self.transcriber.fell_back:
+                message = "overlay.fallback"
             if self.cfg["history"]:
-                engine = "groq" if self.transcriber.uses_groq() else self.cfg["model"]
+                engine = "groq" if self.transcriber.uses_groq() and not self.transcriber.fell_back else self.cfg["model"]
                 title = target[1] if self.cfg["store_titles"] else ""
                 conv = self.conversation.get("name") if self.conversation.get("app") == target[0] else None
                 if title and conv and conv not in title:
@@ -474,6 +543,8 @@ class App:
             self.set_state("idle")
             if message == "overlay.copied":
                 self._show("error", t(message, paste=plat.PASTE_HINT))
+            elif message == "overlay.fallback":
+                self._show("info", t(message))  # jen informace, text je vložený – bez chybového zvuku
             elif message:
                 self._error(message)
             self._maybe_reload_engine()

@@ -123,7 +123,7 @@ def render_pill(state, t, levels, scale, message="", transparent=False, engine=N
     cy = h / 2
     font = _font(int(13 * s))
 
-    shift = GRIP_W if grip and state in ("recording", "transcribing") else 0
+    shift = GRIP_W if grip and state in ("recording", "transcribing", "fallback") else 0
     if shift:
         _grip(d, s, cy)
     if state == "recording":
@@ -156,6 +156,16 @@ def render_pill(state, t, levels, scale, message="", transparent=False, engine=N
             col = tuple(int(WHITE[k] * (1 - amp) * 0.35 + ULTRA[k] * (0.35 + 0.65 * amp)) for k in range(3))
             x = x0 + i * (bw + gap)
             d.rounded_rectangle((x, cy - bh / 2, x + bw, cy + bh / 2), radius=bw / 2, fill=col)
+    elif state == "fallback":
+        # Groq nejde, přepisuje místní model: šnek, text a běžící tečky (pomalejší, ale pracuje)
+        x = (16 + shift) * s
+        _snail(d, x, cy, s, OFFLINE)
+        dots = "." * (1 + int(t * 2.5) % 3)
+        d.text((x + 21 * s, cy), (message or "Přepisuji v počítači") + dots, font=_font(int(12 * s)), fill=WHITE, anchor="lm")
+        engine = None
+    elif state == "info":
+        d.text((w / 2, cy), message, font=font, fill=OFFLINE, anchor="mm")
+        engine = None
     elif state == "error":
         d.text((w / 2, cy), message or "Přepis se nepovedl", font=font, fill=VOICE, anchor="mm")
         engine = None
@@ -185,7 +195,7 @@ class OverlayState:
 
     def current(self):
         """Vrátí stav k vykreslení (chyba po chvíli sama zmizí)."""
-        if self.state == "error" and time.time() - self.since > 2.2:
+        if self.state in ("error", "info") and time.time() - self.since > (3.0 if self.state == "info" else 2.2):
             self.state = "hidden"
         return self.state
 
