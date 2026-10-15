@@ -214,6 +214,8 @@ class Transcriber:
             data["language"] = self.cfg["language"]
         if self.cfg["initial_prompt"]:
             data["prompt"] = self.cfg["initial_prompt"]
+        if not self._dns_ok():
+            raise GroqError("overlay.offline", "adresa api.groq.com se nenašla do 2 s")
         for attempt in (1, 2):
             try:
                 r = self._client().post(
@@ -244,6 +246,25 @@ class Transcriber:
             raise GroqError("overlay.offline", f"HTTP {r.status_code}")
         r.raise_for_status()
         return r.json()["text"].strip()
+
+    @staticmethod
+    def _dns_ok(host="api.groq.com", timeout=2.0):
+        """Najde adresu serveru s časovým limitem. Bez internetu může Windows hledat adresu i 10 s a víc
+        a tenhle čas žádný limit spojení nehlídá – proto vlastní limit."""
+        import socket
+
+        box = {}
+
+        def resolve():
+            try:
+                box["ok"] = bool(socket.getaddrinfo(host, 443))
+            except OSError:
+                box["ok"] = False
+
+        th = threading.Thread(target=resolve, daemon=True)
+        th.start()
+        th.join(timeout)
+        return box.get("ok", False)
 
     def _reset_client(self):
         if self._http is not None:

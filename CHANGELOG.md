@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.21.2 – 2026-10-15
+
+- Bez internetu hledá Windows adresu api.groq.com i přes 10 s a tenhle čas časový limit spojení nehlídá (proběhne před ním). Adresa se teď hledá v samostatném vlákně s limitem 2 s; když se nenajde, rovnou se přepne na místní model. Měřeno s 12s hledáním adresy: šnek po 2,0 s, hotovo po 9,2 s. S internetem beze změny (Groq, ~1 s).
+
 ## 0.21.1 – 2026-10-15
 
 - Bez internetu se to pozná rychle: navázání spojení s Groq do 3 s (dřív 10 s) a při ConnectError/ConnectTimeout se už nezkouší znovu (nový pokus jen u přerušeného existujícího spojení). Šnek v indikátoru se ukáže hned při přepnutí, ještě před načítáním místního modelu. Měřeno: šnek po 3,7 s, přepis hotový po 11,8 s (dřív 35 s a 45,6 s).
