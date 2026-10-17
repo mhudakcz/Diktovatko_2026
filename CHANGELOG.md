@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.21.3 – 2026-10-17
+
+- Nestabilní síť: limity pro Groq podle nahrávky (odeslání 5 s + 4 s/MB, odpověď 8 s + 0,2 × délka nahrávky) místo 60 s. Nový pokus jen když spojení spadne do 3 s (staré spojení po pauze); zaseknuté spojení rovnou přepne na místní model. Dřív při zaseknuté síti 49 a 64 s, teď šnek po ~4 s.
+
 ## 0.21.2 – 2026-10-15
 
 - Bez internetu hledá Windows adresu api.groq.com i přes 10 s a tenhle čas časový limit spojení nehlídá (proběhne před ním). Adresa se teď hledá v samostatném vlákně s limitem 2 s; když se nenajde, rovnou se přepne na místní model. Měřeno s 12s hledáním adresy: šnek po 2,0 s, hotovo po 9,2 s. S internetem beze změny (Groq, ~1 s).

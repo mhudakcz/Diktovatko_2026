@@ -216,19 +216,27 @@ class Transcriber:
             data["prompt"] = self.cfg["initial_prompt"]
         if not self._dns_ok():
             raise GroqError("overlay.offline", "adresa api.groq.com se nenašla do 2 s")
+        wav = buf.getvalue()
+        # Groq běžně odpoví do sekundy. Limity podle velikosti a délky nahrávky, ať se při zaseknuté
+        # síti nečeká minutu a rychle se přepne na místní model.
+        timeout = httpx.Timeout(connect=3, pool=3, write=5 + 4 * len(wav) / 1e6,
+                                read=8 + 0.2 * len(audio) / SAMPLE_RATE)
         for attempt in (1, 2):
+            started = time.time()
             try:
                 r = self._client().post(
                     "https://api.groq.com/openai/v1/audio/transcriptions",
                     headers={"Authorization": f"Bearer {config.groq_key(self.cfg)}"},
-                    files={"file": ("audio.wav", buf.getvalue(), "audio/wav")},
+                    files={"file": ("audio.wav", wav, "audio/wav")},
                     data=data,
+                    timeout=timeout,
                 )
             except httpx.HTTPError as e:
-                # Přerušené spojení (často po delší pauze) – zahodíme ho a zkusíme to ještě jednou s novým.
-                # Když nejde spojení ani navázat (ConnectError/ConnectTimeout), internet není – nový pokus nemá smysl.
+                # Spojení spadlo hned (typicky staré spojení po delší pauze) – zkusíme to jednou s novým.
+                # Když nejde spojení navázat nebo se zaseklo, nový pokus jen zdržuje – rovnou místní model.
                 self._reset_client()
-                if attempt == 1 and not isinstance(e, (httpx.ConnectError, httpx.ConnectTimeout)):
+                quick = time.time() - started < 3
+                if attempt == 1 and quick and not isinstance(e, (httpx.ConnectError, httpx.ConnectTimeout)):
                     log.info("Groq: %s, zkouším znovu s novým spojením", type(e).__name__)
                     time.sleep(0.5)
                     continue
