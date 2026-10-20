@@ -434,10 +434,10 @@ class App:
         elif self.overlay:
             self.overlay.hide()
 
-    def _error(self, message_key):
+    def _error(self, message_key, **params):
         if self.cfg["sounds"]:
             plat.beep("error")
-        self._show("error", t(message_key))
+        self._show("error", t(message_key, **params))
 
     # --- nahrávání ---------------------------------------------------------
     def _audio_callback(self, indata, frames, time_info, status):
@@ -544,9 +544,12 @@ class App:
             if not has_speech(audio):
                 peak = float(np.abs(audio).max()) if len(audio) else 0.0
                 rms = float(np.sqrt(np.mean(audio**2))) if len(audio) else 0.0
-                log.info("V nahrávce (%.1fs) není řeč, ignoruji (špička %.3f, RMS %.4f)", duration, peak, rms)
+                mic = plat.mic_volume()
+                log.info("V nahrávce (%.1fs) není řeč, ignoruji (špička %.3f, RMS %.4f, mikrofon %s %%)",
+                         duration, peak, rms, "?" if mic is None else mic)
                 if duration >= 1.0:  # krátké ťuknutí na zkratku nehlásíme
-                    message = "overlay.quiet"
+                    # Když je mikrofon v systému ztišený, řekneme to rovnou – častá příčina tichých nahrávek.
+                    message = ("overlay.quiet_mic", {"v": mic}) if mic is not None and mic < 80 else "overlay.quiet"
                 return
             t0 = time.time()
             text = self.transcriber.transcribe(normalize(audio))
@@ -579,6 +582,8 @@ class App:
                 self._show("error", t(message, paste=plat.PASTE_HINT))
             elif message == "overlay.fallback":
                 self._show("info", t(message))  # jen informace, text je vložený – bez chybového zvuku
+            elif isinstance(message, tuple):
+                self._error(message[0], **message[1])
             elif message:
                 self._error(message)
             self._maybe_reload_engine()

@@ -269,6 +269,29 @@ def page_url(app, hwnd=None):
     return None
 
 
+def mic_volume():
+    """Hlasitost výchozího mikrofonu ve Windows v procentech, nebo None."""
+    try:
+        from ctypes import POINTER, cast
+
+        import comtypes
+        from comtypes import CLSCTX_ALL
+        from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+
+        try:
+            comtypes.CoInitialize()
+        except OSError:
+            pass
+        mic = AudioUtilities.GetMicrophone()
+        if mic is None:
+            return None
+        vol = cast(mic.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None), POINTER(IAudioEndpointVolume))
+        return round(vol.GetMasterVolumeLevelScalar() * 100)
+    except Exception:
+        log.debug("Hlasitost mikrofonu nejde zjistit", exc_info=True)
+        return None
+
+
 def open_path(path):
     os.startfile(path)
 

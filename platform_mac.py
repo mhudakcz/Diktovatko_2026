@@ -266,6 +266,16 @@ def _app_element(pid):
     return el
 
 
+def mic_volume():
+    """Vstupní hlasitost mikrofonu v Nastavení systému (0–100), nebo None."""
+    try:
+        r = subprocess.run(["osascript", "-e", "input volume of (get volume settings)"],
+                           capture_output=True, text=True, timeout=3)
+        return int(r.stdout.strip()) if r.returncode == 0 and r.stdout.strip().isdigit() else None
+    except Exception:
+        return None
+
+
 def page_url(app, hwnd=None):
     """Adresa stránky v aktivním okně prohlížeče (jen adresa, ne obsah stránky), jinak None."""
     try:

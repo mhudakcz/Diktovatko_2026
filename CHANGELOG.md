@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.22.0 – 2026-10-20
+
+- Upozornění na ztišený mikrofon: u nahrávky zahozené jako tichá se zjistí hlasitost mikrofonu v systému (Windows: pycaw IAudioEndpointVolume, Mac: `input volume of (get volume settings)`). Pod 80 % indikátor napíše „Mikrofon na X %, zvyšte ho ve Windows“ (na Macu „v Nastavení“), jinak dál „Moc potichu“. Hlasitost mikrofonu se zapisuje do logu u každé tiché nahrávky.
+
 ## 0.21.3 – 2026-10-17
 
 - Nestabilní síť: limity pro Groq podle nahrávky (odeslání 5 s + 4 s/MB, odpověď 8 s + 0,2 × délka nahrávky) místo 60 s. Nový pokus jen když spojení spadne do 3 s (staré spojení po pauze); zaseknuté spojení rovnou přepne na místní model. Dřív při zaseknuté síti 49 a 64 s, teď šnek po ~4 s.

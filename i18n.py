@@ -3,6 +3,8 @@
 Texty okna aplikace jsou v ui/i18n.js. Výchozí jazyk je čeština.
 """
 
+import sys
+
 LANGS = ("cs", "en", "de")
 DEFAULT = "cs"
 
@@ -42,6 +44,7 @@ STRINGS = {
         "overlay.copied": "Zkopírováno, vložte {paste}",
         "overlay.no_mic": "Mikrofon není dostupný",
         "overlay.quiet": "Moc potichu, mluvte blíž k mikrofonu",
+        "overlay.quiet_mic": "Mikrofon na {v} %, zvyšte ho " + ("v Nastavení" if sys.platform == "darwin" else "ve Windows"),
         "overlay.bad_key": "Groq klíč je neplatný",
         "overlay.rate_limit": "Limit Groq, zkuste za chvíli",
         "overlay.offline": "Groq je nedostupný",
@@ -101,6 +104,7 @@ STRINGS = {
         "overlay.copied": "Copied, press {paste}",
         "overlay.no_mic": "Microphone unavailable",
         "overlay.quiet": "Too quiet, speak closer to the mic",
+        "overlay.quiet_mic": "Mic at {v} %, raise it in " + ("Settings" if sys.platform == "darwin" else "Windows"),
         "overlay.bad_key": "Groq key is invalid",
         "overlay.rate_limit": "Groq limit, try again soon",
         "overlay.offline": "Groq is unreachable",
@@ -160,6 +164,7 @@ STRINGS = {
         "overlay.copied": "Kopiert, {paste} drücken",
         "overlay.no_mic": "Mikrofon nicht verfügbar",
         "overlay.quiet": "Zu leise, näher ans Mikrofon",
+        "overlay.quiet_mic": "Mikrofon auf {v} %, in " + ("Einstellungen" if sys.platform == "darwin" else "Windows") + " erhöhen",
         "overlay.bad_key": "Groq-Schlüssel ungültig",
         "overlay.rate_limit": "Groq-Limit, gleich nochmal",
         "overlay.offline": "Groq nicht erreichbar",
