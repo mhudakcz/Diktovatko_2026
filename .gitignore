@@ -21,3 +21,5 @@ exporty/
 update.log
 pad.log*
 ax_probe.txt
+.pid
+.watchdog.pid

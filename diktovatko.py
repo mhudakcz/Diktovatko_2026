@@ -53,6 +53,22 @@ log = logging.getLogger("diktovatko")
 
 # Diagnostika nečekaného konce: tvrdý pád v C knihovnách (zvuk, Tk, ikona) zapíše faulthandler
 # do pad.log i s místem v kódu, chyby v jiných vláknech jdou do běžného logu.
+PID_FILE = APP_DIR / ".pid"  # číslo běžícího procesu pro hlídače (watchdog.py)
+
+
+def start_watchdog():
+    """Spustí hlídače, který Diktovátko po nečekaném konci spustí znovu (běží jen jeden)."""
+    kw = {"cwd": APP_DIR}
+    if sys.platform == "win32":
+        kw["creationflags"] = 0x00000008 | 0x00000200  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+    else:
+        kw["start_new_session"] = True
+    try:
+        subprocess.Popen([sys.executable, str(APP_DIR / "watchdog.py")], **kw)
+    except Exception:
+        log.exception("Hlídače nejde spustit")
+
+
 CRASH_LOG = APP_DIR / "pad.log"
 # Ve Windows zachytí i ošetřené chyby COM (0x80010108 při čtení názvu konverzace), které nejsou pádem.
 # Aby soubor nerostl donekonečna, větší než 0,5 MB se při startu přesune do pad.log.1.
@@ -853,6 +869,7 @@ class App:
 
     def quit(self):
         log.info("Ukončuji Diktovátko")
+        PID_FILE.unlink(missing_ok=True)  # úmyslné ukončení – hlídač ho znovu nespustí
         self.ducker.restore_now()
         self.hotkeys.stop()
         self.icon.stop()
@@ -865,7 +882,10 @@ if __name__ == "__main__":
     if "--after-update" in sys.argv:
         time.sleep(3)  # předchozí instance se po aktualizaci ještě ukončuje
     plat.init_process()
-    log.info("Spouštím Diktovátko %s (PID %d)", VERSION, os.getpid())
+    log.info("Spouštím Diktovátko %s (PID %d)%s", VERSION, os.getpid(),
+             " – znovu spuštěno hlídačem po nečekaném konci" if "--restarted" in sys.argv else "")
+    PID_FILE.write_text(str(os.getpid()), encoding="utf-8")
+    start_watchdog()
     try:
         App().run()
     except Exception:

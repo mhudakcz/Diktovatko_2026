@@ -2,6 +2,10 @@
 
 Číslo verze se posouvá s každou změnou: nová funkce zvýší prostřední číslo, oprava poslední. Verze 1.0.0 bude první, kterou prohlásíme za hotovou.
 
+## 0.23.0 – 2026-10-20
+
+- Hlídač (`watchdog.py`): Diktovátko při startu zapíše číslo procesu do `.pid` a spustí hlídače (běží jen jeden, `.watchdog.pid`). Ten každých 10 s ověří, že proces žije; když zmizel a `.pid` zůstal (Ukončit v menu ho maže), po druhé kontrole Diktovátko spustí znovu s `--restarted` a počká, až se nová instance zapíše. Během aktualizace (`.update_backup`) nic nedělá, víc než 3 restarty za 10 minut vzdá. Důvod: Diktovátko dvakrát zmizelo bez stopy současně s chybami ovladače (LiveKernelEvent, AppTermFailureEvent).
+
 ## 0.22.0 – 2026-10-20
 
 - Upozornění na ztišený mikrofon: u nahrávky zahozené jako tichá se zjistí hlasitost mikrofonu v systému (Windows: pycaw IAudioEndpointVolume, Mac: `input volume of (get volume settings)`). Pod 80 % indikátor napíše „Mikrofon na X %, zvyšte ho ve Windows“ (na Macu „v Nastavení“), jinak dál „Moc potichu“. Hlasitost mikrofonu se zapisuje do logu u každé tiché nahrávky.
