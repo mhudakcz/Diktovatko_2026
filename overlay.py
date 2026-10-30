@@ -186,8 +186,12 @@ class OverlayState:
         self.state = "hidden"
         self.message = ""
         self.since = time.time()
+        self.on_click, self.hold = None, None
 
-    def show(self, state, message=""):
+    def show(self, state, message="", on_click=None, hold=None):
+        """on_click = co udělat po kliknutí na indikátor (třeba otevřít nastavení mikrofonu),
+        hold = jak dlouho zůstane chybová hláška vidět (s)."""
+        self.on_click, self.hold = on_click, hold
         self.state, self.message, self.since = state, message, time.time()
 
     def hide(self):
@@ -195,7 +199,8 @@ class OverlayState:
 
     def current(self):
         """Vrátí stav k vykreslení (chyba po chvíli sama zmizí)."""
-        if self.state in ("error", "info") and time.time() - self.since > (3.0 if self.state == "info" else 2.2):
+        limit = self.hold or (3.0 if self.state == "info" else 2.2)
+        if self.state in ("error", "info") and time.time() - self.since > limit:
             self.state = "hidden"
         return self.state
 
@@ -346,6 +351,10 @@ class Overlay(OverlayState):
             key = self._monitor((x + self.w // 2, y + self.h // 2))[1]
             self.positions[key] = self._relative(x, y)
             self._save_positions()
+        elif self.on_click and self.current() in ("error", "info"):
+            action, self.on_click = self.on_click, None
+            self.hide()
+            threading.Thread(target=action, daemon=True).start()
         elif d["badge"] and self.on_toggle:
             threading.Thread(target=self.on_toggle, daemon=True).start()
         self._motion(e)

@@ -269,6 +269,11 @@ def page_url(app, hwnd=None):
     return None
 
 
+def open_mic_settings():
+    """Otevře zvukové nastavení Windows (sekce Vstup s hlasitostí mikrofonu)."""
+    os.startfile("ms-settings:sound")
+
+
 def mic_volume():
     """Hlasitost výchozího mikrofonu ve Windows v procentech, nebo None."""
     try:

@@ -408,6 +408,7 @@ class App:
                     checked=lambda _: self.cfg["offline"] or not config.groq_key(self.cfg),
                     enabled=lambda _: bool(config.groq_key(self.cfg)),
                 ),
+                pystray.MenuItem(tr("menu.mic"), lambda: threading.Thread(target=plat.open_mic_settings, daemon=True).start()),
                 pystray.MenuItem(tr("menu.history"), lambda: self.open_window("history"), default=True),
                 pystray.MenuItem(tr("menu.stats"), lambda: self.open_window("stats")),
                 pystray.MenuItem(tr("menu.settings"), lambda: self.open_window("settings")),
@@ -453,6 +454,10 @@ class App:
     def _error(self, message_key, **params):
         if self.cfg["sounds"]:
             plat.beep("error")
+        if message_key == "overlay.quiet_mic" and sys.platform == "win32" and self.overlay and self.cfg["overlay"]:
+            # Kliknutím na indikátor se otevře nastavení mikrofonu (na Macu na indikátor kliknout nejde).
+            self.overlay.show("error", t("overlay.quiet_mic_click", **params), on_click=plat.open_mic_settings, hold=6)
+            return
         self._show("error", t(message_key, **params))
 
     # --- nahrávání ---------------------------------------------------------

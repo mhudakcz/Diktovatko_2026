@@ -266,6 +266,14 @@ def _app_element(pid):
     return el
 
 
+def open_mic_settings():
+    """Otevře Nastavení systému → Zvuk → Vstup (novější macOS), jinak starší Předvolby zvuku."""
+    for url in ("x-apple.systempreferences:com.apple.Sound-Settings.extension?input",
+                "x-apple.systempreferences:com.apple.preference.sound?input"):
+        if subprocess.run(["open", url], capture_output=True).returncode == 0:
+            return
+
+
 def mic_volume():
     """Vstupní hlasitost mikrofonu v Nastavení systému (0–100), nebo None."""
     try:
